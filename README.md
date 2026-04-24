@@ -2,6 +2,12 @@
 
 Project template for wafer.space MPW runs using the gf180mcu PDK.
 
+## Helpful Commands
+
+```bash
+git submodule update --init --recursive
+```
+
 ## Prerequisites
 
 We use a custom fork of the [gf180mcuD PDK variant](https://github.com/wafer-space/gf180mcu) until all changes have been upstreamed.

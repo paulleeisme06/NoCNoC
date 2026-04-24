@@ -4,3 +4,9 @@
 [submodule "libs/gf180mcu_ocd_ip_sram"]
 	path = libs/gf180mcu_ocd_ip_sram
 	url = https://github.com/RTimothyEdwards/gf180mcu_ocd_ip_sram
+[submodule "src/serv"]
+	path = src/serv
+	url = git@github.com:olofk/serv.git
+[submodule "src/subservient"]
+	path = src/subservient
+	url = git@github.com:olofk/subservient.git
