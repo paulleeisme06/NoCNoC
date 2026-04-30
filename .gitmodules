@@ -7,6 +7,3 @@
 [submodule "src/serv"]
 	path = src/serv
 	url = git@github.com:olofk/serv.git
-[submodule "src/subservient"]
-	path = src/subservient
-	url = git@github.com:olofk/subservient.git
