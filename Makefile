@@ -22,17 +22,90 @@ ifeq ($(filter $(SLOT),$(AVAILABLE_SLOTS)),)
     $(error $(SLOT) does not exist in AVAILABLE_SLOTS: $(AVAILABLE_SLOTS))
 endif
 
+#----------------------------------------
+#Simulation Configuration:
+#----------------------------------------
+
+TOPLEVEL_LANG = verilog
+TOPLEVEL      = top
+#MODULE        = test_flash_mesh
+
+SRC   := $(MAKEFILE_DIR)/src
+FLASH := $(SRC)/flash_Sumi
+MESH  := $(SRC)/mesh
+DFT   := $(SRC)/dft
+
+VERILOG_EXTRA_DIRS = \
+    $(MAKEFILE_DIR)/src/serv/rtl \
+    $(MAKEFILE_DIR)/src/serv/servile \
+    $(MAKEFILE_DIR)/src/subservient/rtl
+
+VERILOG_EXTRA = $(wildcard $(addsuffix /*.v,$(VERILOG_EXTRA_DIRS)))
+
+VERILOG_SOURCES := \
+    $(SRC)/top.v \
+	$(MESH)/boot_controller.v \
+    $(MESH)/mesh_3x3.v \
+    $(MESH)/mesh_tile.v \
+    $(MESH)/mesh_router.v \
+    $(FLASH)/host_spi_slave.v \
+    $(FLASH)/rd_crossbar.v \
+    $(FLASH)/spi_arbiter.v \
+    $(FLASH)/hk_boot_adapter.v \
+    $(FLASH)/housekeeping.sv \
+    $(FLASH)/flash_clk.sv \
+    $(FLASH)/shiftregister.sv \
+    $(DFT)/gf180mcu_fd_ip_sram__sram2048x8m8wm1.v \
+    $(VERILOG_EXTRA)
+
+export VERILOG_SOURCES
+
+SIM = verilator
+
+COMPILE_ARGS += \
+    --timing \
+    -I$(SRC) \
+    -I$(FLASH) \
+    -I$(MESH) \
+    $(addprefix -I,$(VERILOG_EXTRA_DIRS)) \
+    -Wno-PINMISSING \
+    -Wno-MODDUP \
+    -Wno-MINTYPMAXDLY \
+    -Wno-MULTIDRIVEN
+#-------------------------------------
+#Help
+#-------------------------------------
+include $(shell cocotb-config --makefiles)/Makefile.sim
+
 .DEFAULT_GOAL := help
 
-help: ## Show this help message
+#Can add another target by using the ## sign 
+help: ## Show this help message 
 	@echo 'Usage: make [target]'
 	@echo ''
-	@echo 'Available targets:'
-	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  %-20s %s\n", $$1, $$2}'
+	@echo 'Simulation:'
+	@grep -E '^sim[a-zA-Z_-]*:.*?## .*$$' $(MAKEFILE_LIST) | \
+		awk 'BEGIN {FS = ":.*?## "}; {printf "  %-20s %s\n", $$1, $$2}'
+	@echo ''
+	@echo 'ASIC Flow:'
+	@grep -E '^librelane[a-zA-Z_-]*:.*?## .*$$' $(MAKEFILE_LIST) | \
+		awk 'BEGIN {FS = ":.*?## "}; {printf "  %-20s %s\n", $$1, $$2}'
+	@echo ''
+	@echo 'PDK / Setup:'
+	@grep -E '^(clone|install|render)[a-zA-Z_-]*:.*?## .*$$' $(MAKEFILE_LIST) | \
+		awk 'BEGIN {FS = ":.*?## "}; {printf "  %-20s %s\n", $$1, $$2}'
 .PHONY: help
 
 all: librelane ## Build the project (runs LibreLane)
 .PHONY: all
+
+sim-flash: ## Run flash->housekeeping->mesh SRAM test
+	$(MAKE) results.xml \
+		MODULE=test_flash_mesh \
+		SIM_BUILD=sim_build/flash \
+		PYTHONPATH=$(MAKEFILE_DIR)/cocotb:$(PYTHONPATH)
+		VERILOG_SOURCES="$(VERILOG_SOURCES)"
+.PHONY: sim-flash
 
 clone-pdk: ## Clone the GF180MCU PDK repository
 	rm -rf $(MAKEFILE_DIR)/gf180mcu

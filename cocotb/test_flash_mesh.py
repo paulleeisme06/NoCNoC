@@ -48,11 +48,18 @@ async def flash_populates_all_tile_srams(dut):
     dut.rst.value = 0
 
     dut._log.info("Reset released — Verilog will $display SRAM contents on done_loading")
-
-    # Just wait — the always @(posedge hk_done_loading) block in top.v
-    # will print SRAM contents and call $finish automatically
-    for _ in range(600_000):
+    # Wait for internal boot_controller to finish
+    for cycle in range(600_000):
         await RisingEdge(dut.clk)
+        try:
+            v = dut.mesh_inst.cpu_rst_n.value
+            if v.is_resolvable and int(v) == 1:
+                dut._log.info(f"cpu_rst_n asserted at cycle {cycle}")
+                break
+        except Exception:
+            pass
+    # Just wait — the always @(posedge hk_done_loading) block in top.v
+    # will print SRAM contents and call $finish automatically   
 
     dut._log.info("Reached cycle limit")
 """
