@@ -20,30 +20,23 @@ module mesh_tile #(
     wire [3:0]  wb_sel;
     wire        wb_we, wb_stb, wb_ack;
 
-    wire [10:0] sram_waddr, sram_raddr;
+    wire [9:0] sram_waddr, sram_raddr;
     wire [7:0] sram_wdata, sram_rdata;
     wire       sram_wen, sram_ren;
 
-    reg boot_mode_q;
-    always @(posedge clk or posedge rst)
-        if (rst) boot_mode_q <= 1'b1;
-        else     boot_mode_q <= boot_mode;
-
-    // One-cycle HIGH pulse on the clock edge where boot_mode falls.
-    wire cpu_sram_init_pulse = boot_mode_q & ~boot_mode;
-
-    // Address / Data MUX
-    wire [10:0] final_a = boot_mode ? boot_addr : (sram_wen ? sram_waddr : sram_raddr);
-    wire [7:0]  final_d = boot_mode ? boot_data : sram_wdata;
-
-    // SRAM control
-    wire sram_active = boot_mode ? ~boot_wen : ~cpu_sram_init_pulse;
-    wire sram_write  = boot_mode ? ~boot_wen : sram_wen;
+    // -----------------------------------------------------------------------
+    // Boot mode mux — during boot, use boot bus; during run, use subservient
+    // -----------------------------------------------------------------------
+    wire [9:0]  final_waddr = boot_mode ? boot_addr[9:0] : sram_waddr;
+    wire [7:0]  final_wdata = boot_mode ? boot_data      : sram_wdata;
+    wire        final_wen   = boot_mode ? ~boot_wen       : sram_wen;
+    wire [9:0]  final_raddr = boot_mode ? boot_addr[9:0] : sram_raddr;
+    wire        final_ren   = boot_mode ? 1'b0            : sram_ren;
 
     // -----------------------------------------------------------------------
     // Subservient RISC-V core
     // -----------------------------------------------------------------------
-    subservient_core #(.memsize(2048)) core_inst (
+    subservient_core #(.memsize(1024)) core_inst (
         .i_clk       (clk),
         .i_rst       (rst | boot_mode),
         .o_sram_waddr(sram_waddr),
@@ -62,78 +55,18 @@ module mesh_tile #(
     );
 
     // -----------------------------------------------------------------------
-    // Two 1024x8 SRAMs to make 2048x8
-    // final_a[10] selects which bank: 0 = lower, 1 = upper
+    // GF180 1024x8 SRAM wrapper
     // -----------------------------------------------------------------------
-    wire sram0_active = sram_active & ~final_a[10];
-    wire sram1_active = sram_active &  final_a[10];
-    wire [7:0] sram0_out, sram1_out;
-
-    gf180mcu_ocd_ip_sram__sram1024x8m8wm1 sram_inst0 (
-        .CLK (clk),
-        .CEN (~sram0_active),
-        .GWEN(~sram_write),
-        .WEN (8'b0),
-        .A   (final_a[9:0]),
-        .D   (final_d),
-        .Q   (sram0_out)
+    subservient_gf180_ram_1024x8 #(.depth(1024)) sram_inst (
+        .i_clk   (clk),
+        .i_rst   (rst),
+        .i_waddr (final_waddr),
+        .i_wdata (final_wdata),
+        .i_wen   (final_wen),
+        .i_raddr (final_raddr),
+        .o_rdata (sram_rdata),
+        .i_ren   (final_ren)
     );
-
-    gf180mcu_ocd_ip_sram__sram1024x8m8wm1 sram_inst1 (
-        .CLK (clk),
-        .CEN (~sram1_active),
-        .GWEN(~sram_write),
-        .WEN (8'b0),
-        .A   (final_a[9:0]),
-        .D   (final_d),
-        .Q   (sram1_out)
-    );
-
-    assign sram_rdata = final_a[10] ? sram1_out : sram0_out;
-
-    // -----------------------------------------------------------------------
-    // Debug monitors (simulation only)
-    // -----------------------------------------------------------------------
-`ifndef SYNTHESIS
-    always @(posedge clk) begin
-        if (!boot_mode && sram_wen && final_d != 8'h00 && TILE_ID == 4) begin
-            $display("[SRAM t=%0t] MY_ID=%0d WRITE addr=0x%03x data=0x%02x",
-                     $time, TILE_ID, final_a, final_d);
-        end
-    end
-
-    always @(posedge clk) begin
-        if (!boot_mode && TILE_ID == 0 && sram_wen) begin
-            if (final_a >= 11'h600 && final_a <= 11'h609)
-                $display("[GHOST_BUF t=%0t] TILE(0,0) ghost_N[%0d] <= %0d  (addr=0x%03x)",
-                         $time, {21'b0, final_a} - 32'h600, final_d, final_a);
-            if (final_a >= 11'h60A && final_a <= 11'h613)
-                $display("[GHOST_BUF t=%0t] TILE(0,0) ghost_S[%0d] <= %0d  (addr=0x%03x)",
-                         $time, {21'b0, final_a} - 32'h60A, final_d, final_a);
-            if (final_a >= 11'h614 && final_a <= 11'h61D)
-                $display("[GHOST_BUF t=%0t] TILE(0,0) ghost_W[%0d] <= %0d  (addr=0x%03x)",
-                         $time, {21'b0, final_a} - 32'h614, final_d, final_a);
-            if (final_a >= 11'h61E && final_a <= 11'h627)
-                $display("[GHOST_BUF t=%0t] TILE(0,0) ghost_E[%0d] <= %0d  (addr=0x%03x)",
-                         $time, {21'b0, final_a} - 32'h61E, final_d, final_a);
-        end
-    end
-
-    always @(posedge clk) begin
-        if (!boot_mode && TILE_ID == 0 && sram_wen &&
-            final_a >= 11'h640 && final_a <= 11'h6A3) begin
-            begin : ng_block
-                integer ng_off, ng_row, ng_col;
-                ng_off = {21'b0, final_a} - 32'h640;
-                ng_row = ng_off / 10;
-                ng_col = ng_off % 10;
-                if (ng_row == 0 || ng_row == 9 || ng_col == 0 || ng_col == 9)
-                    $display("[NEXT_GRID t=%0t] TILE(0,0) next_grid[%0d][%0d] <= %0d  (addr=0x%03x)",
-                             $time, ng_row, ng_col, final_d, final_a);
-            end
-        end
-    end
-`endif
 
     // -----------------------------------------------------------------------
     // Mesh router

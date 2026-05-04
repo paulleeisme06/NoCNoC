@@ -33,6 +33,31 @@ VERILOG_FILES:
 - dir::../src/mesh - Psi&Aan/mesh_router.v
 - dir::../src/mesh - Psi&Aan/boot_loader.v
 - dir::../src/host-to-chip - Paul&Andrea/host_to_chip.v
+- dir::../src/subservient/rtl/subservient_core.v
+- dir::../src/subservient/rtl/subservient_rf_ram_if.v
+- dir::../src/subservient/rtl/subservient_ram.v
+- dir::../src/subservient/rtl/subservient_generic_ram.v
+- dir::../src/subservient/rtl/subservient_gf180_ram_1024x8.v
+- dir::../src/serv/rtl/serv_top.v
+- dir::../src/serv/rtl/serv_rf_top.v
+- dir::../src/serv/rtl/serv_rf_ram.v
+- dir::../src/serv/rtl/serv_rf_ram_if.v
+- dir::../src/serv/rtl/serv_rf_if.v
+- dir::../src/serv/rtl/serv_state.v
+- dir::../src/serv/rtl/serv_decode.v
+- dir::../src/serv/rtl/serv_alu.v
+- dir::../src/serv/rtl/serv_ctrl.v
+- dir::../src/serv/rtl/serv_mem_if.v
+- dir::../src/serv/rtl/serv_immdec.v
+- dir::../src/serv/rtl/serv_bufreg.v
+- dir::../src/serv/rtl/serv_bufreg2.v
+- dir::../src/serv/rtl/serv_csr.v
+- dir::../src/serv/rtl/serv_aligner.v
+- dir::../src/serv/rtl/serv_compdec.v
+- dir::../src/serv/servile/servile_rf_mem_if.v
+- dir::../src/serv/servile/servile_arbiter.v
+- dir::../src/serv/servile/servile_mux.v
+- dir::../src/serv/servile/servile.v
 - dir::../libs/gf180mcu_ocd_ip_sram/cells/gf180mcu_ocd_ip_sram__sram1024x8m8wm1/gf180mcu_ocd_ip_sram__sram1024x8m8wm1.blackbox.v
 
 # Enable plugin for better SystemVerilog support
