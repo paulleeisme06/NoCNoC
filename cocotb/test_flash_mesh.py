@@ -18,12 +18,16 @@ FIRMWARE = load_firmware()
 async def spi_flash_stream(dut):
     while True:
         await FallingEdge(dut.flash_csb)
+                # Skip 32 bits command+address
+        for _ in range(32):
+            await RisingEdge(dut.flash_clk)
         byte_idx = 0
         while True:
             for bit in range(7, -1, -1):
                 await FallingEdge(dut.flash_clk)
                 b = FIRMWARE[byte_idx] if byte_idx < len(FIRMWARE) else 0xFF
                 dut.flash_miso.value = (b >> bit) & 1
+                await RisingEdge(dut.flash_clk)  # wait for sample
             byte_idx += 1
             try:
                 if int(dut.flash_csb.value) == 1:
@@ -58,10 +62,55 @@ async def flash_populates_all_tile_srams(dut):
                 break
         except Exception:
             pass
-    # Just wait — the always @(posedge hk_done_loading) block in top.v
     # will print SRAM contents and call $finish automatically   
 
     dut._log.info("Reached cycle limit")
+
+    # settle after cpu_rst_n
+    for _ in range(10):
+        await RisingEdge(dut.clk)
+
+    # check all 9 tiles
+    exp = [0x13, 0x01, 0x00, 0x40]
+    dut._log.info(f"Expected SRAM[0:3] = {[hex(b) for b in exp]}")
+
+    errors = 0
+    tiles = [
+        (0,0), (0,1), (0,2),
+        (1,0), (1,1), (1,2),
+        (2,0), (2,1), (2,2)
+    ]
+    for (r, c) in tiles:
+        actual = []
+        for addr in range(4):
+            try:
+                val = dut.mesh_inst.rows[r].cols[c].tile_inst.sram_inst.mem[addr].value
+                if val.is_resolvable:
+                    actual.append(int(val) & 0xFF)
+                else:
+                    actual.append(None)
+            except Exception:
+                actual.append(None)
+
+        if None in actual:
+            dut._log.error(f"tile({r},{c}): X/Z {actual}")
+            errors += 1
+        elif actual != exp:
+            dut._log.error(
+                f"tile({r},{c}): MISMATCH "
+                f"got={[hex(b) for b in actual]} "
+                f"exp={[hex(b) for b in exp]}"
+            )
+            errors += 1
+        else:
+            dut._log.info(f"tile({r},{c}): PASS {[hex(b) for b in actual]}")
+
+        await RisingEdge(dut.clk)
+
+    if errors == 0:
+        dut._log.info("ALL 9 TILES PASS")
+    else:
+        raise AssertionError(f"{errors} tile(s) failed")
 """
 @cocotb.test()
 async def flash_populates_all_tile_srams(dut):

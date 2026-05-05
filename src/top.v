@@ -81,8 +81,59 @@ module top (
             mesh_inst.rows[2].cols[2].tile_inst.sram_inst.mem[2],
             mesh_inst.rows[2].cols[2].tile_inst.sram_inst.mem[3]);
         $display("Expected: [0]=40 [1]=00 [2]=01 [3]=13");
-        $finish;
     end
+
+    always @(posedge mesh_inst.cpu_rst_n) begin
+    #200;
+    $display("=== NOC BOOT SRAM CHECK ===");
+    $display("tile(0,0) [0]=%02x [1]=%02x [2]=%02x [3]=%02x",
+        mesh_inst.rows[0].cols[0].tile_inst.sram_inst.mem[0],
+        mesh_inst.rows[0].cols[0].tile_inst.sram_inst.mem[1],
+        mesh_inst.rows[0].cols[0].tile_inst.sram_inst.mem[2],
+        mesh_inst.rows[0].cols[0].tile_inst.sram_inst.mem[3]);
+    $display("tile(0,1) [0]=%02x [1]=%02x [2]=%02x [3]=%02x",
+        mesh_inst.rows[0].cols[1].tile_inst.sram_inst.mem[0],
+        mesh_inst.rows[0].cols[1].tile_inst.sram_inst.mem[1],
+        mesh_inst.rows[0].cols[1].tile_inst.sram_inst.mem[2],
+        mesh_inst.rows[0].cols[1].tile_inst.sram_inst.mem[3]);
+    $display("tile(0,2) [0]=%02x [1]=%02x [2]=%02x [3]=%02x",
+        mesh_inst.rows[0].cols[2].tile_inst.sram_inst.mem[0],
+        mesh_inst.rows[0].cols[2].tile_inst.sram_inst.mem[1],
+        mesh_inst.rows[0].cols[2].tile_inst.sram_inst.mem[2],
+        mesh_inst.rows[0].cols[2].tile_inst.sram_inst.mem[3]);
+    $display("tile(1,0) [0]=%02x [1]=%02x [2]=%02x [3]=%02x",
+        mesh_inst.rows[1].cols[0].tile_inst.sram_inst.mem[0],
+        mesh_inst.rows[1].cols[0].tile_inst.sram_inst.mem[1],
+        mesh_inst.rows[1].cols[0].tile_inst.sram_inst.mem[2],
+        mesh_inst.rows[1].cols[0].tile_inst.sram_inst.mem[3]);
+    $display("tile(1,1) [0]=%02x [1]=%02x [2]=%02x [3]=%02x",
+        mesh_inst.rows[1].cols[1].tile_inst.sram_inst.mem[0],
+        mesh_inst.rows[1].cols[1].tile_inst.sram_inst.mem[1],
+        mesh_inst.rows[1].cols[1].tile_inst.sram_inst.mem[2],
+        mesh_inst.rows[1].cols[1].tile_inst.sram_inst.mem[3]);
+    $display("tile(1,2) [0]=%02x [1]=%02x [2]=%02x [3]=%02x",
+        mesh_inst.rows[1].cols[2].tile_inst.sram_inst.mem[0],
+        mesh_inst.rows[1].cols[2].tile_inst.sram_inst.mem[1],
+        mesh_inst.rows[1].cols[2].tile_inst.sram_inst.mem[2],
+        mesh_inst.rows[1].cols[2].tile_inst.sram_inst.mem[3]);
+    $display("tile(2,0) [0]=%02x [1]=%02x [2]=%02x [3]=%02x",
+        mesh_inst.rows[2].cols[0].tile_inst.sram_inst.mem[0],
+        mesh_inst.rows[2].cols[0].tile_inst.sram_inst.mem[1],
+        mesh_inst.rows[2].cols[0].tile_inst.sram_inst.mem[2],
+        mesh_inst.rows[2].cols[0].tile_inst.sram_inst.mem[3]);
+    $display("tile(2,1) [0]=%02x [1]=%02x [2]=%02x [3]=%02x",
+        mesh_inst.rows[2].cols[1].tile_inst.sram_inst.mem[0],
+        mesh_inst.rows[2].cols[1].tile_inst.sram_inst.mem[1],
+        mesh_inst.rows[2].cols[1].tile_inst.sram_inst.mem[2],
+        mesh_inst.rows[2].cols[1].tile_inst.sram_inst.mem[3]);
+    $display("tile(2,2) [0]=%02x [1]=%02x [2]=%02x [3]=%02x",
+        mesh_inst.rows[2].cols[2].tile_inst.sram_inst.mem[0],
+        mesh_inst.rows[2].cols[2].tile_inst.sram_inst.mem[1],
+        mesh_inst.rows[2].cols[2].tile_inst.sram_inst.mem[2],
+        mesh_inst.rows[2].cols[2].tile_inst.sram_inst.mem[3]);
+    $display("Expected all tiles: [0]=13 [1]=01 [2]=00 [3]=40");
+    $finish;
+end
 
 endmodule
 
