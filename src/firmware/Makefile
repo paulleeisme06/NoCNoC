@@ -19,7 +19,7 @@ COCOTB_DIR  := $(ROOT_DIR)/cocotb
 # --- FIRMWARE FILES ---
 ########################################
 TARGET_ELF := $(FW_DIR)/firmware.elf
-TARGET_BIN := $(FW_DIR)/firmware.bin
+TARGET_BIN := $(SRC_DIR)/firmware.bin
 TARGET_HEX := $(FW_DIR)/firmware.hex
 
 FW_SRC := $(FW_DIR)/main.c
@@ -46,6 +46,7 @@ export TOPLEVEL
 export MODULE
 export SIM
 
+# Let cocotb find test_mesh.py in ~/NoCNoC/cocotb
 export PYTHONPATH := $(COCOTB_DIR):$(PYTHONPATH)
 
 VERILOG_EXTRA_DIRS = \
@@ -95,8 +96,15 @@ $(TARGET_BIN): $(TARGET_ELF)
 	$(OBJCOPY) -O binary $< $@
 	truncate -s 2048 $@
 
+# Optional hex rule; not used by sim unless you call make hex
+hex: $(TARGET_HEX)
+
 $(TARGET_HEX): $(TARGET_BIN)
-	cd $(FW_DIR) && python3 bin2hex.py firmware.bin firmware.hex
+	@if [ -f "$(FW_DIR)/bin2hex.py" ]; then \
+		cd $(FW_DIR) && python3 bin2hex.py $(TARGET_BIN) firmware.hex; \
+	else \
+		echo "Skipping firmware.hex: bin2hex.py not found in $(FW_DIR)"; \
+	fi
 
 size_check: $(TARGET_ELF)
 	@echo "--- FIRMWARE SIZE REPORT ---"
@@ -105,14 +113,19 @@ size_check: $(TARGET_ELF)
 ########################################
 # --- SIMULATION ---
 ########################################
-sim: $(TARGET_BIN)
-	cd $(FW_DIR) && $(MAKE) -f $(shell cocotb-config --makefiles)/Makefile.sim
+sim: $(TARGET_BIN) size_check
+	cd $(SRC_DIR) && $(MAKE) -f $(shell cocotb-config --makefiles)/Makefile.sim
 
 ########################################
 # --- CLEAN ---
 ########################################
 clean:
-	rm -f $(TARGET_ELF) $(TARGET_BIN) $(TARGET_HEX)
-	rm -rf $(FW_DIR)/sim_build
+	rm -f $(TARGET_ELF)
+	rm -f $(TARGET_HEX)
+	rm -f $(SRC_DIR)/firmware.bin
+	rm -f $(FW_DIR)/firmware.bin
+	rm -rf $(SRC_DIR)/sim_build
+	rm -f $(SRC_DIR)/results.xml
+	rm -f $(SRC_DIR)/dump.fst
 	rm -f $(FW_DIR)/results.xml
 	rm -f $(FW_DIR)/dump.fst
