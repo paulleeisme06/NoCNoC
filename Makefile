@@ -75,7 +75,11 @@ COMPILE_ARGS += \
 #-------------------------------------
 #Help
 #-------------------------------------
-include $(shell cocotb-config --makefiles)/Makefile.sim
+# Only include cocotb Makefile.sim if cocotb-config is available
+COCOTB_MAKEFILES := $(shell cocotb-config --makefiles 2>/dev/null)
+ifneq ($(COCOTB_MAKEFILES),)
+    include $(COCOTB_MAKEFILES)/Makefile.sim
+endif
 
 .DEFAULT_GOAL := help
 
