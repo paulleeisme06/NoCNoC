@@ -80,27 +80,96 @@ module mesh_tile #(
     // One-cycle HIGH pulse on the clock edge where boot_mode falls.
     wire cpu_sram_init_pulse = boot_mode_q & ~boot_mode;
 
+
+    // -----------------------------------------------------------------------
+    // NOC Boot Reciever 
+    // -----------------------------------------------------------------------
+    //  Boot flit payload encoding (set by noc_boot_injector in top.v):
+    //   flit[33]    = valid
+    //   flit[32:29] = dest tile ID
+    //   flit[28:25] = FLIT_TYPE_BOOT = 4'hE
+    //   flit[24:14] = SRAM address [10:0]  (11 bits, covers 2048 bytes)
+    //   flit[13:8] = reserved
+    //   flit[7:0] = data byte
+    //  This uses the boot flits and writes them to SRAM rather than the broadcast bus (which was the implementation before)
+    localparam FLIT_TYPE_BOOT = 4'hE;
+
+    wire [33:0] router_eject_head  = router_inst.fifo_head_comb;
+    wire        router_eject_empty = router_inst.fifo_empty;
+
+    wire flit_is_boot = !router_eject_empty &&
+                        (router_eject_head[28:25] == FLIT_TYPE_BOOT);
+
+    wire noc_boot_active = boot_mode && flit_is_boot;
+
+    wire [10:0] noc_boot_addr_dec = router_eject_head[24:14];
+    wire [7:0]  noc_boot_data_dec = router_eject_head[7:0];
+
+    localparam NB_IDLE  = 2'd0;
+    localparam NB_WRITE = 2'd1;
+    localparam NB_POP   = 2'd2;
+
+    reg [1:0]  nb_state;
+    reg [10:0] nb_addr_latch;
+    reg [7:0]  nb_data_latch;
+    reg        nb_wen;
+    reg        nb_pop;
+
+    always @(posedge clk) begin
+        if (rst) begin
+            nb_state      <= NB_IDLE;
+            nb_wen        <= 0;
+            nb_pop        <= 0;
+            nb_addr_latch <= 0;
+            nb_data_latch <= 0;
+        end else begin
+            nb_wen <= 0;
+            nb_pop <= 0;
+
+            case (nb_state)
+                NB_IDLE: begin
+                    if (noc_boot_active) begin
+                        nb_addr_latch <= noc_boot_addr_dec;
+                        nb_data_latch <= noc_boot_data_dec;
+                        nb_state      <= NB_WRITE;
+                    end
+                end
+                NB_WRITE: begin
+                    nb_wen   <= 1;
+                    nb_state <= NB_POP;
+                    $display("[NOC_BOOT t=%0t] TILE %0d writing addr=0x%03x data=0x%02x",
+                        $time, TILE_ID, nb_addr_latch, nb_data_latch);
+                end
+                NB_POP: begin
+                    nb_pop   <= 1;
+                    nb_state <= NB_IDLE;
+                end
+                default: nb_state <= NB_IDLE;
+            endcase
+        end
+    end
+
+    // Fake WB read to pop the flit — only fires during boot_mode
+    wire boot_pop_active = boot_mode && nb_pop;
+
     // -----------------------------------------------------------------------
     // Address / Data MUX
     // -----------------------------------------------------------------------
     // Boot mode : use raw bootloader signals (the bootloader is slow enough
     //             that its address/data are stable well before the clock edge).
     // CPU mode  : bypass the extra register to provide 1-cycle latency.
-    // Ethan : I edited this to be a 3 way mux with DFT having the highest priority
-    wire [10:0] final_a = dft_mode ? dft_addr : boot_mode ? boot_addr : (sram_wen ? sram_waddr : sram_raddr);
-    wire [7:0] final_d  = dft_mode ? dft_wdata : boot_mode ? boot_data : sram_wdata;
-
+    wire [10:0] final_a = boot_mode ? boot_addr  : (sram_wen ? sram_waddr : sram_raddr);
+    wire [7:0] final_d = boot_mode ? boot_data  : sram_wdata;
 
     // -----------------------------------------------------------------------
     // SRAM control
     // -----------------------------------------------------------------------
     // Boot  : CEN pulses LOW per byte write (boot_wen active-LOW).
     // CPU   : CEN=HIGH for init-pulse cycle, then permanently LOW.
-    // Ethan: Edited these two signals as well to include DFT interface
-    wire sram_active = dft_mode ? dft_ce : boot_mode ? ~boot_wen : ~cpu_sram_init_pulse;
+    wire sram_active = boot_mode ? ~boot_wen : ~cpu_sram_init_pulse;
 
     // GWEN (active-LOW): asserted during writes only.
-    wire sram_write = dft_mode ? dft_we : boot_mode ? ~boot_wen : sram_wen;
+    wire sram_write = boot_mode ? ~boot_wen : sram_wen;
 
     // -----------------------------------------------------------------------
     // Subservient RISC-V core
@@ -198,11 +267,11 @@ module mesh_tile #(
     mesh_router #(.MY_ID(TILE_ID)) router_inst (
         .clk            (clk),
         .rst            (rst),
-        .local_wb_adr   (wb_adr),
-        .local_wb_dat_o (wb_dat_c2r),
+        .local_wb_adr   (final_wb_adr),
+        .local_wb_dat_o (final_wb_dat),
         .local_wb_dat_i (wb_dat_r2c),
-        .local_wb_we    (wb_we),
-        .local_wb_stb   (wb_stb),
+        .local_wb_we    (final_wb_we),
+        .local_wb_stb   (final_wb_stb),
         .local_wb_ack   (wb_ack),
         .n_in (north_in),  .s_in (south_in),  .e_in (east_in),  .w_in (west_in),
         .n_out(north_out), .s_out(south_out), .e_out(east_out), .w_out(west_out),
