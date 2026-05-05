@@ -1,0 +1,511 @@
+--- FIRMWARE SIZE REPORT ---
+   text	   data	    bss	    dec	    hex	filename
+   1164	      0	      0	   1164	    48c	/home/psi19/NoCNoC/src/firmware/firmware.elf
+cd /home/psi19/NoCNoC/src && make -f /home/psi19/.local/share/pipx/venvs/cocotb/lib/python3.12/site-packages/cocotb_tools/makefiles/Makefile.sim
+make[1]: Entering directory '/home/psi19/NoCNoC/src'
+rm -f results.xml
+"make" -f /home/psi19/.local/share/pipx/venvs/cocotb/lib/python3.12/site-packages/cocotb_tools/makefiles/Makefile.sim results.xml
+make[2]: Entering directory '/home/psi19/NoCNoC/src'
+mkdir -p sim_build
+/usr/local/bin/verilator -cc --exe -Mdir sim_build --top-module mesh_3x3 --timing -Wno-PINMISSING -Wno-SPECIFYIGN -Wno-MODDUP -Wno-MINTYPMAXDLY --trace --trace-depth 6 --timescale 1ns/1ps --vpi --public-flat-rw --prefix Vtop -o Vtop -LDFLAGS "-Wl,-rpath,/home/psi19/.local/share/pipx/venvs/cocotb/lib/python3.12/site-packages/cocotb/libs -L/home/psi19/.local/share/pipx/venvs/cocotb/lib/python3.12/site-packages/cocotb/libs -lcocotbvpi_verilator" --timescale 1ns/1ps --vpi --public-flat-rw --prefix Vtop -o Vtop -LDFLAGS "-Wl,-rpath,/home/psi19/.local/share/pipx/venvs/cocotb/lib/python3.12/site-packages/cocotb/libs -L/home/psi19/.local/share/pipx/venvs/cocotb/lib/python3.12/site-packages/cocotb/libs -lcocotbvpi_verilator"  /home/psi19/NoCNoC/src/mesh_psi_aan/mesh_3x3.v /home/psi19/NoCNoC/src/mesh_psi_aan/mesh_tile.v /home/psi19/NoCNoC/src/mesh_psi_aan/mesh_router.v /home/psi19/NoCNoC/src/dft_ethan/gf180mcu_fd_ip_sram__sram2048x8m8wm1.v /home/psi19/NoCNoC/src/mesh_psi_aan/boot_loader.v /home/psi19/NoCNoC/src/subservient/rtl/subservient.v /home/psi19/NoCNoC/src/subservient/rtl/subservient_core.v /home/psi19/NoCNoC/src/subservient/rtl/subservient_debug_switch.v /home/psi19/NoCNoC/src/subservient/rtl/subservient_fpga.v /home/psi19/NoCNoC/src/subservient/rtl/subservient_generic_ram.v /home/psi19/NoCNoC/src/subservient/rtl/subservient_gpio.v /home/psi19/NoCNoC/src/subservient/rtl/subservient_nexys_a7_clock_gen.v /home/psi19/NoCNoC/src/subservient/rtl/subservient_ram.v /home/psi19/NoCNoC/src/subservient/rtl/subservient_rf_ram_if.v /home/psi19/NoCNoC/src/serv/rtl/serv_aligner.v /home/psi19/NoCNoC/src/serv/rtl/serv_alu.v /home/psi19/NoCNoC/src/serv/rtl/serv_bufreg.v /home/psi19/NoCNoC/src/serv/rtl/serv_bufreg2.v /home/psi19/NoCNoC/src/serv/rtl/serv_compdec.v /home/psi19/NoCNoC/src/serv/rtl/serv_csr.v /home/psi19/NoCNoC/src/serv/rtl/serv_ctrl.v /home/psi19/NoCNoC/src/serv/rtl/serv_debug.v /home/psi19/NoCNoC/src/serv/rtl/serv_decode.v /home/psi19/NoCNoC/src/serv/rtl/serv_immdec.v /home/psi19/NoCNoC/src/serv/rtl/serv_mem_if.v /home/psi19/NoCNoC/src/serv/rtl/serv_rf_if.v /home/psi19/NoCNoC/src/serv/rtl/serv_rf_ram.v /home/psi19/NoCNoC/src/serv/rtl/serv_rf_ram_if.v /home/psi19/NoCNoC/src/serv/rtl/serv_rf_top.v /home/psi19/NoCNoC/src/serv/rtl/serv_state.v /home/psi19/NoCNoC/src/serv/rtl/serv_synth_wrapper.v /home/psi19/NoCNoC/src/serv/rtl/serv_top.v /home/psi19/NoCNoC/src/serv/servile/servile.v /home/psi19/NoCNoC/src/serv/servile/servile_arbiter.v /home/psi19/NoCNoC/src/serv/servile/servile_mux.v /home/psi19/NoCNoC/src/serv/servile/servile_rf_mem_if.v /home/psi19/.local/share/pipx/venvs/cocotb/lib/python3.12/site-packages/cocotb/share/lib/verilator/verilator.cpp
+- V e r i l a t i o n   R e p o r t: Verilator 5.044 2026-01-01 rev v5.044
+- Verilator: Built from 4.232 MB sources in 39 modules, into 12.499 MB in 25 C++ files needing 0.001 MB
+- Verilator: Walltime 1.149 s (elab=0.063, cvt=0.914, bld=0.000); cpu 1.141 s on 1 threads; alloced 97.258 MB
+make -C sim_build  -f Vtop.mk
+make[3]: Entering directory '/home/psi19/NoCNoC/src/sim_build'
+ccache g++  -I.  -MMD -I/usr/local/share/verilator/include -I/usr/local/share/verilator/include/vltstd -DVERILATOR=1 -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TIMING=1 -DVM_TRACE=1 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=1 -DVM_TRACE_SAIF=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-int-in-bool-context -Wno-shadow -Wno-sign-compare -Wno-subobject-linkage -Wno-tautological-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable      -fcoroutines -Os  -c -o verilator.o /home/psi19/.local/share/pipx/venvs/cocotb/lib/python3.12/site-packages/cocotb/share/lib/verilator/verilator.cpp
+ccache g++ -Os  -I.  -MMD -I/usr/local/share/verilator/include -I/usr/local/share/verilator/include/vltstd -DVERILATOR=1 -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TIMING=1 -DVM_TRACE=1 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=1 -DVM_TRACE_SAIF=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-int-in-bool-context -Wno-shadow -Wno-sign-compare -Wno-subobject-linkage -Wno-tautological-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable      -fcoroutines -c -o verilated.o /usr/local/share/verilator/include/verilated.cpp
+ccache g++ -Os  -I.  -MMD -I/usr/local/share/verilator/include -I/usr/local/share/verilator/include/vltstd -DVERILATOR=1 -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TIMING=1 -DVM_TRACE=1 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=1 -DVM_TRACE_SAIF=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-int-in-bool-context -Wno-shadow -Wno-sign-compare -Wno-subobject-linkage -Wno-tautological-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable      -fcoroutines -c -o verilated_dpi.o /usr/local/share/verilator/include/verilated_dpi.cpp
+ccache g++ -Os  -I.  -MMD -I/usr/local/share/verilator/include -I/usr/local/share/verilator/include/vltstd -DVERILATOR=1 -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TIMING=1 -DVM_TRACE=1 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=1 -DVM_TRACE_SAIF=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-int-in-bool-context -Wno-shadow -Wno-sign-compare -Wno-subobject-linkage -Wno-tautological-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable      -fcoroutines -c -o verilated_vpi.o /usr/local/share/verilator/include/verilated_vpi.cpp
+ccache g++ -Os  -I.  -MMD -I/usr/local/share/verilator/include -I/usr/local/share/verilator/include/vltstd -DVERILATOR=1 -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TIMING=1 -DVM_TRACE=1 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=1 -DVM_TRACE_SAIF=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-int-in-bool-context -Wno-shadow -Wno-sign-compare -Wno-subobject-linkage -Wno-tautological-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable      -fcoroutines -c -o verilated_vcd_c.o /usr/local/share/verilator/include/verilated_vcd_c.cpp
+ccache g++ -Os  -I.  -MMD -I/usr/local/share/verilator/include -I/usr/local/share/verilator/include/vltstd -DVERILATOR=1 -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TIMING=1 -DVM_TRACE=1 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=1 -DVM_TRACE_SAIF=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-int-in-bool-context -Wno-shadow -Wno-sign-compare -Wno-subobject-linkage -Wno-tautological-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable      -fcoroutines -c -o verilated_timing.o /usr/local/share/verilator/include/verilated_timing.cpp
+ccache g++ -Os  -I.  -MMD -I/usr/local/share/verilator/include -I/usr/local/share/verilator/include/vltstd -DVERILATOR=1 -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TIMING=1 -DVM_TRACE=1 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=1 -DVM_TRACE_SAIF=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-int-in-bool-context -Wno-shadow -Wno-sign-compare -Wno-subobject-linkage -Wno-tautological-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable      -fcoroutines -c -o verilated_threads.o /usr/local/share/verilator/include/verilated_threads.cpp
+ccache g++ -Os  -I.  -MMD -I/usr/local/share/verilator/include -I/usr/local/share/verilator/include/vltstd -DVERILATOR=1 -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TIMING=1 -DVM_TRACE=1 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=1 -DVM_TRACE_SAIF=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-int-in-bool-context -Wno-shadow -Wno-sign-compare -Wno-subobject-linkage -Wno-tautological-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable      -fcoroutines -x c++-header Vtop__pch.h -o Vtop__pch.h.fast.gch
+ccache g++ -Os  -I.  -MMD -I/usr/local/share/verilator/include -I/usr/local/share/verilator/include/vltstd -DVERILATOR=1 -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TIMING=1 -DVM_TRACE=1 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=1 -DVM_TRACE_SAIF=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-int-in-bool-context -Wno-shadow -Wno-sign-compare -Wno-subobject-linkage -Wno-tautological-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable      -fcoroutines -include Vtop__pch.h.fast -c -o Vtop.o Vtop.cpp
+ccache g++ -Os  -I.  -MMD -I/usr/local/share/verilator/include -I/usr/local/share/verilator/include/vltstd -DVERILATOR=1 -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TIMING=1 -DVM_TRACE=1 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=1 -DVM_TRACE_SAIF=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-int-in-bool-context -Wno-shadow -Wno-sign-compare -Wno-subobject-linkage -Wno-tautological-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable      -fcoroutines -include Vtop__pch.h.fast -c -o Vtop___024root__0.o Vtop___024root__0.cpp
+ccache g++ -Os  -I.  -MMD -I/usr/local/share/verilator/include -I/usr/local/share/verilator/include/vltstd -DVERILATOR=1 -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TIMING=1 -DVM_TRACE=1 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=1 -DVM_TRACE_SAIF=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-int-in-bool-context -Wno-shadow -Wno-sign-compare -Wno-subobject-linkage -Wno-tautological-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable      -fcoroutines -include Vtop__pch.h.fast -c -o Vtop___024root__1.o Vtop___024root__1.cpp
+ccache g++ -Os  -I.  -MMD -I/usr/local/share/verilator/include -I/usr/local/share/verilator/include/vltstd -DVERILATOR=1 -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TIMING=1 -DVM_TRACE=1 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=1 -DVM_TRACE_SAIF=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-int-in-bool-context -Wno-shadow -Wno-sign-compare -Wno-subobject-linkage -Wno-tautological-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable      -fcoroutines -include Vtop__pch.h.fast -c -o Vtop___024root__2.o Vtop___024root__2.cpp
+ccache g++ -Os  -I.  -MMD -I/usr/local/share/verilator/include -I/usr/local/share/verilator/include/vltstd -DVERILATOR=1 -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TIMING=1 -DVM_TRACE=1 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=1 -DVM_TRACE_SAIF=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-int-in-bool-context -Wno-shadow -Wno-sign-compare -Wno-subobject-linkage -Wno-tautological-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable      -fcoroutines -include Vtop__pch.h.fast -c -o Vtop_gf180mcu_fd_ip_sram___05Fsram2048x8m8wm1__0.o Vtop_gf180mcu_fd_ip_sram___05Fsram2048x8m8wm1__0.cpp
+ccache g++ -Os  -I.  -MMD -I/usr/local/share/verilator/include -I/usr/local/share/verilator/include/vltstd -DVERILATOR=1 -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TIMING=1 -DVM_TRACE=1 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=1 -DVM_TRACE_SAIF=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-int-in-bool-context -Wno-shadow -Wno-sign-compare -Wno-subobject-linkage -Wno-tautological-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable      -fcoroutines -include Vtop__pch.h.fast -c -o Vtop_subservient_core__M800__0.o Vtop_subservient_core__M800__0.cpp
+ccache g++ -Os  -I.  -MMD -I/usr/local/share/verilator/include -I/usr/local/share/verilator/include/vltstd -DVERILATOR=1 -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TIMING=1 -DVM_TRACE=1 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=1 -DVM_TRACE_SAIF=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-int-in-bool-context -Wno-shadow -Wno-sign-compare -Wno-subobject-linkage -Wno-tautological-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable      -fcoroutines -include Vtop__pch.h.fast -c -o Vtop_subservient_core__M800__1.o Vtop_subservient_core__M800__1.cpp
+ccache g++ -Os  -I.  -MMD -I/usr/local/share/verilator/include -I/usr/local/share/verilator/include/vltstd -DVERILATOR=1 -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TIMING=1 -DVM_TRACE=1 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=1 -DVM_TRACE_SAIF=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-int-in-bool-context -Wno-shadow -Wno-sign-compare -Wno-subobject-linkage -Wno-tautological-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable      -fcoroutines -include Vtop__pch.h.fast -c -o Vtop_subservient_core__M800__2.o Vtop_subservient_core__M800__2.cpp
+ccache g++ -Os  -I.  -MMD -I/usr/local/share/verilator/include -I/usr/local/share/verilator/include/vltstd -DVERILATOR=1 -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TIMING=1 -DVM_TRACE=1 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=1 -DVM_TRACE_SAIF=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-int-in-bool-context -Wno-shadow -Wno-sign-compare -Wno-subobject-linkage -Wno-tautological-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable      -fcoroutines -include Vtop__pch.h.fast -c -o Vtop__Dpi.o Vtop__Dpi.cpp
+ccache g++ -Os  -I.  -MMD -I/usr/local/share/verilator/include -I/usr/local/share/verilator/include/vltstd -DVERILATOR=1 -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TIMING=1 -DVM_TRACE=1 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=1 -DVM_TRACE_SAIF=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-int-in-bool-context -Wno-shadow -Wno-sign-compare -Wno-subobject-linkage -Wno-tautological-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable      -fcoroutines -include Vtop__pch.h.fast -c -o Vtop__Trace__0.o Vtop__Trace__0.cpp
+ccache g++   -I.  -MMD -I/usr/local/share/verilator/include -I/usr/local/share/verilator/include/vltstd -DVERILATOR=1 -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TIMING=1 -DVM_TRACE=1 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=1 -DVM_TRACE_SAIF=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-int-in-bool-context -Wno-shadow -Wno-sign-compare -Wno-subobject-linkage -Wno-tautological-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable      -fcoroutines -x c++-header Vtop__pch.h -o Vtop__pch.h.slow.gch
+ccache g++   -I.  -MMD -I/usr/local/share/verilator/include -I/usr/local/share/verilator/include/vltstd -DVERILATOR=1 -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TIMING=1 -DVM_TRACE=1 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=1 -DVM_TRACE_SAIF=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-int-in-bool-context -Wno-shadow -Wno-sign-compare -Wno-subobject-linkage -Wno-tautological-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable      -fcoroutines -include Vtop__pch.h.slow -c -o Vtop__ConstPool__0__Slow.o Vtop__ConstPool__0__Slow.cpp
+ccache g++   -I.  -MMD -I/usr/local/share/verilator/include -I/usr/local/share/verilator/include/vltstd -DVERILATOR=1 -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TIMING=1 -DVM_TRACE=1 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=1 -DVM_TRACE_SAIF=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-int-in-bool-context -Wno-shadow -Wno-sign-compare -Wno-subobject-linkage -Wno-tautological-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable      -fcoroutines -include Vtop__pch.h.slow -c -o Vtop___024root__Slow.o Vtop___024root__Slow.cpp
+ccache g++   -I.  -MMD -I/usr/local/share/verilator/include -I/usr/local/share/verilator/include/vltstd -DVERILATOR=1 -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TIMING=1 -DVM_TRACE=1 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=1 -DVM_TRACE_SAIF=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-int-in-bool-context -Wno-shadow -Wno-sign-compare -Wno-subobject-linkage -Wno-tautological-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable      -fcoroutines -include Vtop__pch.h.slow -c -o Vtop___024root__0__Slow.o Vtop___024root__0__Slow.cpp
+ccache g++   -I.  -MMD -I/usr/local/share/verilator/include -I/usr/local/share/verilator/include/vltstd -DVERILATOR=1 -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TIMING=1 -DVM_TRACE=1 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=1 -DVM_TRACE_SAIF=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-int-in-bool-context -Wno-shadow -Wno-sign-compare -Wno-subobject-linkage -Wno-tautological-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable      -fcoroutines -include Vtop__pch.h.slow -c -o Vtop_gf180mcu_fd_ip_sram___05Fsram2048x8m8wm1__Slow.o Vtop_gf180mcu_fd_ip_sram___05Fsram2048x8m8wm1__Slow.cpp
+ccache g++   -I.  -MMD -I/usr/local/share/verilator/include -I/usr/local/share/verilator/include/vltstd -DVERILATOR=1 -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TIMING=1 -DVM_TRACE=1 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=1 -DVM_TRACE_SAIF=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-int-in-bool-context -Wno-shadow -Wno-sign-compare -Wno-subobject-linkage -Wno-tautological-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable      -fcoroutines -include Vtop__pch.h.slow -c -o Vtop_gf180mcu_fd_ip_sram___05Fsram2048x8m8wm1__0__Slow.o Vtop_gf180mcu_fd_ip_sram___05Fsram2048x8m8wm1__0__Slow.cpp
+ccache g++   -I.  -MMD -I/usr/local/share/verilator/include -I/usr/local/share/verilator/include/vltstd -DVERILATOR=1 -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TIMING=1 -DVM_TRACE=1 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=1 -DVM_TRACE_SAIF=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-int-in-bool-context -Wno-shadow -Wno-sign-compare -Wno-subobject-linkage -Wno-tautological-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable      -fcoroutines -include Vtop__pch.h.slow -c -o Vtop_subservient_core__M800__Slow.o Vtop_subservient_core__M800__Slow.cpp
+ccache g++   -I.  -MMD -I/usr/local/share/verilator/include -I/usr/local/share/verilator/include/vltstd -DVERILATOR=1 -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TIMING=1 -DVM_TRACE=1 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=1 -DVM_TRACE_SAIF=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-int-in-bool-context -Wno-shadow -Wno-sign-compare -Wno-subobject-linkage -Wno-tautological-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable      -fcoroutines -include Vtop__pch.h.slow -c -o Vtop_subservient_core__M800__0__Slow.o Vtop_subservient_core__M800__0__Slow.cpp
+ccache g++   -I.  -MMD -I/usr/local/share/verilator/include -I/usr/local/share/verilator/include/vltstd -DVERILATOR=1 -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TIMING=1 -DVM_TRACE=1 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=1 -DVM_TRACE_SAIF=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-int-in-bool-context -Wno-shadow -Wno-sign-compare -Wno-subobject-linkage -Wno-tautological-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable      -fcoroutines -include Vtop__pch.h.slow -c -o Vtop__Syms__ctor__0__Slow.o Vtop__Syms__ctor__0__Slow.cpp
+ccache g++   -I.  -MMD -I/usr/local/share/verilator/include -I/usr/local/share/verilator/include/vltstd -DVERILATOR=1 -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TIMING=1 -DVM_TRACE=1 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=1 -DVM_TRACE_SAIF=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-int-in-bool-context -Wno-shadow -Wno-sign-compare -Wno-subobject-linkage -Wno-tautological-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable      -fcoroutines -include Vtop__pch.h.slow -c -o Vtop__Syms__ctor__1__Slow.o Vtop__Syms__ctor__1__Slow.cpp
+ccache g++   -I.  -MMD -I/usr/local/share/verilator/include -I/usr/local/share/verilator/include/vltstd -DVERILATOR=1 -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TIMING=1 -DVM_TRACE=1 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=1 -DVM_TRACE_SAIF=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-int-in-bool-context -Wno-shadow -Wno-sign-compare -Wno-subobject-linkage -Wno-tautological-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable      -fcoroutines -include Vtop__pch.h.slow -c -o Vtop__Syms__ctor__2__Slow.o Vtop__Syms__ctor__2__Slow.cpp
+ccache g++   -I.  -MMD -I/usr/local/share/verilator/include -I/usr/local/share/verilator/include/vltstd -DVERILATOR=1 -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TIMING=1 -DVM_TRACE=1 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=1 -DVM_TRACE_SAIF=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-int-in-bool-context -Wno-shadow -Wno-sign-compare -Wno-subobject-linkage -Wno-tautological-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable      -fcoroutines -include Vtop__pch.h.slow -c -o Vtop__Syms__ctor__3__Slow.o Vtop__Syms__ctor__3__Slow.cpp
+ccache g++   -I.  -MMD -I/usr/local/share/verilator/include -I/usr/local/share/verilator/include/vltstd -DVERILATOR=1 -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TIMING=1 -DVM_TRACE=1 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=1 -DVM_TRACE_SAIF=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-int-in-bool-context -Wno-shadow -Wno-sign-compare -Wno-subobject-linkage -Wno-tautological-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable      -fcoroutines -include Vtop__pch.h.slow -c -o Vtop__Syms__dtor__0__Slow.o Vtop__Syms__dtor__0__Slow.cpp
+ccache g++   -I.  -MMD -I/usr/local/share/verilator/include -I/usr/local/share/verilator/include/vltstd -DVERILATOR=1 -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TIMING=1 -DVM_TRACE=1 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=1 -DVM_TRACE_SAIF=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-int-in-bool-context -Wno-shadow -Wno-sign-compare -Wno-subobject-linkage -Wno-tautological-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable      -fcoroutines -include Vtop__pch.h.slow -c -o Vtop__Syms__Slow.o Vtop__Syms__Slow.cpp
+ccache g++   -I.  -MMD -I/usr/local/share/verilator/include -I/usr/local/share/verilator/include/vltstd -DVERILATOR=1 -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TIMING=1 -DVM_TRACE=1 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=1 -DVM_TRACE_SAIF=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-int-in-bool-context -Wno-shadow -Wno-sign-compare -Wno-subobject-linkage -Wno-tautological-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable      -fcoroutines -include Vtop__pch.h.slow -c -o Vtop__Trace__0__Slow.o Vtop__Trace__0__Slow.cpp
+ccache g++   -I.  -MMD -I/usr/local/share/verilator/include -I/usr/local/share/verilator/include/vltstd -DVERILATOR=1 -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TIMING=1 -DVM_TRACE=1 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=1 -DVM_TRACE_SAIF=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-int-in-bool-context -Wno-shadow -Wno-sign-compare -Wno-subobject-linkage -Wno-tautological-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable      -fcoroutines -include Vtop__pch.h.slow -c -o Vtop__TraceDecls__0__Slow.o Vtop__TraceDecls__0__Slow.cpp
+g++    verilator.o verilated.o verilated_dpi.o verilated_vpi.o verilated_vcd_c.o verilated_timing.o verilated_threads.o Vtop__ALL.a   -Wl,-rpath,/home/psi19/.local/share/pipx/venvs/cocotb/lib/python3.12/site-packages/cocotb/libs -L/home/psi19/.local/share/pipx/venvs/cocotb/lib/python3.12/site-packages/cocotb/libs -lcocotbvpi_verilator -Wl,-rpath,/home/psi19/.local/share/pipx/venvs/cocotb/lib/python3.12/site-packages/cocotb/libs -L/home/psi19/.local/share/pipx/venvs/cocotb/lib/python3.12/site-packages/cocotb/libs -lcocotbvpi_verilator  -pthread -lpthread -latomic   -o Vtop
+rm Vtop__ALL.verilator_deplist.tmp
+make[3]: Leaving directory '/home/psi19/NoCNoC/src/sim_build'
+rm -f results.xml
+COCOTB_TEST_MODULES=test_mesh COCOTB_TESTCASE= COCOTB_TEST_FILTER= COCOTB_TOPLEVEL=mesh_3x3 TOPLEVEL_LANG=verilog \
+         sim_build/Vtop --trace --trace-file sim_build/dump.fst    
+     -.--ns INFO     gpi                                ..mbed/gpi_embed.cpp:93   in _embed_init_python              Using Python 3.12.4 interpreter at /home/psi19/.local/share/pipx/venvs/cocotb/bin/python
+     -.--ns INFO     gpi                                ../gpi/GpiCommon.cpp:79   in gpi_print_registered_impl       VPI registered
+     0.00ns INFO     cocotb                             Running on Verilator version 5.044 2026-01-01
+     0.00ns INFO     cocotb                             Seeding Python random module with 1777974618
+     0.00ns INFO     cocotb                             Initialized cocotb v2.0.1 from /home/psi19/.local/share/pipx/venvs/cocotb/lib/python3.12/site-packages/cocotb
+     0.00ns INFO     cocotb.regression                  pytest not found, install it to enable better AssertionError messages
+[testbench] current_grid @ 0x0500
+     0.00ns INFO     cocotb                             Running tests
+     0.00ns INFO     cocotb.regression                  running test_mesh.test_magic_check (1/4)
+                                                            Firmware writes 0xDEADBEEF to 0x0730 and 0xCAFEBABE to 0x0734
+2700000.00ns INFO     cocotb.mesh_3x3                    [boot] cpu_rst_n asserted — CPU running.
+
+
+============================================================
+MAGIC CHECK — verifying testbench address mapping
+============================================================
+
+TILE (0,0):
+  [FAIL] 0x0730 = 0x00000000  (expect 0xDEADBEEF)
+  [FAIL] 0x0734 = 0x00000000  (expect 0xCAFEBABE)
+  SRAM: elem_bits=8, depth=2048
+  Raw SRAM words around 0x0730:
+    mem[1838] = 0x00000000
+    mem[1839] = 0x00000000
+    mem[1840] = 0x00000000
+    mem[1841] = 0x00000000
+    mem[1842] = 0x00000000
+    mem[1843] = 0x00000000
+    mem[1844] = 0x00000000
+    mem[1845] = 0x00000000
+  -> ADDRESS MAPPING BROKEN for tile (0,0)
+     sram_read_word is not reading what firmware wrote
+
+TILE (0,1):
+  [FAIL] 0x0730 = 0x00000000  (expect 0xDEADBEEF)
+  [FAIL] 0x0734 = 0x00000000  (expect 0xCAFEBABE)
+  SRAM: elem_bits=8, depth=2048
+  Raw SRAM words around 0x0730:
+    mem[1838] = 0x00000000
+    mem[1839] = 0x00000000
+    mem[1840] = 0x00000000
+    mem[1841] = 0x00000000
+    mem[1842] = 0x00000000
+    mem[1843] = 0x00000000
+    mem[1844] = 0x00000000
+    mem[1845] = 0x00000000
+  -> ADDRESS MAPPING BROKEN for tile (0,1)
+     sram_read_word is not reading what firmware wrote
+
+TILE (0,2):
+  [FAIL] 0x0730 = 0x00000000  (expect 0xDEADBEEF)
+  [FAIL] 0x0734 = 0x00000000  (expect 0xCAFEBABE)
+  SRAM: elem_bits=8, depth=2048
+  Raw SRAM words around 0x0730:
+    mem[1838] = 0x00000000
+    mem[1839] = 0x00000000
+    mem[1840] = 0x00000000
+    mem[1841] = 0x00000000
+    mem[1842] = 0x00000000
+    mem[1843] = 0x00000000
+    mem[1844] = 0x00000000
+    mem[1845] = 0x00000000
+  -> ADDRESS MAPPING BROKEN for tile (0,2)
+     sram_read_word is not reading what firmware wrote
+
+TILE (1,0):
+  [FAIL] 0x0730 = 0x00000000  (expect 0xDEADBEEF)
+  [FAIL] 0x0734 = 0x00000000  (expect 0xCAFEBABE)
+  SRAM: elem_bits=8, depth=2048
+  Raw SRAM words around 0x0730:
+    mem[1838] = 0x00000000
+    mem[1839] = 0x00000000
+    mem[1840] = 0x00000000
+    mem[1841] = 0x00000000
+    mem[1842] = 0x00000000
+    mem[1843] = 0x00000000
+    mem[1844] = 0x00000000
+    mem[1845] = 0x00000000
+  -> ADDRESS MAPPING BROKEN for tile (1,0)
+     sram_read_word is not reading what firmware wrote
+
+TILE (1,1):
+  [FAIL] 0x0730 = 0x00000000  (expect 0xDEADBEEF)
+  [FAIL] 0x0734 = 0x00000000  (expect 0xCAFEBABE)
+  SRAM: elem_bits=8, depth=2048
+  Raw SRAM words around 0x0730:
+    mem[1838] = 0x00000000
+    mem[1839] = 0x00000000
+    mem[1840] = 0x00000000
+    mem[1841] = 0x00000000
+    mem[1842] = 0x00000000
+    mem[1843] = 0x00000000
+    mem[1844] = 0x00000000
+    mem[1845] = 0x00000000
+  -> ADDRESS MAPPING BROKEN for tile (1,1)
+     sram_read_word is not reading what firmware wrote
+
+TILE (1,2):
+  [FAIL] 0x0730 = 0x00000000  (expect 0xDEADBEEF)
+  [FAIL] 0x0734 = 0x00000000  (expect 0xCAFEBABE)
+  SRAM: elem_bits=8, depth=2048
+  Raw SRAM words around 0x0730:
+    mem[1838] = 0x00000000
+    mem[1839] = 0x00000000
+    mem[1840] = 0x00000000
+    mem[1841] = 0x00000000
+    mem[1842] = 0x00000000
+    mem[1843] = 0x00000000
+    mem[1844] = 0x00000000
+    mem[1845] = 0x00000000
+  -> ADDRESS MAPPING BROKEN for tile (1,2)
+     sram_read_word is not reading what firmware wrote
+
+TILE (2,0):
+  [FAIL] 0x0730 = 0x00000000  (expect 0xDEADBEEF)
+  [FAIL] 0x0734 = 0x00000000  (expect 0xCAFEBABE)
+  SRAM: elem_bits=8, depth=2048
+  Raw SRAM words around 0x0730:
+    mem[1838] = 0x00000000
+    mem[1839] = 0x00000000
+    mem[1840] = 0x00000000
+    mem[1841] = 0x00000000
+    mem[1842] = 0x00000000
+    mem[1843] = 0x00000000
+    mem[1844] = 0x00000000
+    mem[1845] = 0x00000000
+  -> ADDRESS MAPPING BROKEN for tile (2,0)
+     sram_read_word is not reading what firmware wrote
+
+TILE (2,1):
+  [FAIL] 0x0730 = 0x00000000  (expect 0xDEADBEEF)
+  [FAIL] 0x0734 = 0x00000000  (expect 0xCAFEBABE)
+  SRAM: elem_bits=8, depth=2048
+  Raw SRAM words around 0x0730:
+    mem[1838] = 0x00000000
+    mem[1839] = 0x00000000
+    mem[1840] = 0x00000000
+    mem[1841] = 0x00000000
+    mem[1842] = 0x00000000
+    mem[1843] = 0x00000000
+    mem[1844] = 0x00000000
+    mem[1845] = 0x00000000
+  -> ADDRESS MAPPING BROKEN for tile (2,1)
+     sram_read_word is not reading what firmware wrote
+
+TILE (2,2):
+  [FAIL] 0x0730 = 0x00000000  (expect 0xDEADBEEF)
+  [FAIL] 0x0734 = 0x00000000  (expect 0xCAFEBABE)
+  SRAM: elem_bits=8, depth=2048
+  Raw SRAM words around 0x0730:
+    mem[1838] = 0x00000000
+    mem[1839] = 0x00000000
+    mem[1840] = 0x00000000
+    mem[1841] = 0x00000000
+    mem[1842] = 0x00000000
+    mem[1843] = 0x00000000
+    mem[1844] = 0x00000000
+    mem[1845] = 0x00000000
+  -> ADDRESS MAPPING BROKEN for tile (2,2)
+     sram_read_word is not reading what firmware wrote
+4700000.00ns ERROR    cocotb.mesh_3x3                    MAGIC CHECK FAILED — fix sram_read_word() address mapping before debugging firmware
+4700000.00ns WARNING  ..est_magic_check.test_magic_check Magic check failed: testbench cannot correctly read firmware-written addresses
+                                                         Traceback (most recent call last):
+                                                           File "/home/psi19/NoCNoC/cocotb/test_mesh.py", line 403, in test_magic_check
+                                                             assert all_pass, "Magic check failed: testbench cannot correctly read firmware-written addresses"
+                                                                    ^^^^^^^^
+                                                         AssertionError: Magic check failed: testbench cannot correctly read firmware-written addresses
+4700000.00ns WARNING  cocotb.regression                  test_mesh.test_magic_check failed
+4700000.00ns INFO     cocotb.regression                  running test_mesh.test_iter0_seed_only (2/4)
+7400000.00ns INFO     cocotb.mesh_3x3                    [boot] cpu_rst_n asserted — CPU running.
+
+
+*** SEED SANITY CHECK — all tiles ***
+
+TILE (0,0) seed sanity
+  my_id=0x0  live_count=0  col0_bm=0x000 (0000000000)
+  send_bm=0x000 (0000000000)
+  Ghost flags=0x00: sent N=0 S=0 E=0 W=0
+
+DUMP @ 0x0500 (100 bytes):
+0x0500: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+0x0510: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+0x0520: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+0x0530: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+0x0540: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+0x0550: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+0x0560: 00 00 00 00
+
+TILE (0,1) seed sanity
+  my_id=0x0  live_count=0  col0_bm=0x000 (0000000000)
+  send_bm=0x000 (0000000000)
+  Ghost flags=0x00: sent N=0 S=0 E=0 W=0
+
+DUMP @ 0x0500 (100 bytes):
+0x0500: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+0x0510: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+0x0520: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+0x0530: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+0x0540: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+0x0550: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+0x0560: 00 00 00 00
+
+TILE (0,2) seed sanity
+  my_id=0x0  live_count=0  col0_bm=0x000 (0000000000)
+  send_bm=0x000 (0000000000)
+  Ghost flags=0x00: sent N=0 S=0 E=0 W=0
+
+DUMP @ 0x0500 (100 bytes):
+0x0500: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+0x0510: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+0x0520: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+0x0530: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+0x0540: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+0x0550: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+0x0560: 00 00 00 00
+
+TILE (1,0) seed sanity
+  my_id=0x0  live_count=0  col0_bm=0x000 (0000000000)
+  send_bm=0x000 (0000000000)
+  Ghost flags=0x00: sent N=0 S=0 E=0 W=0
+
+DUMP @ 0x0500 (100 bytes):
+0x0500: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+0x0510: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+0x0520: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+0x0530: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+0x0540: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+0x0550: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+0x0560: 00 00 00 00
+
+TILE (1,1) seed sanity
+  my_id=0x0  live_count=0  col0_bm=0x000 (0000000000)
+  send_bm=0x000 (0000000000)
+  Ghost flags=0x00: sent N=0 S=0 E=0 W=0
+
+DUMP @ 0x0500 (100 bytes):
+0x0500: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+0x0510: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+0x0520: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+0x0530: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+0x0540: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+0x0550: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+0x0560: 00 00 00 00
+
+TILE (1,2) seed sanity
+  my_id=0x0  live_count=0  col0_bm=0x000 (0000000000)
+  send_bm=0x000 (0000000000)
+  Ghost flags=0x00: sent N=0 S=0 E=0 W=0
+
+DUMP @ 0x0500 (100 bytes):
+0x0500: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+0x0510: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+0x0520: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+0x0530: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+0x0540: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+0x0550: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+0x0560: 00 00 00 00
+
+TILE (2,0) seed sanity
+  my_id=0x0  live_count=0  col0_bm=0x000 (0000000000)
+  send_bm=0x000 (0000000000)
+  Ghost flags=0x00: sent N=0 S=0 E=0 W=0
+
+DUMP @ 0x0500 (100 bytes):
+0x0500: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+0x0510: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+0x0520: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+0x0530: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+0x0540: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+0x0550: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+0x0560: 00 00 00 00
+
+TILE (2,1) seed sanity
+  my_id=0x0  live_count=0  col0_bm=0x000 (0000000000)
+  send_bm=0x000 (0000000000)
+  Ghost flags=0x00: sent N=0 S=0 E=0 W=0
+
+DUMP @ 0x0500 (100 bytes):
+0x0500: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+0x0510: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+0x0520: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+0x0530: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+0x0540: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+0x0550: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+0x0560: 00 00 00 00
+
+TILE (2,2) seed sanity
+  my_id=0x0  live_count=0  col0_bm=0x000 (0000000000)
+  send_bm=0x000 (0000000000)
+  Ghost flags=0x00: sent N=0 S=0 E=0 W=0
+
+DUMP @ 0x0500 (100 bytes):
+0x0500: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+0x0510: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+0x0520: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+0x0530: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+0x0540: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+0x0550: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+0x0560: 00 00 00 00
+
+
+******** ITERATION 0 (seed) ********
+
+===================================================
+TILE (0,0)  ITERATION 0
+EXPECTED (Python GoL)   ACTUAL (SRAM)
+---------------------------------------------------
+##########    ##########
+##########    ##########
+##########    ##########
+##########    ##########
+#####.####    ##########  <- MISMATCH
+#####.####    ##########  <- MISMATCH
+#####.####    ##########  <- MISMATCH
+##########    ##########
+.########.    ##########  <- MISMATCH
+.########.    ##########  <- MISMATCH
+===================================================
+
+===================================================
+TILE (0,1)  ITERATION 0
+EXPECTED (Python GoL)   ACTUAL (SRAM)
+---------------------------------------------------
+##########    ##########
+##########    ##########
+##########    ##########
+##########    ##########
+#####.####    ##########  <- MISMATCH
+#####.####    ##########  <- MISMATCH
+#####.####    ##########  <- MISMATCH
+##########    ##########
+.########.    ##########  <- MISMATCH
+.########.    ##########  <- MISMATCH
+===================================================
+
+===================================================
+TILE (0,2)  ITERATION 0
+EXPECTED (Python GoL)   ACTUAL (SRAM)
+---------------------------------------------------
+##########    ##########
+##########    ##########
+##########    ##########
+##########    ##########
+#####.####    ##########  <- MISMATCH
+#####.####    ##########  <- MISMATCH
+#####.####    ##########  <- MISMATCH
+##########    ##########
+.########.    ##########  <- MISMATCH
+.########.    ##########  <- MISMATCH
+===================================================
+
+===================================================
+TILE (1,0)  ITERATION 0
+EXPECTED (Python GoL)   ACTUAL (SRAM)
+---------------------------------------------------
+##########    ##########
+##########    ##########
+##########    ##########
+##########    ##########
+#####.####    ##########  <- MISMATCH
+#####.####    ##########  <- MISMATCH
+#####.####    ##########  <- MISMATCH
+##########    ##########
+.########.    ##########  <- MISMATCH
+.########.    ##########  <- MISMATCH
+===================================================
+
+===================================================
+TILE (1,1)  ITERATION 0
+EXPECTED (Python GoL)   ACTUAL (SRAM)
+---------------------------------------------------
+##########    ##########
+##########    ##########
+##########    ##########
+##########    ##########
+#####.####    ##########  <- MISMATCH
+#####.####    ##########  <- MISMATCH
+#####.####    ##########  <- MISMATCH
+##########    ##########
+.########.    ##########  <- MISMATCH
+.########.    ##########  <- MISMATCH
+===================================================
+
+===================================================
+TILE (1,2)  ITERATION 0
+EXPECTED (Python GoL)   ACTUAL (SRAM)
+---------------------------------------------------
+##########    ##########
+##########    ##########
+##########    ##########
+##########    ##########
+#####.####    ##########  <- MISMATCH
+#####.####    ##########  <- MISMATCH
+#####.####    ##########  <- MISMATCH
+##########    ##########
+.########.    ##########  <- MISMATCH
+.########.    ##########  <- MISMATCH
+===================================================
+
+===================================================
+TILE (2,0)  ITERATION 0
+EXPECTED (Python GoL)   ACTUAL (SRAM)
+---------------------------------------------------
+##########    ##########
+##########    ##########
+##########    ##########
+##########    ##########
+#####.####    ##########  <- MISMATCH
+#####.####    ##########  <- MISMATCH
+#####.####    ##########  <- MISMATCH
+##########    ##########
+.########.    ##########  <- MISMATCH
+.########.    ##########  <- MISMATCH
+===================================================
+
+===================================================
+TILE (2,1)  ITERATION 0
+EXPECTED (Python GoL)   ACTUAL (SRAM)
+---------------------------------------------------
+##########    ##########
+##########    ##########
+##########    ##########
+##########    ##########
+#####.####    ##########  <- MISMATCH
+#####.####    ##########  <- MISMATCH
+#####.####    ##########  <- MISMATCH
+##########    ##########
+.########.    ##########  <- MISMATCH
+.########.    ##########  <- MISMATCH
+===================================================
+
+===================================================
+TILE (2,2)  ITERATION 0
+EXPECTED (Python GoL)   ACTUAL (SRAM)
+---------------------------------------------------
+##########    ##########
+##########    ##########
+##########    ##########
+##########    ##########
+#####.####    ##########  <- MISMATCH
+#####.####    ##########  <- MISMATCH
+#####.####    ##########  <- MISMATCH
+##########    ##########
+.########.    ##########  <- MISMATCH
+.########.    ##########  <- MISMATCH
+===================================================
+9400000.00ns ERROR    cocotb.mesh_3x3                    63 mismatches in seed
+9400000.00ns WARNING  ..0_seed_only.test_iter0_seed_only Seed mismatch: 63 cells wrong.
+                                                         Traceback (most recent call last):
+                                                           File "/home/psi19/NoCNoC/cocotb/test_mesh.py", line 428, in test_iter0_seed_only
+                                                             assert total == 0, f"Seed mismatch: {total} cells wrong."
+                                                                    ^^^^^^^^^^
+                                                         AssertionError: Seed mismatch: 63 cells wrong.
+9400000.00ns WARNING  cocotb.regression                  test_mesh.test_iter0_seed_only failed
+9400000.00ns INFO     cocotb.regression                  running test_mesh.test_col_bitmap_diagnostic (3/4)
+12100000.00ns INFO     cocotb.mesh_3x3                    [boot] cpu_rst_n asserted — CPU running.
