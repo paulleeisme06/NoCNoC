@@ -552,4 +552,3 @@ async def test_gol_iter1_iter2(dut):
         f"GoL test failed: iter0={iter0_mismatches}, "
         f"iter1={iter1_mismatches}, iter2={iter2_mismatches} mismatches."
     )
-    
