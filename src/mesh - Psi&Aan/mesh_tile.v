@@ -155,21 +155,47 @@ module mesh_tile #(
     // -----------------------------------------------------------------------
     // Address / Data MUX
     // -----------------------------------------------------------------------
-    // Boot mode : use raw bootloader signals (the bootloader is slow enough
-    //             that its address/data are stable well before the clock edge).
-    // CPU mode  : bypass the extra register to provide 1-cycle latency.
-    wire [10:0] final_a = boot_mode ? boot_addr  : (sram_wen ? sram_waddr : sram_raddr);
-    wire [7:0] final_d = boot_mode ? boot_data  : sram_wdata;
+    // Priority: DFT (highest) > boot_bus > NOC boot > CPU
+    // tile(0,0) receives boot via boot bus; tiles 1-8 receive via NOC boot flits.
+    wire boot_bus_writing = boot_mode && ~boot_wen;
+    wire noc_boot_writing = boot_mode && nb_wen && (TILE_ID != 4'h0);
+
+    wire [10:0] final_a =
+        dft_mode         ? dft_addr       :
+        boot_bus_writing ? boot_addr      :
+        noc_boot_writing ? nb_addr_latch  :
+        sram_wen         ? sram_waddr     :
+                           sram_raddr;
+
+    wire [7:0] final_d =
+        dft_mode         ? dft_wdata      :
+        boot_bus_writing ? boot_data      :
+        noc_boot_writing ? nb_data_latch  :
+                           sram_wdata;
 
     // -----------------------------------------------------------------------
     // SRAM control
     // -----------------------------------------------------------------------
     // Boot  : CEN pulses LOW per byte write (boot_wen active-LOW).
     // CPU   : CEN=HIGH for init-pulse cycle, then permanently LOW.
-    wire sram_active = boot_mode ? ~boot_wen : ~cpu_sram_init_pulse;
+    wire sram_active =
+        dft_mode  ? dft_ce :
+        boot_mode ? (boot_bus_writing | noc_boot_writing) :
+                    ~cpu_sram_init_pulse;
 
     // GWEN (active-LOW): asserted during writes only.
-    wire sram_write = boot_mode ? ~boot_wen : sram_wen;
+    wire sram_write =
+        dft_mode  ? dft_we :
+        boot_mode ? (boot_bus_writing | noc_boot_writing) :
+                    sram_wen;
+
+    // -----------------------------------------------------------------------
+    // WB mux — CPU WB normally, fake read to pop NOC boot flit
+    // -----------------------------------------------------------------------
+    wire final_wb_stb = boot_pop_active ? 1'b1           : wb_stb;
+    wire final_wb_we  = boot_pop_active ? 1'b0           : wb_we;
+    wire [31:0] final_wb_adr = boot_pop_active ? 32'h80000004 : wb_adr;
+    wire [31:0] final_wb_dat = boot_pop_active ? 32'h0        : wb_dat_c2r;
 
     // -----------------------------------------------------------------------
     // Subservient RISC-V core

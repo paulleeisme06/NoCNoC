@@ -123,7 +123,7 @@ def chip_top_runner():
         proj_path / "../src/mesh - Psi&Aan/mesh_3x3.v",
         proj_path / "../src/mesh - Psi&Aan/mesh_tile.v",
         proj_path / "../src/mesh - Psi&Aan/mesh_router.v",
-        proj_path / "../src/mesh - Psi&Aan/boot_loader.v",
+        proj_path / "../src/mesh - Psi&Aan/boot_controller.v",
         # Add all .v files from subservient and serv submodules:
         *sorted((proj_path / "../src/subservient/rtl").glob("*.v")),
         *sorted((proj_path / "../src/serv/rtl").glob("*.v")),
