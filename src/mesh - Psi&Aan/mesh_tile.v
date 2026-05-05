@@ -13,7 +13,16 @@ module mesh_tile #(
     input  wire [33:0] north_in, south_in, east_in, west_in,
     output wire [33:0] north_out, south_out, east_out, west_out,
     input  wire [33:0] ne_in, nw_in, se_in, sw_in,
-    output wire [33:0] ne_out, nw_out, se_out, sw_out
+    output wire [33:0] ne_out, nw_out, se_out, sw_out,
+
+    // Ethan: The following ports are for off chip debugging purposes
+
+    input wire dft_mode,  // 1 = DFT takes over SRAM
+    input wire dft_ce,    // active high chip enable
+    input wire dft_we,    // active high write enable
+    input wire [10:0] dft_addr, 
+    input wire [7:0]  dft_wdata,
+    output wire [7:0]  dft_rdata
 );
 
     wire [31:0] wb_adr, wb_dat_c2r, wb_dat_r2c;
@@ -77,25 +86,28 @@ module mesh_tile #(
     // Boot mode : use raw bootloader signals (the bootloader is slow enough
     //             that its address/data are stable well before the clock edge).
     // CPU mode  : bypass the extra register to provide 1-cycle latency.
-    wire [10:0] final_a = boot_mode ? boot_addr  : (sram_wen ? sram_waddr : sram_raddr);
-    wire [7:0] final_d = boot_mode ? boot_data  : sram_wdata;
+    // Ethan : I edited this to be a 3 way mux with DFT having the highest priority
+    wire [10:0] final_a = dft_mode ? dft_addr : boot_mode ? boot_addr : (sram_wen ? sram_waddr : sram_raddr);
+    wire [7:0] final_d  = dft_mode ? dft_wdata : boot_mode ? boot_data : sram_wdata;
+
 
     // -----------------------------------------------------------------------
     // SRAM control
     // -----------------------------------------------------------------------
     // Boot  : CEN pulses LOW per byte write (boot_wen active-LOW).
     // CPU   : CEN=HIGH for init-pulse cycle, then permanently LOW.
-    wire sram_active = boot_mode ? ~boot_wen : ~cpu_sram_init_pulse;
+    // Ethan: Edited these two signals as well to include DFT interface
+    wire sram_active = dft_mode ? dft_ce : boot_mode ? ~boot_wen : ~cpu_sram_init_pulse;
 
     // GWEN (active-LOW): asserted during writes only.
-    wire sram_write = boot_mode ? ~boot_wen : sram_wen;
+    wire sram_write = dft_mode ? dft_we : boot_mode ? ~boot_wen : sram_wen;
 
     // -----------------------------------------------------------------------
     // Subservient RISC-V core
     // -----------------------------------------------------------------------
     subservient_core #(.memsize(2048)) core_inst (
         .i_clk       (clk),
-        .i_rst       (rst | boot_mode),
+        .i_rst       (rst | boot_mode | dft_mode),  // Ethan: Updated to hold core in reset during DFT
         .o_sram_waddr(sram_waddr),
         .o_sram_wdata(sram_wdata),
         .o_sram_wen  (sram_wen),
@@ -125,6 +137,8 @@ module mesh_tile #(
         .VDD (),
         .VSS ()
     );
+
+    assign dft_rdata = sram_rdata;
 
     // DEBUG: monitor ALL non-zero SRAM writes (to find where do_recv writes go)
     always @(posedge clk) begin

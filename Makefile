@@ -76,11 +76,11 @@ librelane-padring: ## Only create the padring
 .PHONY: librelane-padring
 
 sim: ## Run RTL simulation with cocotb
-	cd cocotb; PDK_ROOT=${PDK_ROOT} PDK=${PDK} SLOT=${SLOT} python3 chip_top_tb.py
+	cd cocotb; PDK_ROOT=${PDK_ROOT} PDK=${PDK} SLOT=${SLOT} python3.13 chip_top_tb.py
 .PHONY: sim
 
 sim-gl: ## Run gate-level simulation with cocotb (after copy-final)
-	cd cocotb; GL=1 PDK_ROOT=${PDK_ROOT} PDK=${PDK} SLOT=${SLOT} python3 chip_top_tb.py
+	cd cocotb; GL=1 PDK_ROOT=${PDK_ROOT} PDK=${PDK} SLOT=${SLOT} python3.13 chip_top_tb.py
 .PHONY: sim-gl
 
 sim-view: ## View simulation waveforms in GTKWave
