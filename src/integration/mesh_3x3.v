@@ -17,7 +17,7 @@ module mesh_3x3 (
     input  wire        host_rst
 );
     wire [7:0] boot_data;
-    wire [10:0] boot_addr;
+    wire [9:0] boot_addr;
     wire       boot_wen, cpu_rst_n;
 
     // boot_mode stays high while host holds tiles in reset so the boot bus
@@ -32,7 +32,7 @@ module mesh_3x3 (
     );
 
     // After boot (cpu_rst_n=1) host can write via the same boot bus path
-    wire [10:0] mux_boot_addr = cpu_rst_n ? host_sram_addr : boot_addr;
+    wire [10:0] mux_boot_addr = cpu_rst_n ? host_sram_addr : {1'b0, boot_addr};
     wire  [7:0] mux_boot_data = cpu_rst_n ? host_sram_data : boot_data;
     wire        mux_boot_wen  = cpu_rst_n ? host_sram_wen  : boot_wen;
 

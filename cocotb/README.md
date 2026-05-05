@@ -1,0 +1,2 @@
+- `make sim-top` — runs `cocotb/test_top.py` (full pipeline: boot to seed to GoL to readback)                           
+- `make sim-flash` — runs `cocotb/test_flash_mesh.py` (flash boot only: verifies firmware loads into all tile SRAMs)
