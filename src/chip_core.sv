@@ -39,63 +39,95 @@ module chip_core #(
     assign input_pd = '0;
 
     // Set the bidir as output
-    assign bidir_oe = '1;
+    assign bidir_out[0] = spi_miso;
+    assign bidir_oe = {{NUM_BIDIR_PADS-4{1'b0}}, 4'b1111};  // [3:1]=flash outputs, [0]=miso
     assign bidir_cs = '0;
     assign bidir_sl = '0;
     assign bidir_ie = ~bidir_oe;
     assign bidir_pu = '0;
     assign bidir_pd = '0;
     
+    
     logic _unused;
     assign _unused = &bidir_in;
 
-    logic [NUM_BIDIR_PADS-1:0] count;
+    // logic [NUM_BIDIR_PADS-1:0] count;
 
-    always_ff @(posedge clk) begin
+    // always_ff @(posedge clk) begin
+    //     if (!rst_n) begin
+    //         count <= '0;
+    //     end else begin
+    //         if (&input_in) begin
+    //             count <= count + 1;
+    //         end
+    //     end
+    // end
+
+    // Ethan: SPI pad assignments and instantiation:
+
+    wire spi_clk  = input_in[0];
+    wire spi_mosi = input_in[1];
+    wire spi_cs_n = input_in[2];
+    wire dft_mode = input_in[3];
+
+    wire       dbg_req, dbg_we;
+    wire [3:0] dbg_tile_id;
+    wire [10:0] dbg_addr;
+    wire [7:0]  dbg_wdata;
+    wire [7:0]  dbg_rdata;
+    wire        dbg_ack;
+    wire        spi_miso;
+
+    spi_debug my_spi_debug (
+        .clk        (clk),
+        .rst        (~rst_n),
+        .spi_clk    (spi_clk),
+        .spi_cs_n   (spi_cs_n),
+        .spi_mosi   (spi_mosi),
+        .spi_miso   (spi_miso),
+        .dbg_req    (dbg_req),
+        .dbg_we     (dbg_we),
+        .dbg_tile_id(dbg_tile_id),
+        .dbg_addr   (dbg_addr),
+        .dbg_wdata  (dbg_wdata),
+        .dbg_rdata  (dbg_rdata),
+        .dbg_ack    (dbg_ack)
+    );
+
+    reg dbg_ack_r;
+    always @(posedge clk) begin
         if (!rst_n) begin
-            count <= '0;
+            dbg_ack_r <= 1'b0;
         end else begin
-            if (&input_in) begin
-                count <= count + 1;
-            end
+            dbg_ack_r <= dbg_req & ~dbg_we;
         end
     end
+    assign dbg_ack = dbg_ack_r;
 
-    logic [7:0] sram_0_out;
+    // Ethan: mesh 3x3 instantiation:
+    mesh_3x3 u_mesh (
+        .clk          (clk),
+        .rst          (~rst_n),
+        .inject_00_nw (34'b0),       // tie off unused NoC injection for now
+        .monitor_22_se(),
 
-    gf180mcu_ocd_ip_sram__sram512x8m8wm1 sram_0 (
-        `ifdef USE_POWER_PINS
-        .VDD  (VDD),
-        .VSS  (VSS),
-        `endif
+        // Flash boot pins — assign to remaining input/bidir pads
+        .flash_miso   (input_in[4]),
+        .flash_cs_n   (bidir_out[1]),
+        .flash_clk    (bidir_out[2]),
+        .flash_mosi   (bidir_out[3]),
 
-        .CLK  (clk),
-        .CEN  (1'b1),
-        .GWEN (1'b0),
-        .WEN  (8'b0),
-        .A    ('0),
-        .D    ('0),
-        .Q    (sram_0_out)
+        // DFT
+        .dft_mode     (dft_mode),
+        .dft_tile_id  (dbg_tile_id),
+        .dft_we       (dbg_we & dbg_req),
+        .dft_addr     (dbg_addr),
+        .dft_wdata    (dbg_wdata),
+        .dft_rdata    (dbg_rdata)
     );
 
-    logic [7:0] sram_1_out;
+    
 
-    gf180mcu_ocd_ip_sram__sram512x8m8wm1 sram_1 (
-        `ifdef USE_POWER_PINS
-        .VDD  (VDD),
-        .VSS  (VSS),
-        `endif
-
-        .CLK  (clk),
-        .CEN  (1'b1),
-        .GWEN (1'b0),
-        .WEN  (8'b0),
-        .A    ('0),
-        .D    ('0),
-        .Q    (sram_1_out)
-    );
-
-    assign bidir_out = count ^ {24'd0, sram_0_out, sram_1_out};
 
 endmodule
 
