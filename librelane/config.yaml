@@ -28,6 +28,7 @@ DESIGN_NAME: chip_top
 VERILOG_FILES:
 - dir::../src/chip_top.sv
 - dir::../src/chip_core.sv
+- dir::../src/dft - Ethan/spi_debug.v
 - dir::../src/mesh - Psi&Aan/mesh_3x3.v
 - dir::../src/mesh - Psi&Aan/mesh_tile.v
 - dir::../src/mesh - Psi&Aan/mesh_router.v
@@ -59,6 +60,14 @@ VERILOG_FILES:
 - dir::../src/serv/servile/servile_mux.v
 - dir::../src/serv/servile/servile.v
 - dir::../libs/gf180mcu_ocd_ip_sram/cells/gf180mcu_ocd_ip_sram__sram1024x8m8wm1/gf180mcu_ocd_ip_sram__sram1024x8m8wm1.blackbox.v
+- dir::../src/flash - Sumi/flash_clk.sv
+- dir::../src/flash - Sumi/hk_boot_adapter.v
+- dir::../src/flash - Sumi/housekeeping.sv
+- dir::../src/flash - Sumi/shiftregister.sv
+- dir::../src/serv/*.v 
+- dir::../src/subservient/*.v
+- dir::../src/serv/servile/*.v
+
 
 # Enable plugin for better SystemVerilog support
 # USE_SLANG: True

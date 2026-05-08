@@ -41,11 +41,29 @@ DEBUG_BIT9_VAL       = DEBUG_BASE + 72   # 0x0748  bit9 after & 1
 
 
 def load_firmware_binary():
-    bin_file = os.path.join(os.path.dirname(__file__), FIRMWARE_BIN_NAME)
-    if os.path.exists(bin_file):
-        with open(bin_file, "rb") as f:
-            return list(f.read())
-    return [0] * 2048
+    candidates = [
+        os.path.abspath(FIRMWARE_BIN_NAME),  # current working directory
+        os.path.abspath(os.path.join(os.getcwd(), FIRMWARE_BIN_NAME)),
+        os.path.abspath(os.path.join(os.path.dirname(__file__), FIRMWARE_BIN_NAME)),
+    ]
+
+    for bin_file in candidates:
+        print(f"[firmware] checking {bin_file}")
+        if os.path.exists(bin_file):
+            with open(bin_file, "rb") as f:
+                data = list(f.read())
+
+            print(f"[firmware] loaded {len(data)} bytes from {bin_file}")
+            print("[firmware] first 16 bytes =", " ".join(f"{b:02x}" for b in data[:16]))
+
+            if len(data) < 2048:
+                data += [0] * (2048 - len(data))
+
+            return data[:2048]
+
+    raise FileNotFoundError(
+        "Could not find firmware.bin. Checked:\n" + "\n".join(candidates)
+    )
 
 
 FIRMWARE = load_firmware_binary()
