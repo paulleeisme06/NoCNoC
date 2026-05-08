@@ -10,7 +10,7 @@ Tests the complete flow:
                blinker pattern in all 9 tiles.
   3. RUN     — Host SPI sends CMD 0x03/0x00 (release reset).
                Testbench waits for 0xCCCCCCCC on monitor_22_se.
-  4. READBACK — Cocotb reads all 9 tile SRAMs via hierarchy probing,
+  4. READBACK — Cocotb reads all 9 tile SRAMs via backdoor ports,
                 assembles 30x30 frame, asserts pixel-level correctness,
                 writes gol_gen1.pbm.
 
@@ -35,8 +35,15 @@ MESH_R     = 3
 MESH_C     = 3
 FRAME_SIZE = 30
 
-FIRMWARE_BIN  = "firmware.bin"
-FIRMWARE_ELF  = os.path.join("firmware", "firmware.elf")
+_BASE = os.path.dirname(os.path.abspath(__file__))
+_FW_CANDIDATES = [
+    os.path.join(_BASE, "..", "firmware", "firmware.bin"),
+    os.path.join(_BASE, "..", "src", "firmware", "firmware.bin"),
+]
+_ELF_CANDIDATES = [
+    os.path.join(_BASE, "..", "firmware", "firmware.elf"),
+    os.path.join(_BASE, "..", "src", "firmware", "firmware.elf"),
+]
 
 RESET_HOLD_MS   = 2
 ITER_TIMEOUT_MS = 200
@@ -81,17 +88,21 @@ def read_elf_symbol(elf_path, sym_name):
 # ============================================================
 
 def load_firmware():
-    p = os.path.join(os.path.dirname(__file__), FIRMWARE_BIN)
-    if os.path.exists(p):
-        with open(p, "rb") as f: return list(f.read())
+    for p in _FW_CANDIDATES:
+        p = os.path.normpath(p)
+        if os.path.exists(p):
+            print(f"[testbench] loading firmware from {p}")
+            with open(p, "rb") as f: return list(f.read())
+    print("[testbench] WARNING: firmware.bin not found — loading zeros")
     return [0] * 2048
 
 FIRMWARE = load_firmware()
 
-_elf  = os.path.join(os.path.dirname(__file__), FIRMWARE_ELF)
-SRAM_GRID_BASE = (read_elf_symbol(_elf, "current_grid")
-               or read_elf_symbol(_elf, "_bss_start")
-               or len(FIRMWARE))
+_elf = next((os.path.normpath(p) for p in _ELF_CANDIDATES if os.path.exists(os.path.normpath(p))), None)
+# current_grid is a #define (0x0500) not an ELF symbol — hardcode the fallback
+SRAM_GRID_BASE = ((_elf and (read_elf_symbol(_elf, "current_grid")
+                              or read_elf_symbol(_elf, "_bss_start")))
+                  or 0x0500)
 print(f"[testbench] SRAM_GRID_BASE = 0x{SRAM_GRID_BASE:04x}")
 
 # ============================================================
@@ -115,19 +126,26 @@ async def spi_flash_model(dut):
                 break
 
 # ============================================================
-# DUT helpers
+# DUT helpers — backdoor port access
 # ============================================================
 
-def get_tile(dut, r, c):
-    return dut.mesh_inst.rows[r].cols[c].tile_inst
+class TileHandle:
+    """Wraps the top-level backdoor ports to address a specific tile."""
+    def __init__(self, dut, r, c):
+        self._dut = dut
+        self._id  = (r << 2) | c
+        self.clk  = dut.clk
 
-def sram_read_byte(tile, addr):
-    mem = tile.sram_inst.mem
-    w   = len(mem[0])
-    if w <= 8:
-        return int(mem[addr].value) & 0xFF
-    bpw = w // 8
-    return (int(mem[addr // bpw].value) >> (8 * (addr % bpw))) & 0xFF
+def get_tile(dut, r, c):
+    return TileHandle(dut, r, c)
+
+async def sram_read_byte(tile, addr):
+    """Read one byte from tile SRAM via top-level backdoor ports."""
+    tile._dut.tb_tile_sel.value = tile._id
+    tile._dut.tb_raddr.value    = addr & 0x7FF
+    await RisingEdge(tile.clk)   # edge 1: SRAM captures addr
+    await RisingEdge(tile.clk)   # edge 2: tb_rdata stable
+    return int(tile._dut.tb_rdata.value) & 0xFF
 
 # ============================================================
 # SRAM dump + ASCII visualization helpers
@@ -135,31 +153,35 @@ def sram_read_byte(tile, addr):
 
 SRAM_SIZE = 2048   # bytes per tile
 
-def dump_sram_hex(tile, base, length, label=""):
+async def dump_sram_hex(tile, base, length, label=""):
     """Print a hex dump of 'length' bytes from tile SRAM starting at base."""
     print(f"\n  ┌─ {label} (0x{base:03x} – 0x{base+length-1:03x}) {'─'*20}")
     for i in range(0, length, 16):
-        chunk = [sram_read_byte(tile, base + i + j)
-                 for j in range(16) if (i + j) < length]
+        chunk = []
+        for j in range(16):
+            if (i + j) < length:
+                chunk.append(await sram_read_byte(tile, base + i + j))
         hex_part  = " ".join(f"{b:02x}" for b in chunk)
-        # ASCII printable or dot
         asc_part  = "".join(chr(b) if 32 <= b < 127 else "." for b in chunk)
         print(f"  │ 0x{base+i:03x}: {hex_part:<48}  {asc_part}")
     print(f"  └{'─'*60}")
 
-def dump_sram_full_hex(tile, label="full SRAM"):
-    """Hex dump the entire 1024-byte SRAM for one tile."""
-    dump_sram_hex(tile, 0, SRAM_SIZE, label)
+async def dump_sram_full_hex(tile, label="full SRAM"):
+    """Hex dump the entire SRAM for one tile."""
+    await dump_sram_hex(tile, 0, SRAM_SIZE, label)
 
-def dump_grid_ascii(tile, label="current_grid"):
+async def dump_grid_ascii(tile, label="current_grid"):
     """
     Read current_grid from SRAM and render as ASCII art.
     Shows a border, row numbers, and uses █/· for live/dead cells.
     Also shows the raw byte values in a compact table below.
     """
-    grid = [[sram_read_byte(tile, SRAM_GRID_BASE + y * TILE_SIZE + x)
-             for x in range(TILE_SIZE)]
-            for y in range(TILE_SIZE)]
+    grid = []
+    for y in range(TILE_SIZE):
+        row = []
+        for x in range(TILE_SIZE):
+            row.append(await sram_read_byte(tile, SRAM_GRID_BASE + y * TILE_SIZE + x))
+        grid.append(row)
 
     live_count = sum(grid[y][x] & 1 for y in range(TILE_SIZE) for x in range(TILE_SIZE))
 
@@ -174,7 +196,7 @@ def dump_grid_ascii(tile, label="current_grid"):
     print(f"  └{'─'*50}")
     return grid
 
-def dump_checkpoint(dut, title, tiles="all", show_firmware_bytes=16,
+async def dump_checkpoint(dut, title, tiles="all", show_firmware_bytes=16,
                     show_grid=True, show_full_sram=False):
     """
     Master dump function — called at each checkpoint.
@@ -183,7 +205,7 @@ def dump_checkpoint(dut, title, tiles="all", show_firmware_bytes=16,
     tiles            : "all" or list of (row,col) tuples
     show_firmware_bytes : number of bytes from addr 0 to show as hex (0 = skip)
     show_grid        : show ASCII art of current_grid
-    show_full_sram   : show full 1024-byte hex dump (verbose)
+    show_full_sram   : show full SRAM hex dump (verbose)
     """
     border = "═" * 60
     print(f"\n╔{border}╗")
@@ -201,20 +223,20 @@ def dump_checkpoint(dut, title, tiles="all", show_firmware_bytes=16,
         print(f"\n  ▶ tile({tr},{tc})  TILE_ID=0x{tr*4+tc:X}")
 
         if show_firmware_bytes > 0:
-            dump_sram_hex(tile, 0, show_firmware_bytes,
+            await dump_sram_hex(tile, 0, show_firmware_bytes,
                           f"firmware header (first {show_firmware_bytes}B)")
 
         # Always show the region around SRAM_GRID_BASE
         context_start = max(0, SRAM_GRID_BASE - 4)
         context_len   = TILE_SIZE * TILE_SIZE + 8
-        dump_sram_hex(tile, context_start, context_len,
+        await dump_sram_hex(tile, context_start, context_len,
                       f"current_grid region (±4B context)")
 
         if show_grid:
-            dump_grid_ascii(tile, f"current_grid visual")
+            await dump_grid_ascii(tile, f"current_grid visual")
 
         if show_full_sram:
-            dump_sram_full_hex(tile, "full SRAM")
+            await dump_sram_full_hex(tile, "full SRAM")
 
 # ============================================================
 # SPI bit-bang master
@@ -227,7 +249,7 @@ async def spi_transfer(dut, tx_bytes: list) -> list:
     Returns list of received bytes (MISO).
     """
     dut.host_csb.value  = 0
-    await Timer(SPI_HALF_NS, unit="ns")
+    await Timer(SPI_HALF_NS, units="ns")
 
     rx_bytes = []
     for byte in tx_bytes:
@@ -235,33 +257,33 @@ async def spi_transfer(dut, tx_bytes: list) -> list:
         for bit in range(7, -1, -1):
             # Set MOSI before rising edge
             dut.host_mosi.value = (byte >> bit) & 1
-            await Timer(SPI_HALF_NS, unit="ns")
+            await Timer(SPI_HALF_NS, units="ns")
 
             # Rising edge — slave samples MOSI
             dut.host_sclk.value = 1
-            await Timer(SPI_HALF_NS, unit="ns")
+            await Timer(SPI_HALF_NS, units="ns")
 
             # Sample MISO on rising edge
             rx = (rx << 1) | int(dut.host_miso.value)
 
             # Falling edge
             dut.host_sclk.value = 0
-            await Timer(SPI_HALF_NS, unit="ns")
+            await Timer(SPI_HALF_NS, units="ns")
 
         rx_bytes.append(rx)
 
     dut.host_csb.value = 1
-    await Timer(SPI_HALF_NS * 4, unit="ns")  # CS deassert hold
+    await Timer(SPI_HALF_NS * 4, units="ns")  # CS deassert hold
     return rx_bytes
 
 async def host_write_sram(dut, addr: int, data: int):
     """
     CMD 0x00: write one byte to all tile SRAMs at addr.
-    Transaction: [0x00, addr[9:8], addr[7:0], data]
+    Transaction: [0x00, addr[10:8], addr[7:0], data]
     """
     await spi_transfer(dut, [
         0x00,
-        (addr >> 8) & 0x03,
+        (addr >> 8) & 0x07,   # 3 bits for 11-bit address space (0x000–0x7FF)
         addr & 0xFF,
         data & 0xFF
     ])
@@ -378,18 +400,6 @@ else:
             for dy in (-1, 0, 1):
                 INPUT_FRAME[tr*TILE_SIZE + cy + dy][tc*TILE_SIZE + cx] = 1
 
-def gol_step(grid):
-    n = [[0]*TILE_SIZE for _ in range(TILE_SIZE)]
-    for y in range(TILE_SIZE):
-        for x in range(TILE_SIZE):
-            live = sum(
-                grid[y+dy][x+dx]
-                for dy in (-1,0,1) for dx in (-1,0,1)
-                if (dy or dx) and 0<=y+dy<TILE_SIZE and 0<=x+dx<TILE_SIZE
-            )
-            n[y][x] = 1 if (grid[y][x] and live in (2,3)) or (not grid[y][x] and live==3) else 0
-    return n
-
 GEN0 = INPUT_FRAME
 GEN1 = gol_step_frame(GEN0)
 GEN2 = gol_step_frame(GEN1)
@@ -399,16 +409,21 @@ REF  = [GEN0, GEN1, GEN2]
 # Frame read + assert
 # ============================================================
 
-def read_tile_grid(tile):
-    return [[sram_read_byte(tile, SRAM_GRID_BASE + y*TILE_SIZE + x) & 1
-             for x in range(TILE_SIZE)]
-            for y in range(TILE_SIZE)]
+async def read_tile_grid(tile):
+    grid = []
+    for y in range(TILE_SIZE):
+        row = []
+        for x in range(TILE_SIZE):
+            val = await sram_read_byte(tile, SRAM_GRID_BASE + y*TILE_SIZE + x)
+            row.append(val & 1)
+        grid.append(row)
+    return grid
 
-def read_30x30(dut):
+async def read_30x30(dut):
     f = [[0]*FRAME_SIZE for _ in range(FRAME_SIZE)]
     for tr in range(MESH_R):
         for tc in range(MESH_C):
-            g = read_tile_grid(get_tile(dut, tr, tc))
+            g = await read_tile_grid(get_tile(dut, tr, tc))
             for ly in range(TILE_SIZE):
                 for lx in range(TILE_SIZE):
                     f[tr*TILE_SIZE+ly][tc*TILE_SIZE+lx] = g[ly][lx]
@@ -428,8 +443,8 @@ def print_frame(frame, label):
         print("  " + "".join("█" if v else "·" for v in row))
     print("=" * 36)
 
-def assert_frame(dut, gen_idx, label):
-    act = read_30x30(dut)
+async def assert_frame(dut, gen_idx, label):
+    act = await read_30x30(dut)
     ref = REF[gen_idx]
     write_pbm(act, f"gol_gen{gen_idx}.pbm")
     print_frame(act, label)
@@ -480,23 +495,25 @@ async def wait_for_monitor(dut, target_payload, timeout_ms):
 
 async def do_boot(dut):
     """Start clock, reset, run SPI flash model, wait for cpu_rst_n."""
-    cocotb.start_soon(Clock(dut.clk, 10, unit="ns").start())
+    cocotb.start_soon(Clock(dut.clk, 10, units="ns").start())
 
     # Initial pin state
-    dut.rst.value       = 1
-    dut.flash_miso.value = 0
-    dut.host_csb.value  = 1
-    dut.host_sclk.value = 0
-    dut.host_mosi.value = 0
+    dut.rst.value         = 1
+    dut.flash_miso.value  = 0
+    dut.host_csb.value    = 1
+    dut.host_sclk.value   = 0
+    dut.host_mosi.value   = 0
+    dut.tb_tile_sel.value = 0
+    dut.tb_raddr.value    = 0
 
-    await Timer(RESET_HOLD_MS, unit="ms")
+    await Timer(RESET_HOLD_MS, units="ms")
     dut.rst.value = 0
 
     cocotb.start_soon(spi_flash_model(dut))
 
     dut._log.info("[boot] Waiting for boot_controller to finish...")
     while int(dut.mesh_inst.cpu_rst_n.value) == 0:
-        await Timer(10, unit="us")
+        await Timer(10, units="us")
     dut._log.info("[boot] cpu_rst_n asserted — firmware loaded.")
 
 # ============================================================
@@ -514,7 +531,7 @@ async def verify_firmware_load(dut):
         for tc in range(MESH_C):
             tile = get_tile(dut, tr, tc)
             for addr in range(16):
-                actual   = sram_read_byte(tile, addr)
+                actual   = await sram_read_byte(tile, addr)
                 expected = FIRMWARE[addr] if addr < len(FIRMWARE) else 0
                 if actual != expected:
                     dut._log.error(
@@ -534,11 +551,11 @@ async def host_write_seed(dut):
     """
     1. Assert reset via SPI (cores stay frozen)
     2. Write blinker seed bytes to current_grid address in all SRAMs
-    3. Verify via hierarchy probe
+    3. Verify via backdoor ports
     """
     dut._log.info("[stage2] Asserting reset via host SPI...")
     await host_set_reset(dut, hold=True)
-    await Timer(100, unit="ns")
+    await Timer(100, units="ns")
 
     # Print the input PBM so it's visible in the log
     print_pbm(INPUT_FRAME, "input.pbm — seed being written to all tiles")
@@ -553,14 +570,14 @@ async def host_write_seed(dut):
             val  = tile_seed[y][x]
             await host_write_sram(dut, addr, val)
 
-    # Verify via hierarchy probe on tile(0,0) — all tiles get same write
-    dut._log.info("[stage2] Verifying seed via hierarchy probe on tile(0,0)...")
+    # Verify via backdoor ports on tile(0,0) — all tiles get same write
+    dut._log.info("[stage2] Verifying seed via backdoor ports on tile(0,0)...")
     tile00  = get_tile(dut, 0, 0)
     errors  = 0
     for y in range(TILE_SIZE):
         for x in range(TILE_SIZE):
             addr     = SRAM_GRID_BASE + y * TILE_SIZE + x
-            actual   = sram_read_byte(tile00, addr) & 1
+            actual   = (await sram_read_byte(tile00, addr)) & 1
             expected = tile_seed[y][x]
             if actual != expected:
                 dut._log.error(
@@ -580,9 +597,7 @@ async def host_write_seed(dut):
 async def run_gol(dut):
     """
     Release reset via SPI, wait for 0xCCCCCCCC.
-    Watches BOTH monitor_22_se AND tile(0,0)'s inject_flit so we catch
-    the signal regardless of where it appears.
-    Prints debug state every 10ms so we can see if cores are running.
+    Watches monitor_22_se. Prints debug state every 10ms.
     """
     SIG_GEN_STABLE   = 0x0CCCCCCC   # lower 29 bits of 0xCCCCCCCC
     SIG_BOOT_ALIVE   = 0x0AAAAAAA   # lower 29 bits of 0xAAAAAAAA
@@ -592,26 +607,19 @@ async def run_gol(dut):
     await host_set_reset(dut, hold=False)
 
     # ── Immediate post-release diagnostics ──────────────────────────────
-    await Timer(100, unit="ns")
+    await Timer(100, units="ns")
     try:
-        tile_rst   = int(dut.mesh_inst.rows[0].cols[0].tile_inst.rst.value)
-        boot_mode  = int(dut.mesh_inst.rows[0].cols[0].tile_inst.boot_mode.value)
         cpu_rst_n  = int(dut.mesh_inst.cpu_rst_n.value)
         host_rst   = int(dut.host_rst.value)
         host_rst_en= int(dut.host_rst_en.value)
         dut._log.info(
             f"[stage3] POST-RELEASE: cpu_rst_n={cpu_rst_n} "
-            f"host_rst_en={host_rst_en} host_rst={host_rst} "
-            f"tile.rst={tile_rst} tile.boot_mode={boot_mode}"
+            f"host_rst_en={host_rst_en} host_rst={host_rst}"
         )
-        if tile_rst:
-            dut._log.error("[stage3] ✗ tile.rst is still HIGH — cores not running!")
-        if boot_mode:
-            dut._log.error("[stage3] ✗ tile.boot_mode is still HIGH — SRAM in write mode!")
     except Exception as e:
         dut._log.warning(f"[stage3] Could not probe signals: {e}")
 
-    # ── Poll for signal on both paths ───────────────────────────────────
+    # ── Poll for signal on monitor_22_se ────────────────────────────────
     dut._log.info("[stage3] Polling for NOC signals (checking every 10ms)...")
 
     clk_period_ns  = 10
@@ -619,10 +627,9 @@ async def run_gol(dut):
     total_cycles   = int(ITER_TIMEOUT_MS * 1e6 / clk_period_ns)
     cycles_done    = 0
     seen           = False
-    last_flit_00   = 0
+    last_flit      = 0
 
     while cycles_done < total_cycles:
-        # Run poll_interval cycles
         for _ in range(poll_interval):
             await RisingEdge(dut.clk)
             cycles_done += 1
@@ -632,28 +639,17 @@ async def run_gol(dut):
                 flit = int(dut.monitor_22_se.value)
                 if flit & (1 << 33):
                     payload = flit & 0x1FFFFFFF
-                    if payload == SIG_GEN_STABLE:
-                        dut._log.info(f"[stage3] ✓ 0xCCCCCCCC on monitor_22_se @ cycle {cycles_done}")
-                        seen = True; break
-            except Exception:
-                pass
-
-            # Check tile(0,0) inject_flit
-            try:
-                flit = int(dut.mesh_inst.rows[0].cols[0].tile_inst.router_inst.inject_flit.value)
-                if flit & (1 << 33):
-                    payload = flit & 0x1FFFFFFF
-                    if payload != last_flit_00:
-                        last_flit_00 = payload
+                    if payload != last_flit:
+                        last_flit = payload
                         if payload == SIG_GEN_STABLE:
-                            dut._log.info(f"[stage3] ✓ 0xCCCCCCCC on inject_flit(0,0) @ cycle {cycles_done}")
-                            seen = True; break
+                            dut._log.info(f"[stage3] ✓ 0xCCCCCCCC on monitor_22_se @ cycle {cycles_done}")
+                            seen = True
                         elif payload == SIG_BOOT_ALIVE:
-                            dut._log.info(f"[stage3] ► 0xAAAAAAAA (boot alive) on inject_flit(0,0)")
+                            dut._log.info(f"[stage3] ► 0xAAAAAAAA (boot alive) on monitor_22_se")
                         elif payload == SIG_MATH_DONE:
-                            dut._log.info(f"[stage3] ► 0xDDDDDDDD (math done) on inject_flit(0,0)")
+                            dut._log.info(f"[stage3] ► 0xDDDDDDDD (math done) on monitor_22_se")
                         else:
-                            dut._log.info(f"[stage3] ► flit 0x{payload:08x} on inject_flit(0,0)")
+                            dut._log.info(f"[stage3] ► flit 0x{payload:08x} on monitor_22_se")
             except Exception:
                 pass
 
@@ -663,21 +659,19 @@ async def run_gol(dut):
         if seen:
             break
 
-        # 10ms heartbeat — print current state
+        # 10ms heartbeat
         elapsed_ms = cycles_done * clk_period_ns / 1e6
         try:
-            tile_rst  = int(dut.mesh_inst.rows[0].cols[0].tile_inst.rst.value)
-            boot_mode = int(dut.mesh_inst.rows[0].cols[0].tile_inst.boot_mode.value)
+            cpu_rst_n = int(dut.mesh_inst.cpu_rst_n.value)
             dut._log.info(
                 f"[stage3] {elapsed_ms:.0f}ms elapsed — "
-                f"tile.rst={tile_rst} boot_mode={boot_mode} "
-                f"last_flit=0x{last_flit_00:08x} — still waiting..."
+                f"cpu_rst_n={cpu_rst_n} last_flit=0x{last_flit:08x} — still waiting..."
             )
         except Exception:
             dut._log.info(f"[stage3] {elapsed_ms:.0f}ms elapsed — still waiting...")
 
     if seen:
-        await Timer(5, unit="us")
+        await Timer(5, units="us")
         dut._log.info("[stage3] ✓ Generation 1 stable — sampling SRAM")
     else:
         dut._log.error(
@@ -687,7 +681,7 @@ async def run_gol(dut):
             "  2. tile.boot_mode still high (cpu_rst_n wiring issue)\n"
             "  3. firmware not executing (PC stuck)\n"
             "  4. NOC signal sent to wrong tile ID / wrong flit bits\n"
-            "  Check the heartbeat lines above for tile.rst and boot_mode."
+            "  Check the heartbeat lines above for cpu_rst_n state."
         )
 
     return seen
@@ -703,7 +697,7 @@ async def test_full_pipeline(dut):
       Stage 1 — boot_controller loads firmware into all 9 SRAMs
       Stage 2 — host SPI overwrites current_grid with blinker seed
       Stage 3 — host releases reset, GoL runs, waits for stable signal
-      Stage 4 — hierarchy probe reads 30x30 result, pixel assert, PBM write
+      Stage 4 — backdoor ports read 30x30 result, pixel assert, PBM write
     """
 
     # ---- BOOT ----
@@ -711,13 +705,8 @@ async def test_full_pipeline(dut):
 
     # ──────────────────────────────────────────────────────────
     # CHECKPOINT A: right after boot_controller finishes
-    # Shows firmware bytes at addr 0 and what current_grid looks
-    # like before the host has written anything.
-    # Expected: firmware bytes match firmware.bin, current_grid
-    # shows the initial values baked into .data (vertical blinker
-    # at indices 45/55/65).
     # ──────────────────────────────────────────────────────────
-    dump_checkpoint(dut,
+    await dump_checkpoint(dut,
         title="AFTER BOOT — firmware loaded, CPUs not yet released",
         tiles=[(0,0), (1,1), (2,2)],   # sample 3 tiles (diagonal)
         show_firmware_bytes=32,
@@ -732,10 +721,8 @@ async def test_full_pipeline(dut):
 
     # ──────────────────────────────────────────────────────────
     # CHECKPOINT B: after host SPI has overwritten current_grid
-    # Shows new seed bytes — should see blinker pattern (1s at
-    # rows 4,5,6 col 5).  All 9 tiles should be identical.
     # ──────────────────────────────────────────────────────────
-    dump_checkpoint(dut,
+    await dump_checkpoint(dut,
         title="AFTER HOST SEED — current_grid overwritten with blinker",
         tiles="all",
         show_firmware_bytes=0,     # skip — firmware bytes unchanged
@@ -747,10 +734,8 @@ async def test_full_pipeline(dut):
 
     # ──────────────────────────────────────────────────────────
     # CHECKPOINT C: after 0xCCCCCCCC — generation 1 stable
-    # current_grid should now contain the HORIZONTAL blinker
-    # (rows 5 col 4,5,6) — the classic one-step blinker flip.
     # ──────────────────────────────────────────────────────────
-    dump_checkpoint(dut,
+    await dump_checkpoint(dut,
         title="AFTER GOL GEN 1 — current_grid should be horizontal blinker",
         tiles="all",
         show_firmware_bytes=0,
@@ -758,8 +743,8 @@ async def test_full_pipeline(dut):
         show_full_sram=False)
 
     # ---- STAGE 4: readback + assert ----
-    dut._log.info("[stage4] Reading back 30x30 frame via hierarchy probe...")
-    mismatches = assert_frame(dut, 1, "Generation 1 — actual result")
+    dut._log.info("[stage4] Reading back 30x30 frame via backdoor ports...")
+    mismatches = await assert_frame(dut, 1, "Generation 1 — actual result")
 
     # ---- Print reference for comparison ----
     print_frame(REF[1], "Generation 1 — Python reference")
@@ -794,12 +779,12 @@ async def test_sram_dump_after_boot(dut):
     """
     # ---- Step 1: boot ----
     await do_boot(dut)
-    await Timer(1, unit="us")
+    await Timer(1, units="us")
 
     # ---- Step 2: assert host reset (tiles stay frozen, boot bus active) ----
     dut._log.info("[sram-dump] Asserting host reset via SPI...")
     await host_set_reset(dut, hold=True)
-    await Timer(100, unit="ns")
+    await Timer(100, units="ns")
 
     # ---- Step 3: write seed from input.pbm into current_grid on all tiles ----
     tile_seed = frame_to_tile_grid(INPUT_FRAME, 0, 0)
@@ -824,21 +809,21 @@ async def test_sram_dump_after_boot(dut):
             tile = get_tile(dut, tr, tc)
             print(f"\n  ▶ tile({tr},{tc})")
 
-            dump_sram_hex(tile, 0, DUMP_BYTES,
+            await dump_sram_hex(tile, 0, DUMP_BYTES,
                           f"firmware header (first {DUMP_BYTES}B)")
 
             grid_len = TILE_SIZE * TILE_SIZE
-            dump_sram_hex(tile, SRAM_GRID_BASE, grid_len,
+            await dump_sram_hex(tile, SRAM_GRID_BASE, grid_len,
                           f"current_grid @ 0x{SRAM_GRID_BASE:03x}  ← host-written")
 
-            dump_grid_ascii(tile, f"tile({tr},{tc}) current_grid visual")
+            await dump_grid_ascii(tile, f"tile({tr},{tc}) current_grid visual")
 
             # Spot-check: current_grid should match tile_seed
             mismatches = []
             for y in range(TILE_SIZE):
                 for x in range(TILE_SIZE):
                     addr = SRAM_GRID_BASE + y * TILE_SIZE + x
-                    got  = sram_read_byte(tile, addr) & 1
+                    got  = (await sram_read_byte(tile, addr)) & 1
                     exp  = tile_seed[y][x]
                     if got != exp:
                         mismatches.append((y, x, exp, got))
@@ -851,4 +836,3 @@ async def test_sram_dump_after_boot(dut):
     # ---- Step 5: release reset ----
     await host_set_reset(dut, hold=False)
     dut._log.info("[sram-dump] Reset released — test complete")
-    
