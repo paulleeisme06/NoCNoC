@@ -28,11 +28,11 @@ DESIGN_NAME: chip_top
 VERILOG_FILES:
 - dir::../src/chip_top.sv
 - dir::../src/chip_core.sv
-- dir::../src/dft - Ethan/spi_debug.v
-- dir::../src/mesh - Psi&Aan/mesh_3x3.v
-- dir::../src/mesh - Psi&Aan/mesh_tile.v
-- dir::../src/mesh - Psi&Aan/mesh_router.v
-- dir::../src/mesh - Psi&Aan/boot_loader.v
+- dir::../src/dft_ethan/spi_debug.v
+- dir::../src/mesh_psi_aan/mesh_3x3.v
+- dir::../src/mesh_psi_aan/mesh_tile.v
+- dir::../src/mesh_psi_aan/mesh_router.v
+- dir::../src/mesh_psi_aan/boot_loader.v
 - dir::../src/host-to-chip - Paul&Andrea/host_to_chip.v
 - dir::../src/flash - Sumi/flash_clk.sv
 - dir::../src/flash - Sumi/hk_boot_adapter.v

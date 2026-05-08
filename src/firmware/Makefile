@@ -60,7 +60,7 @@ VERILOG_SOURCES = \
 	$(RTL_DIR)/mesh_3x3.v \
 	$(RTL_DIR)/mesh_tile.v \
 	$(RTL_DIR)/mesh_router.v \
-	$(RTL_DIR)/boot_loader.v \
+	$(RTL_DIR)/boot_controller.v \
 	$(DFT_DIR)/gf180mcu_fd_ip_sram__sram2048x8m8wm1.v \
 	$(VERILOG_EXTRA)
 
