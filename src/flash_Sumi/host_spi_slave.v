@@ -40,7 +40,7 @@ module host_spi_slave (
     output reg         spi_miso,
 
     // Broadcast SRAM write bus (connects to same bus as boot_controller)
-    output reg  [9:0]  sram_waddr,
+    output reg  [10:0] sram_waddr,
     output reg  [7:0]  sram_wdata,
     output reg         sram_wen,      // active-high, one sys_clk pulse
 
@@ -50,7 +50,7 @@ module host_spi_slave (
 
     // Readback interface (to rd_crossbar)
     output reg  [3:0]  rd_tile,       // {tile_row[1:0], tile_col[1:0]}
-    output reg  [9:0]  rd_addr,
+    output reg  [10:0] rd_addr,
     output reg         rd_req,        // one sys_clk pulse
     input  wire [7:0]  rd_data
 );
@@ -139,7 +139,7 @@ module host_spi_slave (
     localparam ST_DONE       = 4'd12;
 
     reg [3:0] state;
-    reg [1:0] addr_hi_r;
+    reg [2:0] addr_hi_r;
 
     always @(posedge sys_clk) begin
         sram_wen <= 1'b0;
@@ -150,10 +150,10 @@ module host_spi_slave (
             state       <= ST_IDLE;
             host_rst    <= 1'b0;
             host_rst_en <= 1'b0;
-            sram_waddr  <= 10'h0;
+            sram_waddr  <= 11'h0;
             sram_wdata  <= 8'h0;
             rd_tile     <= 4'h0;
-            rd_addr     <= 10'h0;
+            rd_addr     <= 11'h0;
         end else if (cs_deassert) begin
             state <= ST_IDLE;
         end else begin
@@ -175,7 +175,7 @@ module host_spi_slave (
                 // ---- WRITE_SRAM ----
                 ST_WR_ADDRHI:
                     if (rx_byte_rdy) begin
-                        addr_hi_r <= rx_shift[1:0];
+                        addr_hi_r <= rx_shift[2:0];
                         state     <= ST_WR_ADDRLO;
                     end
 
@@ -205,7 +205,7 @@ module host_spi_slave (
 
                 ST_RD_ADDRHI:
                     if (rx_byte_rdy) begin
-                        addr_hi_r <= rx_shift[1:0];
+                        addr_hi_r <= rx_shift[2:0];
                         state     <= ST_RD_ADDRLO;
                     end
 
