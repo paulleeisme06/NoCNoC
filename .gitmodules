@@ -6,7 +6,7 @@
 	url = https://github.com/RTimothyEdwards/gf180mcu_ocd_ip_sram
 [submodule "src/serv"]
 	path = src/serv
-	url = git@github.com:olofk/serv.git
+	url = https://github.com/olofk/serv.git
 [submodule "src/subservient"]
 	path = src/subservient
 	url = git@github.com:paulleeisme06/subservient.git

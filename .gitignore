@@ -6,3 +6,9 @@ sim_build/
 final/
 img/
 *.lyrdb
+*.txt
+*.bin
+*.elf
+sim_build/
+src/firmware/firmware.bin
+src/firmware/test.txt
