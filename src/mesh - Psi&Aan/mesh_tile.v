@@ -221,7 +221,7 @@ module mesh_tile #(
     // -----------------------------------------------------------------------
     // GF180 2048×8 SRAM
     // -----------------------------------------------------------------------
-    gf180mcu_fd_ip_sram__sram2048x8m8wm1 sram_inst (
+   /* gf180mcu_fd_ip_sram__sram2048x8m8wm1 sram_inst (
         .CLK (clk),
         .CEN (~sram_active),  // Active-LOW chip enable
         .GWEN(~sram_write),   // Active-LOW global write enable
@@ -231,6 +231,21 @@ module mesh_tile #(
         .Q   (sram_rdata),
         .VDD (),
         .VSS ()
+    );
+    */
+    // Ethan: correct SRAM instantiation
+    sram2048x8_gf180 sram2048 (
+        `ifdef USE_POWER_PINS
+            .VDD (VDD),
+            .VSS (VSS),
+        `endif
+        .CLK (clk),
+        .CEN (~sram_active),
+        .GWEN (~sram_write),
+        .WEN (8'b0),
+        .A (final_a),
+        .D (final_d),
+        .Q (sram_rdata)
     );
 
     assign dft_rdata = sram_rdata;
