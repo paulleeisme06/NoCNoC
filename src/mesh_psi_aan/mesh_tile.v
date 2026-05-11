@@ -1,29 +1,38 @@
 `default_nettype none
 
+// ============================================================================
+// mesh_tile — one RISC-V tile in the MESH_R × MESH_C mesh
+//
+// Parameters:
+//   TILE_ID  : 6-bit tile identifier, encoded as {row[2:0], col[2:0]}
+//   MESH_R   : mesh row count    (passed through to router)
+//   MESH_C   : mesh column count (passed through to router)
+//
+// Do NOT hardcode MESH_R / MESH_C here — they are driven from mesh_nxn.v
+// which reads them from mesh_config.vh.
+// ============================================================================
 module mesh_tile #(
-    parameter [3:0] TILE_ID = 4'b0000
+    parameter [5:0]   TILE_ID = 6'b000000,
+    parameter integer MESH_R  = 5,
+    parameter integer MESH_C  = 5
 )(
     input wire clk,
     input wire rst,
     input wire boot_mode,
     input wire [10:0] boot_addr,
-    input wire [7:0] boot_data,
-    input wire       boot_wen,
+    input wire [7:0]  boot_data,
+    input wire        boot_wen,
 
-    input  wire [33:0] north_in, south_in, east_in, west_in,
-    output wire [33:0] north_out, south_out, east_out, west_out,
-    input  wire [33:0] ne_in, nw_in, se_in, sw_in,
-    output wire [33:0] ne_out, nw_out, se_out, sw_out,
-
-    // Ethan: The following ports are for off chip debugging purposes
-
-    input wire dft_mode,  // 1 = DFT takes over SRAM
-    input wire dft_ce,    // active high chip enable
-    input wire dft_we,    // active high write enable
-    input wire [10:0] dft_addr, 
-    input wire [7:0]  dft_wdata,
-    output wire [7:0]  dft_rdata
+    input  wire [35:0] north_in, south_in, east_in, west_in,
+    output wire [35:0] north_out, south_out, east_out, west_out,
+    input  wire [35:0] ne_in, nw_in, se_in, sw_in,
+    output wire [35:0] ne_out, nw_out, se_out, sw_out
 );
+
+    initial begin
+        $display("[TILE_ID_CHECK] TILE_ID param = %0d  (row=%0d col=%0d)",
+                TILE_ID, TILE_ID[5:3], TILE_ID[2:0]);
+    end
 
     wire [31:0] wb_adr, wb_dat_c2r, wb_dat_r2c;
     wire [3:0]  wb_sel;
@@ -71,106 +80,67 @@ module mesh_tile #(
     // All four signals are registered here for identical reasons.
     //
     // -----------------------------------------------------------------------
+    wire [10:0] sram_waddr, sram_raddr;
+    wire [7:0]  sram_wdata, sram_rdata;
+    wire        sram_wen, sram_ren;
+
+    // -------------------------------------------------------------------------
+    // Address pipeline registers
+    // -------------------------------------------------------------------------
+    reg [10:0] sram_raddr_reg;
+    reg [10:0] sram_waddr_reg;
+    reg [7:0]  sram_wdata_reg;
+    reg        sram_wen_reg;
+
+    always @(posedge clk) begin
+        if (rst) begin
+            sram_raddr_reg <= 0;
+            sram_waddr_reg <= 0;
+            sram_wdata_reg <= 0;
+            sram_wen_reg   <= 0;
+        end else begin
+            sram_raddr_reg <= sram_raddr;
+            sram_waddr_reg <= sram_waddr;
+            sram_wdata_reg <= sram_wdata;
+            sram_wen_reg   <= sram_wen;
+        end
+    end
+
+    // -------------------------------------------------------------------------
+    // Seed/grid write monitor (tile 1 only)
+    // -------------------------------------------------------------------------
+    always @(posedge clk) begin
+        if (!boot_mode && TILE_ID == 1) begin
+            if (sram_wen && final_a >= 11'h500 && final_a <= 11'h563)
+                $display("[SEED_WRITE t=%0t] TILE=1 addr=0x%03x data=0x%02x",
+                        $time, final_a, final_d);
+            if (!sram_wen && final_a >= 11'h500 && final_a <= 11'h563)
+                $display("[SEED_READ  t=%0t] TILE=1 addr=0x%03x data=0x%02x",
+                        $time, final_a, sram_rdata);
+        end
+    end
+
+    // -------------------------------------------------------------------------
     // CEN startup-pulse generator
-    // -----------------------------------------------------------------------
-    // The GF180 SRAM model requires CEN to perform a HIGH→LOW transition to
-    // arm its internal cen_fell flag before any operation is accepted.
-    // After that transition CEN is held LOW permanently (synchronous mode).
-    //
+    // -------------------------------------------------------------------------
     reg boot_mode_q;
     always @(posedge clk or posedge rst)
         if (rst) boot_mode_q <= 1'b1;
         else     boot_mode_q <= boot_mode;
 
-    // One-cycle HIGH pulse on the clock edge where boot_mode falls.
     wire cpu_sram_init_pulse = boot_mode_q & ~boot_mode;
 
-
-    // -----------------------------------------------------------------------
-    // NOC Boot Reciever 
-    // -----------------------------------------------------------------------
-    //  Boot flit payload encoding (set by noc_boot_injector in top.v):
-    //   flit[33]    = valid
-    //   flit[32:29] = dest tile ID
-    //   flit[28:25] = FLIT_TYPE_BOOT = 4'hE
-    //   flit[24:14] = SRAM address [10:0]  (11 bits, covers 2048 bytes)
-    //   flit[13:8] = reserved
-    //   flit[7:0] = data byte
-    //  This uses the boot flits and writes them to SRAM rather than the broadcast bus (which was the implementation before)
-    localparam FLIT_TYPE_BOOT = 4'hE;
-
-    wire [33:0] router_eject_head  = router_inst.fifo_head_comb;
-    wire        router_eject_empty = router_inst.fifo_empty;
-
-    wire flit_is_boot = !router_eject_empty &&
-                        (router_eject_head[28:25] == FLIT_TYPE_BOOT);
-
-    wire noc_boot_active = boot_mode && flit_is_boot;
-
-    wire [10:0] noc_boot_addr_dec = router_eject_head[24:14];
-    wire [7:0]  noc_boot_data_dec = router_eject_head[7:0];
-
-    localparam NB_IDLE  = 2'd0;
-    localparam NB_WRITE = 2'd1;
-    localparam NB_POP   = 2'd2;
-
-    reg [1:0]  nb_state;
-    reg [10:0] nb_addr_latch;
-    reg [7:0]  nb_data_latch;
-    reg        nb_wen;
-    reg        nb_pop;
-
-    always @(posedge clk) begin
-        if (rst) begin
-            nb_state      <= NB_IDLE;
-            nb_wen        <= 0;
-            nb_pop        <= 0;
-            nb_addr_latch <= 0;
-            nb_data_latch <= 0;
-        end else begin
-            nb_wen <= 0;
-            nb_pop <= 0;
-
-            case (nb_state)
-                NB_IDLE: begin
-                    if (noc_boot_active) begin
-                        nb_addr_latch <= noc_boot_addr_dec;
-                        nb_data_latch <= noc_boot_data_dec;
-                        nb_state      <= NB_WRITE;
-                    end
-                end
-                NB_WRITE: begin
-                    nb_wen   <= 1;
-                    nb_state <= NB_POP;
-                    $display("[NOC_BOOT t=%0t] TILE %0d writing addr=0x%03x data=0x%02x",
-                        $time, TILE_ID, nb_addr_latch, nb_data_latch);
-                end
-                NB_POP: begin
-                    nb_pop   <= 1;
-                    nb_state <= NB_IDLE;
-                end
-                default: nb_state <= NB_IDLE;
-            endcase
-        end
-    end
-
-    // Fake WB read to pop the flit — only fires during boot_mode
-    wire boot_pop_active = boot_mode && nb_pop;
-
-    // -----------------------------------------------------------------------
+    // -------------------------------------------------------------------------
     // Address / Data MUX
-    // -----------------------------------------------------------------------
-    // Priority: DFT (highest) > boot_bus > NOC boot > CPU
-    // tile(0,0) receives boot via boot bus; tiles 1-8 receive via NOC boot flits.
-    wire boot_bus_writing = boot_mode && ~boot_wen;
-    wire noc_boot_writing = boot_mode && nb_wen && (TILE_ID != 4'h0);
+    // -------------------------------------------------------------------------
+    wire [10:0] final_a = boot_mode ? boot_addr  : (sram_wen ? sram_waddr : sram_raddr);
+    wire [7:0]  final_d = boot_mode ? boot_data  : sram_wdata;
 
-    wire [10:0] final_a =
-        dft_mode         ? dft_addr       :
-        boot_bus_writing ? boot_addr      :
-        noc_boot_writing ? nb_addr_latch  :
-        sram_wen         ? sram_waddr     :
-                           sram_raddr;
+    // -------------------------------------------------------------------------
+    // SRAM control signals
+    // -------------------------------------------------------------------------
+    wire sram_active = boot_mode ? ~boot_wen            : ~cpu_sram_init_pulse;
+    wire sram_write  = boot_mode ? ~boot_wen            : sram_wen;
 
     wire [7:0] final_d =
         dft_mode         ? dft_wdata      :
@@ -206,8 +176,12 @@ module mesh_tile #(
     // Subservient RISC-V core
     // -----------------------------------------------------------------------
     subservient_core #(.memsize(1024)) core_inst (
+    // -------------------------------------------------------------------------
+    // Subservient RISC-V core (bit-serial SERV)
+    // -------------------------------------------------------------------------
+    subservient_core #(.memsize(2048)) core_inst (
         .i_clk       (clk),
-        .i_rst       (rst | boot_mode | dft_mode),  // Ethan: Updated to hold core in reset during DFT
+        .i_rst       (rst | boot_mode),
         .o_sram_waddr(sram_waddr),
         .o_sram_wdata(sram_wdata),
         .o_sram_wen  (sram_wen),
@@ -235,25 +209,51 @@ module mesh_tile #(
         .i_raddr (final_raddr),
         .o_rdata (sram_rdata),
         .i_ren   (final_ren)
+    // -------------------------------------------------------------------------
+    // GF180 2048×8 SRAM
+    // -------------------------------------------------------------------------
+    gf180mcu_fd_ip_sram__sram2048x8m8wm1 sram_inst (
+        .CLK (clk),
+        .CEN (~sram_active),
+        .GWEN(~sram_write),
+        .WEN (8'b0),
+        .A   (final_a),
+        .D   (final_d),
+        .Q   (sram_rdata),
+        .VDD (),
+        .VSS ()
     );
 
-    assign dft_rdata = sram_rdata;
-
-    // DEBUG: monitor ALL non-zero SRAM writes (to find where do_recv writes go)
+    // -------------------------------------------------------------------------
+    // Debug: SRAM write monitor — tile 1
+    // -------------------------------------------------------------------------
     always @(posedge clk) begin
-        if (!boot_mode && sram_wen && final_d != 8'h00 && TILE_ID == 4) begin
+        if (!boot_mode && sram_wen && final_d != 8'h00 && TILE_ID == 1) begin
             $display("[SRAM t=%0t] MY_ID=%0d WRITE addr=0x%03x data=0x%02x",
                      $time, TILE_ID, final_a, final_d);
         end
     end
 
-    // ── TILE(0,0) ghost buffer write monitor ─────────────────────────────────
-    // ghost_N  @ 0x0600..0x0609  — bottom row of north neighbour  (none for (0,0), should stay 0)
-    // ghost_S  @ 0x060A..0x0613  — top    row of south neighbour  tile(1,0)
-    // ghost_W  @ 0x0614..0x061D  — right  col of west  neighbour  (none for (0,0), should stay 0)
-    // ghost_E  @ 0x061E..0x0627  — left   col of east  neighbour  tile(0,1)
-    // Watching these writes confirms recv_ghost() decoded the bitmap correctly
-    // and stored it into the right buffer slot.
+    // -------------------------------------------------------------------------
+    // Debug: SRAM read monitor — tile 1
+    // -------------------------------------------------------------------------
+    reg [10:0] prev_raddr_t1;
+    reg        prev_rvalid_t1;
+    always @(posedge clk) begin
+        if (!boot_mode && TILE_ID == 1) begin
+            prev_raddr_t1  <= final_a;
+            prev_rvalid_t1 <= !sram_wen;
+        end else begin
+            prev_rvalid_t1 <= 1'b0;
+        end
+        if (prev_rvalid_t1)
+            $display("[SRAM_READ t=%0t] MY_ID=%0d READ addr=0x%03x data=0x%02x (1-cycle-delayed)",
+                     $time, TILE_ID, prev_raddr_t1, sram_rdata);
+    end
+
+    // -------------------------------------------------------------------------
+    // Debug: ghost buffer write monitor — tile(0,0)
+    // -------------------------------------------------------------------------
     always @(posedge clk) begin
         if (!boot_mode && TILE_ID == 0 && sram_wen) begin
             if (final_a >= 11'h600 && final_a <= 11'h609)
@@ -271,11 +271,9 @@ module mesh_tile #(
         end
     end
 
-    // ── TILE(0,0) next_grid boundary cell write monitor ───────────────────────
-    // next_grid @ 0x0640..0x06A3  (10x10 = 100 bytes, row-major)
-    // Only prints border cells (row 0, row 9, col 0, col 9) because those are
-    // the cells whose neighbour_count() uses ghost buffer values — interior
-    // cells only touch grid[] which is always local and unambiguous.
+    // -------------------------------------------------------------------------
+    // Debug: next_grid border-cell write monitor — tile(0,0)
+    // -------------------------------------------------------------------------
     always @(posedge clk) begin
         if (!boot_mode && TILE_ID == 0 && sram_wen &&
             final_a >= 11'h640 && final_a <= 11'h6A3) begin
@@ -291,17 +289,21 @@ module mesh_tile #(
         end
     end
 
-    // -----------------------------------------------------------------------
+    // -------------------------------------------------------------------------
     // Mesh router
-    // -----------------------------------------------------------------------
-    mesh_router #(.MY_ID(TILE_ID)) router_inst (
+    // -------------------------------------------------------------------------
+    mesh_router #(
+        .MY_ID (TILE_ID),
+        .MESH_R(MESH_R),
+        .MESH_C(MESH_C)
+    ) router_inst (
         .clk            (clk),
         .rst            (rst),
-        .local_wb_adr   (final_wb_adr),
-        .local_wb_dat_o (final_wb_dat),
+        .local_wb_adr   (wb_adr),
+        .local_wb_dat_o (wb_dat_c2r),
         .local_wb_dat_i (wb_dat_r2c),
-        .local_wb_we    (final_wb_we),
-        .local_wb_stb   (final_wb_stb),
+        .local_wb_we    (wb_we),
+        .local_wb_stb   (wb_stb),
         .local_wb_ack   (wb_ack),
         .n_in (north_in),  .s_in (south_in),  .e_in (east_in),  .w_in (west_in),
         .n_out(north_out), .s_out(south_out), .e_out(east_out), .w_out(west_out),

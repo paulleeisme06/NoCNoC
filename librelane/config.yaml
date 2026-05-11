@@ -33,6 +33,11 @@ VERILOG_FILES:
 - dir::../src/mesh_psi_aan/mesh_tile.v
 - dir::../src/mesh_psi_aan/mesh_router.v
 - dir::../src/mesh_psi_aan/boot_controller.v
+- dir::../src/dft_ethan/spi_debug.v
+- dir::../src/mesh_psi_aan/mesh_3x3.v
+- dir::../src/mesh_psi_aan/mesh_tile.v
+- dir::../src/mesh_psi_aan/mesh_router.v
+- dir::../src/mesh_psi_aan/boot_loader.v
 - dir::../src/host-to-chip - Paul&Andrea/host_to_chip.v
 - dir::../src/subservient/rtl/subservient_core.v
 - dir::../src/subservient/rtl/subservient_rf_ram_if.v
