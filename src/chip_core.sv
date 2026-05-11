@@ -141,6 +141,7 @@ module chip_core #(
     // -------------------------------------------------------------------------
     // spi_debug — DFT interface (Ethan)
     // -------------------------------------------------------------------------
+    assign dbg_rdata = 8'b0; // mesh_rxc has no DFT readback yet
     spi_debug my_spi_debug (
         .clk        (clk),
         .rst        (~rst_n),
