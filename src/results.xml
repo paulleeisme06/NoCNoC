@@ -1,10 +1,8 @@
 <testsuites name="results">
   <testsuite name="all" package="all">
-    <property name="random_seed" value="1778492337" />
-    <testcase name="test_magic_check" classname="test_mesh" file="/home/psi19/NoCNoC/cocotb/test_mesh.py" lineno="224" time="110.05966401100159" sim_time_ns="4700000.0" ratio_time="42704.11001373026" />
-    <testcase name="test_iter0_seed_only" classname="test_mesh" file="/home/psi19/NoCNoC/cocotb/test_mesh.py" lineno="260" time="112.5099949836731" sim_time_ns="4700000.0" ratio_time="41774.06639011975" />
-    <testcase name="test_checkerboard_iter1_iter2" classname="test_mesh" file="/home/psi19/NoCNoC/cocotb/test_mesh.py" lineno="286" time="359.38054275512695" sim_time_ns="11016690.0" ratio_time="30654.664594645295">
-      <failure error_type="AssertionError" error_msg="Checkerboard test failed: iter0=0, iter1=0, iter2=800" />
-    </testcase>
+    <property name="random_seed" value="1778493906" />
+    <testcase name="test_magic_check" classname="test_mesh" file="/home/psi19/NoCNoC/cocotb/test_mesh.py" lineno="224" time="111.28390836715698" sim_time_ns="4700000.0" ratio_time="42234.31823128799" />
+    <testcase name="test_iter0_seed_only" classname="test_mesh" file="/home/psi19/NoCNoC/cocotb/test_mesh.py" lineno="260" time="115.85858511924744" sim_time_ns="4700000.0" ratio_time="40566.69598685782" />
+    <testcase name="test_checkerboard_iter1_iter2" classname="test_mesh" file="/home/psi19/NoCNoC/cocotb/test_mesh.py" lineno="286" time="184.47094750404358" sim_time_ns="6539350.0" ratio_time="35449.21348580734" />
   </testsuite>
 </testsuites>

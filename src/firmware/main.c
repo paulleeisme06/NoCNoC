@@ -269,8 +269,22 @@ int main(void)
     noc_signal(SIG_GEN_STABLE);
 
     /*
-     * Stop here so iteration 1 remains stable.
-     * Do not continue to iteration 2 yet.
+     * ITERATION 2:
+     * expected parity is (row + col + 2) even — same phase as iter 0.
+     */
+    *(volatile uint32_t *)DEBUG_PHASE_MARKER = 0x00000002u;
+    *(volatile uint32_t *)DEBUG_PRE_CHECKERBOARD = 0x11110002u;
+
+    write_checkerboard_asm(fill_val, 2u);
+
+    *(volatile uint32_t *)DEBUG_POST_CHECKERBOARD = 0x22220002u;
+    *(volatile uint32_t *)DEBUG_ITER_COUNT = 2u;
+
+    noc_signal(SIG_MATH_DONE);
+    noc_signal(SIG_GEN_STABLE);
+
+    /*
+     * Stop here so iteration 2 remains stable.
      */
     while (1) {
         __asm__ volatile ("nop");
