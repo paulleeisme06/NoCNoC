@@ -15,8 +15,8 @@
 #define PHYS_COLS    3
 
 /* Must match ACTIVE_R / ACTIVE_C in test_mesh.py */
-#define ACTIVE_ROWS  3
-#define ACTIVE_COLS  3
+#define ACTIVE_ROWS  2
+#define ACTIVE_COLS  2
 
 #define GRID_BASE       0x0500u
 #define GHOST_BASE      0x0600u
