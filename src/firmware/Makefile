@@ -37,7 +37,7 @@ LDFLAGS = -T $(LINKER) -nostdlib
 # --- COCOTB / VERILATOR SETTINGS ---
 ########################################
 TOPLEVEL_LANG = verilog
-TOPLEVEL      = mesh_3x3
+TOPLEVEL      = mesh_rxc
 MODULE        = test_mesh
 SIM           = verilator
 
