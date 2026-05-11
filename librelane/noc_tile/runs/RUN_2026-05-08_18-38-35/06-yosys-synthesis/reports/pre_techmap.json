@@ -1,0 +1,77 @@
+{
+   "creator": "Yosys 0.62 (git sha1 7326bb7d6641500ecb285c291a54a662cb1e76cf, clang++ 21.1.2 -fPIC -O3)",
+   "invocation": "stat -json -liberty /home/etcfranc/NoCNoC/librelane/noc_tile/runs/RUN_2026-05-08_18-38-35/tmp/8a8a544cfc164b0e94b967a480993924.lib -liberty /home/etcfranc/NoCNoC/librelane/noc_tile/runs/RUN_2026-05-08_18-38-35/tmp/15cbbec3cd8646f4bb6428bd022e933c.lib -liberty /home/etcfranc/NoCNoC/librelane/noc_tile/runs/RUN_2026-05-08_18-38-35/tmp/1a7a79f3920b49cc9888494dc632c82e.lib ",
+   "modules": {
+      "\\mesh_tile": {
+         "num_wires":         8357,
+         "num_wire_bits":     9521,
+         "num_pub_wires":     134,
+         "num_pub_wire_bits": 1275,
+         "num_ports":         28,
+         "num_port_bits":     597,
+         "num_memories":      0,
+         "num_memory_bits":   0,
+         "num_processes":     0,
+         "num_cells":         8948,
+         "num_submodules":       0,
+         "num_cells_by_type": {
+            "$_ANDNOT_": 433,
+            "$_AND_": 54,
+            "$_DFFE_PN_": 25,
+            "$_DFFE_PP_": 145,
+            "$_DFF_PP1_": 1,
+            "$_DFF_P_": 40,
+            "$_MUX_": 6699,
+            "$_NAND_": 130,
+            "$_NOR_": 76,
+            "$_NOT_": 340,
+            "$_ORNOT_": 62,
+            "$_OR_": 585,
+            "$_SDFFCE_PN0P_": 88,
+            "$_SDFFCE_PP0P_": 32,
+            "$_SDFFE_PP0P_": 11,
+            "$_SDFF_PN0_": 2,
+            "$_SDFF_PP0_": 188,
+            "$_XNOR_": 5,
+            "$_XOR_": 30,
+            "gf180mcu_ocd_ip_sram__sram1024x8m8wm1": 2
+         }
+      }
+   },
+      "design": {
+         "num_wires":         8357,
+         "num_wire_bits":     9521,
+         "num_pub_wires":     134,
+         "num_pub_wire_bits": 1275,
+         "num_ports":         28,
+         "num_port_bits":     597,
+         "num_memories":      0,
+         "num_memory_bits":   0,
+         "num_processes":     0,
+         "num_cells":         8948,
+         "num_submodules":       0,
+         "num_cells_by_type": {
+            "$_ANDNOT_": 433,
+            "$_AND_": 54,
+            "$_DFFE_PN_": 25,
+            "$_DFFE_PP_": 145,
+            "$_DFF_PP1_": 1,
+            "$_DFF_P_": 40,
+            "$_MUX_": 6699,
+            "$_NAND_": 130,
+            "$_NOR_": 76,
+            "$_NOT_": 340,
+            "$_ORNOT_": 62,
+            "$_OR_": 585,
+            "$_SDFFCE_PN0P_": 88,
+            "$_SDFFCE_PP0P_": 32,
+            "$_SDFFE_PP0P_": 11,
+            "$_SDFF_PN0_": 2,
+            "$_SDFF_PP0_": 188,
+            "$_XNOR_": 5,
+            "$_XOR_": 30,
+            "gf180mcu_ocd_ip_sram__sram1024x8m8wm1": 2
+         }
+      }
+}
+

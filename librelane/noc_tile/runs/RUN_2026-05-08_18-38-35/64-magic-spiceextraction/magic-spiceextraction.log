@@ -1,0 +1,325 @@
+
+Magic 8.3 revision 623 - Compiled on Fri Apr 17 00:01:28 UTC 2026.
+Starting magic under Tcl interpreter
+Using the terminal as the console.
+Using NULL graphics device.
+Processing system .magicrc file
+Switching to WIRING tool.
+Switching to NETLIST tool.
+Switching to PICK tool.
+Switching to BOX tool.
+Sourcing design .magicrc for technology gf180mcuD ...
+10 Magic internal units = 1 Lambda
+Input style import: scaleFactor=10, multiplier=2
+The following types are not handled by extraction and will be treated as non-electrical types:
+    obsactive mvobsactive filldiff fillpoly m1hole obsm1 fillm1 obsv1 m2hole obsm2 fillm2 obsv2 m3hole obsm3 fillm3 m4hole obsm4 fillm4 m5hole obsm5 fillm5 glass fillblock lvstext obscomment 
+Scaled tech values by 10 / 1 to match internal grid scaling
+Loading gf180mcuD Device Generator Menu ...
+Loading "/nix/store/xjkk69lna4pw6jkb6bhsvqkgmfkjqxg5-python3-3.13.9-env/lib/python3.13/site-packages/librelane/scripts/magic/wrapper.tcl" from command line.
+> lef read /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_as_sc_mcu7t3v3/techlef/gf180mcu_as_sc_mcu7t3v3__nom.tlef
+Reading LEF data from file /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_as_sc_mcu7t3v3/techlef/gf180mcu_as_sc_mcu7t3v3__nom.tlef.
+This action cannot be undone.
+LEF read, Line 88 (Message): Unknown keyword "MINWIDTH" in LEF file; ignoring.
+LEF read, Line 95 (Message): Unknown keyword "ANTENNAMODEL" in LEF file; ignoring.
+LEF read, Line 105 (Message): Unknown keyword "DENSITYCHECKWINDOW" in LEF file; ignoring.
+LEF read, Line 106 (Message): Unknown keyword "DENSITYCHECKSTEP" in LEF file; ignoring.
+LEF read, Line 120 (Message): Unknown keyword "ARRAYSPACING" in LEF file; ignoring.
+LEF read, Line 125 (Message): Unknown keyword "ANTENNAMODEL" in LEF file; ignoring.
+LEF read, Line 137 (Message): Unknown keyword "MINWIDTH" in LEF file; ignoring.
+LEF read, Line 144 (Message): Unknown keyword "ANTENNAMODEL" in LEF file; ignoring.
+LEF read, Line 145 (Message): Unknown keyword "ANTENNADIFFSIDEAREARATIO" in LEF file; ignoring.
+LEF read, Line 146 (Message): Unknown keyword "ANTENNAGATEPLUSDIFF" in LEF file; ignoring.
+LEF read, Line 155 (Message): Unknown keyword "DENSITYCHECKWINDOW" in LEF file; ignoring.
+LEF read, Line 156 (Message): Unknown keyword "DENSITYCHECKSTEP" in LEF file; ignoring.
+LEF read, Line 172 (Message): Unknown keyword "ARRAYSPACING" in LEF file; ignoring.
+LEF read, Line 177 (Message): Unknown keyword "ANTENNAMODEL" in LEF file; ignoring.
+LEF read, Line 189 (Message): Unknown keyword "MINWIDTH" in LEF file; ignoring.
+LEF read, Line 196 (Message): Unknown keyword "ANTENNAMODEL" in LEF file; ignoring.
+LEF read, Line 197 (Message): Unknown keyword "ANTENNADIFFSIDEAREARATIO" in LEF file; ignoring.
+LEF read, Line 198 (Message): Unknown keyword "ANTENNAGATEPLUSDIFF" in LEF file; ignoring.
+LEF read, Line 207 (Message): Unknown keyword "DENSITYCHECKWINDOW" in LEF file; ignoring.
+LEF read, Line 208 (Message): Unknown keyword "DENSITYCHECKSTEP" in LEF file; ignoring.
+LEF read, Line 224 (Message): Unknown keyword "ARRAYSPACING" in LEF file; ignoring.
+LEF read, Line 229 (Message): Unknown keyword "ANTENNAMODEL" in LEF file; ignoring.
+LEF read, Line 241 (Message): Unknown keyword "MINWIDTH" in LEF file; ignoring.
+LEF read, Line 248 (Message): Unknown keyword "ANTENNAMODEL" in LEF file; ignoring.
+LEF read, Line 249 (Message): Unknown keyword "ANTENNADIFFSIDEAREARATIO" in LEF file; ignoring.
+LEF read, Line 250 (Message): Unknown keyword "ANTENNAGATEPLUSDIFF" in LEF file; ignoring.
+LEF read, Line 259 (Message): Unknown keyword "DENSITYCHECKWINDOW" in LEF file; ignoring.
+LEF read, Line 260 (Message): Unknown keyword "DENSITYCHECKSTEP" in LEF file; ignoring.
+LEF read, Line 276 (Message): Unknown keyword "ARRAYSPACING" in LEF file; ignoring.
+LEF read, Line 281 (Message): Unknown keyword "ANTENNAMODEL" in LEF file; ignoring.
+LEF read, Line 295 (Message): Unknown keyword "MINWIDTH" in LEF file; ignoring.
+LEF read, Line 307 (Message): Unknown keyword "ANTENNAMODEL" in LEF file; ignoring.
+LEF read, Line 308 (Message): Unknown keyword "ANTENNADIFFSIDEAREARATIO" in LEF file; ignoring.
+LEF read, Line 309 (Message): Unknown keyword "ANTENNAGATEPLUSDIFF" in LEF file; ignoring.
+LEF read, Line 314 (Message): Unknown keyword "DENSITYCHECKWINDOW" in LEF file; ignoring.
+LEF read, Line 315 (Message): Unknown keyword "DENSITYCHECKSTEP" in LEF file; ignoring.
+LEF read: Processed 1319 lines.
+> lef read /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_as_sc_mcu7t3v3/lef/gf180mcu_as_sc_mcu7t3v3.lef
+Reading LEF data from file /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_as_sc_mcu7t3v3/lef/gf180mcu_as_sc_mcu7t3v3.lef.
+This action cannot be undone.
+LEF read: Processed 6762 lines.
+> lef read /home/etcfranc/NoCNoC/libs/gf180mcu_ocd_ip_sram/cells/gf180mcu_ocd_ip_sram__sram1024x8m8wm1/gf180mcu_ocd_ip_sram__sram1024x8m8wm1.lef
+Reading LEF data from file /home/etcfranc/NoCNoC/libs/gf180mcu_ocd_ip_sram/cells/gf180mcu_ocd_ip_sram__sram1024x8m8wm1/gf180mcu_ocd_ip_sram__sram1024x8m8wm1.lef.
+This action cannot be undone.
+LEF read: Processed 2550 lines.
+> lef read /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_fd_io/lef/gf180mcu_fd_io__dvdd.lef
+Reading LEF data from file /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_fd_io/lef/gf180mcu_fd_io__dvdd.lef.
+This action cannot be undone.
+LEF read: Processed 801 lines.
+> lef read /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_fd_io/lef/gf180mcu_fd_io__cor.lef
+Reading LEF data from file /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_fd_io/lef/gf180mcu_fd_io__cor.lef.
+This action cannot be undone.
+LEF read: Processed 1317 lines.
+> lef read /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_fd_io/lef/gf180mcu_fd_io__bi_24t.lef
+Reading LEF data from file /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_fd_io/lef/gf180mcu_fd_io__bi_24t.lef.
+This action cannot be undone.
+LEF read: Processed 874 lines.
+> lef read /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_fd_io/lef/gf180mcu_fd_io__bi_t.lef
+Reading LEF data from file /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_fd_io/lef/gf180mcu_fd_io__bi_t.lef.
+This action cannot be undone.
+LEF read: Processed 897 lines.
+> lef read /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_fd_io/lef/gf180mcu_fd_io__dvss.lef
+Reading LEF data from file /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_fd_io/lef/gf180mcu_fd_io__dvss.lef.
+This action cannot be undone.
+LEF read: Processed 801 lines.
+> lef read /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_fd_io/lef/gf180mcu_fd_io__asig_5p0.lef
+Reading LEF data from file /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_fd_io/lef/gf180mcu_fd_io__asig_5p0.lef.
+This action cannot be undone.
+LEF read: Processed 820 lines.
+> lef read /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_fd_io/lef/gf180mcu_fd_io__in_c.lef
+Reading LEF data from file /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_fd_io/lef/gf180mcu_fd_io__in_c.lef.
+This action cannot be undone.
+LEF read: Processed 817 lines.
+> lef read /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_fd_io/lef/gf180mcu_fd_io__fill5.lef
+Reading LEF data from file /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_fd_io/lef/gf180mcu_fd_io__fill5.lef.
+This action cannot be undone.
+LEF read: Processed 767 lines.
+> lef read /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_fd_io/lef/gf180mcu_fd_io__brk5.lef
+Reading LEF data from file /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_fd_io/lef/gf180mcu_fd_io__brk5.lef.
+This action cannot be undone.
+LEF read: Processed 83 lines.
+> lef read /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_fd_io/lef/gf180mcu_fd_io__fill1.lef
+Reading LEF data from file /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_fd_io/lef/gf180mcu_fd_io__fill1.lef.
+This action cannot be undone.
+LEF read: Processed 347 lines.
+> lef read /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_fd_io/lef/gf180mcu_fd_io__brk2.lef
+Reading LEF data from file /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_fd_io/lef/gf180mcu_fd_io__brk2.lef.
+This action cannot be undone.
+LEF read: Processed 47 lines.
+> lef read /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_fd_io/lef/gf180mcu_fd_io__fillnc.lef
+Reading LEF data from file /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_fd_io/lef/gf180mcu_fd_io__fillnc.lef.
+This action cannot be undone.
+LEF read: Processed 347 lines.
+> lef read /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_fd_io/lef/gf180mcu_ws_io__dvdd.lef
+Reading LEF data from file /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_fd_io/lef/gf180mcu_ws_io__dvdd.lef.
+This action cannot be undone.
+LEF read: Processed 818 lines.
+> lef read /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_fd_io/lef/gf180mcu_fd_io__in_s.lef
+Reading LEF data from file /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_fd_io/lef/gf180mcu_fd_io__in_s.lef.
+This action cannot be undone.
+LEF read: Processed 817 lines.
+> lef read /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_fd_io/lef/gf180mcu_fd_io__fill10.lef
+Reading LEF data from file /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_fd_io/lef/gf180mcu_fd_io__fill10.lef.
+This action cannot be undone.
+LEF read: Processed 767 lines.
+> lef read /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_fd_io/lef/gf180mcu_ef_io__bi_t.lef
+Reading LEF data from file /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_fd_io/lef/gf180mcu_ef_io__bi_t.lef.
+This action cannot be undone.
+LEF read: Processed 390 lines.
+> lef read /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_fd_io/lef/gf180mcu_ws_io__dvss.lef
+Reading LEF data from file /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_fd_io/lef/gf180mcu_ws_io__dvss.lef.
+This action cannot be undone.
+LEF read: Processed 818 lines.
+> def read /home/etcfranc/NoCNoC/librelane/noc_tile/runs/RUN_2026-05-08_18-38-35/53-odb-cellfrequencytables/mesh_tile.def -noblockage
+Reading DEF data from file /home/etcfranc/NoCNoC/librelane/noc_tile/runs/RUN_2026-05-08_18-38-35/53-odb-cellfrequencytables/mesh_tile.def.
+This action cannot be undone.
+  Processed 100 vias total.
+  Processed 2 non-default rules total.
+  Processed 18130 subcell instances total.
+  Processed 599 pins total.
+  Processed 2 special nets total.
+  Processed 4350 nets total.
+DEF read: Processed 103694 lines.
+> spice read /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_as_sc_mcu7t3v3/spice/gf180mcu_as_sc_mcu7t3v3.spice
+Annotating port orders from /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_as_sc_mcu7t3v3/spice/gf180mcu_as_sc_mcu7t3v3.spice
+Annotating cell gf180mcu_as_sc_mcu7t3v3__and2_2
+Cell gf180mcu_as_sc_mcu7t3v3__and2_2 port order was modified.
+Annotating cell gf180mcu_as_sc_mcu7t3v3__and2_4
+Cell gf180mcu_as_sc_mcu7t3v3__and2_4 port order was modified.
+Annotating cell gf180mcu_as_sc_mcu7t3v3__ao211_2
+Cell gf180mcu_as_sc_mcu7t3v3__ao211_2 port order was modified.
+Annotating cell gf180mcu_as_sc_mcu7t3v3__ao211_4
+Cell gf180mcu_as_sc_mcu7t3v3__ao211_4 port order was modified.
+Annotating cell gf180mcu_as_sc_mcu7t3v3__ao21_2
+Cell gf180mcu_as_sc_mcu7t3v3__ao21_2 port order was modified.
+Annotating cell gf180mcu_as_sc_mcu7t3v3__ao21_4
+Cell gf180mcu_as_sc_mcu7t3v3__ao21_4 port order was modified.
+Annotating cell gf180mcu_as_sc_mcu7t3v3__ao21b_2
+Cell gf180mcu_as_sc_mcu7t3v3__ao21b_2 port order was modified.
+Annotating cell gf180mcu_as_sc_mcu7t3v3__ao21b_4
+Cell gf180mcu_as_sc_mcu7t3v3__ao21b_4 port order was modified.
+Annotating cell gf180mcu_as_sc_mcu7t3v3__ao22_2
+Cell gf180mcu_as_sc_mcu7t3v3__ao22_2 port order was modified.
+Annotating cell gf180mcu_as_sc_mcu7t3v3__ao22_4
+Cell gf180mcu_as_sc_mcu7t3v3__ao22_4 port order was modified.
+Annotating cell gf180mcu_as_sc_mcu7t3v3__ao31_2
+Cell gf180mcu_as_sc_mcu7t3v3__ao31_2 port order was modified.
+Annotating cell gf180mcu_as_sc_mcu7t3v3__ao31_4
+Cell gf180mcu_as_sc_mcu7t3v3__ao31_4 port order was modified.
+Annotating cell gf180mcu_as_sc_mcu7t3v3__aoi211_2
+Cell gf180mcu_as_sc_mcu7t3v3__aoi211_2 port order was modified.
+Annotating cell gf180mcu_as_sc_mcu7t3v3__aoi211_4
+Cell gf180mcu_as_sc_mcu7t3v3__aoi211_4 port order was modified.
+Annotating cell gf180mcu_as_sc_mcu7t3v3__aoi21_2
+Cell gf180mcu_as_sc_mcu7t3v3__aoi21_2 port order was modified.
+Annotating cell gf180mcu_as_sc_mcu7t3v3__aoi21_4
+Cell gf180mcu_as_sc_mcu7t3v3__aoi21_4 port order was modified.
+Annotating cell gf180mcu_as_sc_mcu7t3v3__aoi21b_2
+Cell gf180mcu_as_sc_mcu7t3v3__aoi21b_2 port order was modified.
+Annotating cell gf180mcu_as_sc_mcu7t3v3__aoi21b_4
+Cell gf180mcu_as_sc_mcu7t3v3__aoi21b_4 port order was modified.
+Annotating cell gf180mcu_as_sc_mcu7t3v3__aoi22_2
+Cell gf180mcu_as_sc_mcu7t3v3__aoi22_2 port order was modified.
+Annotating cell gf180mcu_as_sc_mcu7t3v3__aoi22_4
+Cell gf180mcu_as_sc_mcu7t3v3__aoi22_4 port order was modified.
+Annotating cell gf180mcu_as_sc_mcu7t3v3__aoi31_2
+Cell gf180mcu_as_sc_mcu7t3v3__aoi31_2 port order was modified.
+Annotating cell gf180mcu_as_sc_mcu7t3v3__aoi31_4
+Cell gf180mcu_as_sc_mcu7t3v3__aoi31_4 port order was modified.
+Annotating cell gf180mcu_as_sc_mcu7t3v3__buff_12
+Cell gf180mcu_as_sc_mcu7t3v3__buff_12 port order was modified.
+Annotating cell gf180mcu_as_sc_mcu7t3v3__buff_2
+Cell gf180mcu_as_sc_mcu7t3v3__buff_2 port order was modified.
+Annotating cell gf180mcu_as_sc_mcu7t3v3__buff_4
+Cell gf180mcu_as_sc_mcu7t3v3__buff_4 port order was modified.
+Annotating cell gf180mcu_as_sc_mcu7t3v3__buff_8
+Cell gf180mcu_as_sc_mcu7t3v3__buff_8 port order was modified.
+Annotating cell gf180mcu_as_sc_mcu7t3v3__clkbuff_12
+Cell gf180mcu_as_sc_mcu7t3v3__clkbuff_12 port order was modified.
+Annotating cell gf180mcu_as_sc_mcu7t3v3__clkbuff_4
+Cell gf180mcu_as_sc_mcu7t3v3__clkbuff_4 port order was modified.
+Annotating cell gf180mcu_as_sc_mcu7t3v3__clkbuff_8
+Cell gf180mcu_as_sc_mcu7t3v3__clkbuff_8 port order was modified.
+Annotating cell gf180mcu_as_sc_mcu7t3v3__dfsrtp_2
+Cell gf180mcu_as_sc_mcu7t3v3__dfsrtp_2 port order was modified.
+Annotating cell gf180mcu_as_sc_mcu7t3v3__dfxtn_2
+Cell gf180mcu_as_sc_mcu7t3v3__dfxtn_2 port order was modified.
+Annotating cell gf180mcu_as_sc_mcu7t3v3__dfxtp_2
+Cell gf180mcu_as_sc_mcu7t3v3__dfxtp_2 port order was modified.
+Annotating cell gf180mcu_as_sc_mcu7t3v3__diode_2
+Cell gf180mcu_as_sc_mcu7t3v3__diode_2 port order was modified.
+Annotating cell gf180mcu_as_sc_mcu7t3v3__fill_1
+Cell gf180mcu_as_sc_mcu7t3v3__fill_1 port order was modified.
+Annotating cell gf180mcu_as_sc_mcu7t3v3__fill_2
+Cell gf180mcu_as_sc_mcu7t3v3__fill_2 port order was modified.
+Annotating cell gf180mcu_as_sc_mcu7t3v3__fill_4
+Cell gf180mcu_as_sc_mcu7t3v3__fill_4 port order was modified.
+Annotating cell gf180mcu_as_sc_mcu7t3v3__fill_8
+Cell gf180mcu_as_sc_mcu7t3v3__fill_8 port order was modified.
+Annotating cell gf180mcu_as_sc_mcu7t3v3__fillcap_16
+Cell gf180mcu_as_sc_mcu7t3v3__fillcap_16 port order was modified.
+Annotating cell gf180mcu_as_sc_mcu7t3v3__fillcap_4
+Cell gf180mcu_as_sc_mcu7t3v3__fillcap_4 port order was modified.
+Annotating cell gf180mcu_as_sc_mcu7t3v3__fillcap_8
+Cell gf180mcu_as_sc_mcu7t3v3__fillcap_8 port order was modified.
+Annotating cell gf180mcu_as_sc_mcu7t3v3__inv_2
+Cell gf180mcu_as_sc_mcu7t3v3__inv_2 port order was modified.
+Annotating cell gf180mcu_as_sc_mcu7t3v3__inv_4
+Cell gf180mcu_as_sc_mcu7t3v3__inv_4 port order was modified.
+Annotating cell gf180mcu_as_sc_mcu7t3v3__inv_6
+Cell gf180mcu_as_sc_mcu7t3v3__inv_6 port order was modified.
+Annotating cell gf180mcu_as_sc_mcu7t3v3__invz_2
+Cell gf180mcu_as_sc_mcu7t3v3__invz_2 port order was modified.
+Annotating cell gf180mcu_as_sc_mcu7t3v3__maj3_2
+Cell gf180mcu_as_sc_mcu7t3v3__maj3_2 port order was modified.
+Annotating cell gf180mcu_as_sc_mcu7t3v3__maj3_4
+Cell gf180mcu_as_sc_mcu7t3v3__maj3_4 port order was modified.
+Annotating cell gf180mcu_as_sc_mcu7t3v3__mux2_2
+Cell gf180mcu_as_sc_mcu7t3v3__mux2_2 port order was modified.
+Annotating cell gf180mcu_as_sc_mcu7t3v3__mux2_4
+Cell gf180mcu_as_sc_mcu7t3v3__mux2_4 port order was modified.
+Annotating cell gf180mcu_as_sc_mcu7t3v3__nand2_2
+Cell gf180mcu_as_sc_mcu7t3v3__nand2_2 port order was modified.
+Annotating cell gf180mcu_as_sc_mcu7t3v3__nand2_4
+Cell gf180mcu_as_sc_mcu7t3v3__nand2_4 port order was modified.
+Annotating cell gf180mcu_as_sc_mcu7t3v3__nand2b_2
+Cell gf180mcu_as_sc_mcu7t3v3__nand2b_2 port order was modified.
+Annotating cell gf180mcu_as_sc_mcu7t3v3__nand2b_4
+Cell gf180mcu_as_sc_mcu7t3v3__nand2b_4 port order was modified.
+Annotating cell gf180mcu_as_sc_mcu7t3v3__nand3_2
+Cell gf180mcu_as_sc_mcu7t3v3__nand3_2 port order was modified.
+Annotating cell gf180mcu_as_sc_mcu7t3v3__nand4_2
+Cell gf180mcu_as_sc_mcu7t3v3__nand4_2 port order was modified.
+Annotating cell gf180mcu_as_sc_mcu7t3v3__nor2_2
+Cell gf180mcu_as_sc_mcu7t3v3__nor2_2 port order was modified.
+Annotating cell gf180mcu_as_sc_mcu7t3v3__nor2_4
+Cell gf180mcu_as_sc_mcu7t3v3__nor2_4 port order was modified.
+Annotating cell gf180mcu_as_sc_mcu7t3v3__nor2b_2
+Cell gf180mcu_as_sc_mcu7t3v3__nor2b_2 port order was modified.
+Annotating cell gf180mcu_as_sc_mcu7t3v3__nor2b_4
+Cell gf180mcu_as_sc_mcu7t3v3__nor2b_4 port order was modified.
+Annotating cell gf180mcu_as_sc_mcu7t3v3__nor3_2
+Cell gf180mcu_as_sc_mcu7t3v3__nor3_2 port order was modified.
+Annotating cell gf180mcu_as_sc_mcu7t3v3__oai211_2
+Cell gf180mcu_as_sc_mcu7t3v3__oai211_2 port order was modified.
+Annotating cell gf180mcu_as_sc_mcu7t3v3__or2_2
+Cell gf180mcu_as_sc_mcu7t3v3__or2_2 port order was modified.
+Annotating cell gf180mcu_as_sc_mcu7t3v3__or2_4
+Cell gf180mcu_as_sc_mcu7t3v3__or2_4 port order was modified.
+Annotating cell gf180mcu_as_sc_mcu7t3v3__tap_2
+Cell gf180mcu_as_sc_mcu7t3v3__tap_2 port order was modified.
+Annotating cell gf180mcu_as_sc_mcu7t3v3__tieh_4
+Cell gf180mcu_as_sc_mcu7t3v3__tieh_4 port order was modified.
+Annotating cell gf180mcu_as_sc_mcu7t3v3__tiel_4
+Cell gf180mcu_as_sc_mcu7t3v3__tiel_4 port order was modified.
+Annotating cell gf180mcu_as_sc_mcu7t3v3__xnor2_2
+Cell gf180mcu_as_sc_mcu7t3v3__xnor2_2 port order was modified.
+Annotating cell gf180mcu_as_sc_mcu7t3v3__xnor2_4
+Cell gf180mcu_as_sc_mcu7t3v3__xnor2_4 port order was modified.
+Processing mesh_tile
+Extracting gf180mcu_as_sc_mcu7t3v3__buff_8 into gf180mcu_as_sc_mcu7t3v3__buff_8.ext:
+Extracting gf180mcu_as_sc_mcu7t3v3__clkbuff_12 into gf180mcu_as_sc_mcu7t3v3__clkbuff_12.ext:
+Extracting gf180mcu_as_sc_mcu7t3v3__tiel_4 into gf180mcu_as_sc_mcu7t3v3__tiel_4.ext:
+Extracting gf180mcu_ocd_ip_sram__sram1024x8m8wm1 into gf180mcu_ocd_ip_sram__sram1024x8m8wm1.ext:
+Extracting gf180mcu_as_sc_mcu7t3v3__buff_2 into gf180mcu_as_sc_mcu7t3v3__buff_2.ext:
+Extracting gf180mcu_as_sc_mcu7t3v3__inv_2 into gf180mcu_as_sc_mcu7t3v3__inv_2.ext:
+Extracting gf180mcu_as_sc_mcu7t3v3__inv_4 into gf180mcu_as_sc_mcu7t3v3__inv_4.ext:
+Extracting gf180mcu_as_sc_mcu7t3v3__inv_6 into gf180mcu_as_sc_mcu7t3v3__inv_6.ext:
+Extracting gf180mcu_as_sc_mcu7t3v3__clkbuff_4 into gf180mcu_as_sc_mcu7t3v3__clkbuff_4.ext:
+Extracting gf180mcu_as_sc_mcu7t3v3__dfxtp_2 into gf180mcu_as_sc_mcu7t3v3__dfxtp_2.ext:
+Extracting gf180mcu_as_sc_mcu7t3v3__tieh_4 into gf180mcu_as_sc_mcu7t3v3__tieh_4.ext:
+Extracting gf180mcu_as_sc_mcu7t3v3__dfsrtp_2 into gf180mcu_as_sc_mcu7t3v3__dfsrtp_2.ext:
+Extracting gf180mcu_as_sc_mcu7t3v3__nor2_2 into gf180mcu_as_sc_mcu7t3v3__nor2_2.ext:
+Extracting gf180mcu_as_sc_mcu7t3v3__nor3_2 into gf180mcu_as_sc_mcu7t3v3__nor3_2.ext:
+Extracting gf180mcu_as_sc_mcu7t3v3__and2_2 into gf180mcu_as_sc_mcu7t3v3__and2_2.ext:
+Extracting gf180mcu_as_sc_mcu7t3v3__aoi22_2 into gf180mcu_as_sc_mcu7t3v3__aoi22_2.ext:
+Extracting gf180mcu_as_sc_mcu7t3v3__nand2_2 into gf180mcu_as_sc_mcu7t3v3__nand2_2.ext:
+Extracting gf180mcu_as_sc_mcu7t3v3__ao22_2 into gf180mcu_as_sc_mcu7t3v3__ao22_2.ext:
+Extracting gf180mcu_as_sc_mcu7t3v3__aoi211_2 into gf180mcu_as_sc_mcu7t3v3__aoi211_2.ext:
+Extracting gf180mcu_as_sc_mcu7t3v3__aoi21b_2 into gf180mcu_as_sc_mcu7t3v3__aoi21b_2.ext:
+Extracting gf180mcu_as_sc_mcu7t3v3__aoi21_2 into gf180mcu_as_sc_mcu7t3v3__aoi21_2.ext:
+Extracting gf180mcu_as_sc_mcu7t3v3__or2_2 into gf180mcu_as_sc_mcu7t3v3__or2_2.ext:
+Extracting gf180mcu_as_sc_mcu7t3v3__ao21_2 into gf180mcu_as_sc_mcu7t3v3__ao21_2.ext:
+Extracting gf180mcu_as_sc_mcu7t3v3__mux2_2 into gf180mcu_as_sc_mcu7t3v3__mux2_2.ext:
+Extracting gf180mcu_as_sc_mcu7t3v3__ao31_2 into gf180mcu_as_sc_mcu7t3v3__ao31_2.ext:
+Extracting gf180mcu_as_sc_mcu7t3v3__ao211_2 into gf180mcu_as_sc_mcu7t3v3__ao211_2.ext:
+Extracting gf180mcu_as_sc_mcu7t3v3__nor2b_2 into gf180mcu_as_sc_mcu7t3v3__nor2b_2.ext:
+Extracting gf180mcu_as_sc_mcu7t3v3__nand2b_2 into gf180mcu_as_sc_mcu7t3v3__nand2b_2.ext:
+Extracting gf180mcu_as_sc_mcu7t3v3__aoi31_2 into gf180mcu_as_sc_mcu7t3v3__aoi31_2.ext:
+Extracting gf180mcu_as_sc_mcu7t3v3__ao21b_2 into gf180mcu_as_sc_mcu7t3v3__ao21b_2.ext:
+Extracting gf180mcu_as_sc_mcu7t3v3__xnor2_2 into gf180mcu_as_sc_mcu7t3v3__xnor2_2.ext:
+Extracting gf180mcu_as_sc_mcu7t3v3__nand4_2 into gf180mcu_as_sc_mcu7t3v3__nand4_2.ext:
+Extracting gf180mcu_as_sc_mcu7t3v3__nand3_2 into gf180mcu_as_sc_mcu7t3v3__nand3_2.ext:
+Extracting gf180mcu_as_sc_mcu7t3v3__oai211_2 into gf180mcu_as_sc_mcu7t3v3__oai211_2.ext:
+Extracting gf180mcu_as_sc_mcu7t3v3__maj3_2 into gf180mcu_as_sc_mcu7t3v3__maj3_2.ext:
+Extracting gf180mcu_as_sc_mcu7t3v3__tap_2 into gf180mcu_as_sc_mcu7t3v3__tap_2.ext:
+Extracting gf180mcu_as_sc_mcu7t3v3__fillcap_16 into gf180mcu_as_sc_mcu7t3v3__fillcap_16.ext:
+Extracting gf180mcu_as_sc_mcu7t3v3__fillcap_4 into gf180mcu_as_sc_mcu7t3v3__fillcap_4.ext:
+Extracting gf180mcu_as_sc_mcu7t3v3__fill_1 into gf180mcu_as_sc_mcu7t3v3__fill_1.ext:
+Extracting gf180mcu_as_sc_mcu7t3v3__fill_2 into gf180mcu_as_sc_mcu7t3v3__fill_2.ext:
+Extracting gf180mcu_as_sc_mcu7t3v3__fillcap_8 into gf180mcu_as_sc_mcu7t3v3__fillcap_8.ext:
+Extracting gf180mcu_as_sc_mcu7t3v3__diode_2 into gf180mcu_as_sc_mcu7t3v3__diode_2.ext:
+Extracting mesh_tile into mesh_tile.ext:
+exttospice finished.

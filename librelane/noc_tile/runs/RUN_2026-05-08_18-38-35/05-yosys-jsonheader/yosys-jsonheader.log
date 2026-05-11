@@ -1,0 +1,1583 @@
+
+ /----------------------------------------------------------------------------\
+ |  yosys -- Yosys Open SYnthesis Suite                                       |
+ |  Copyright (C) 2012 - 2026  Claire Xenia Wolf <claire@yosyshq.com>         |
+ |  Distributed under an ISC-like license, type "license" to see terms        |
+ \----------------------------------------------------------------------------/
+ Yosys 0.62 (git sha1 7326bb7d6641500ecb285c291a54a662cb1e76cf, clang++ 21.1.2 -fPIC -O3)
+
+1. Executing Verilog-2005 frontend: /home/etcfranc/NoCNoC/librelane/noc_tile/runs/RUN_2026-05-08_18-38-35/tmp/41835ff3bba04c30bce78734ad64bba7.bb.v
+Parsing SystemVerilog input from `/home/etcfranc/NoCNoC/librelane/noc_tile/runs/RUN_2026-05-08_18-38-35/tmp/41835ff3bba04c30bce78734ad64bba7.bb.v' to AST representation.
+Generating RTLIL representation for module `\gf180mcu_as_sc_mcu7t3v3__and2_2'.
+Generating RTLIL representation for module `\gf180mcu_as_sc_mcu7t3v3__and2_4'.
+Generating RTLIL representation for module `\gf180mcu_as_sc_mcu7t3v3__ao21_2'.
+Generating RTLIL representation for module `\gf180mcu_as_sc_mcu7t3v3__ao21_4'.
+Generating RTLIL representation for module `\gf180mcu_as_sc_mcu7t3v3__ao21b_2'.
+Generating RTLIL representation for module `\gf180mcu_as_sc_mcu7t3v3__ao21b_4'.
+Generating RTLIL representation for module `\gf180mcu_as_sc_mcu7t3v3__ao22_2'.
+Generating RTLIL representation for module `\gf180mcu_as_sc_mcu7t3v3__ao22_4'.
+Generating RTLIL representation for module `\gf180mcu_as_sc_mcu7t3v3__ao31_2'.
+Generating RTLIL representation for module `\gf180mcu_as_sc_mcu7t3v3__ao31_4'.
+Generating RTLIL representation for module `\gf180mcu_as_sc_mcu7t3v3__aoi21_2'.
+Generating RTLIL representation for module `\gf180mcu_as_sc_mcu7t3v3__aoi21_4'.
+Generating RTLIL representation for module `\gf180mcu_as_sc_mcu7t3v3__aoi21b_2'.
+Generating RTLIL representation for module `\gf180mcu_as_sc_mcu7t3v3__aoi21b_4'.
+Generating RTLIL representation for module `\gf180mcu_as_sc_mcu7t3v3__aoi22_2'.
+Generating RTLIL representation for module `\gf180mcu_as_sc_mcu7t3v3__aoi22_4'.
+Generating RTLIL representation for module `\gf180mcu_as_sc_mcu7t3v3__aoi31_2'.
+Generating RTLIL representation for module `\gf180mcu_as_sc_mcu7t3v3__aoi31_4'.
+Generating RTLIL representation for module `\gf180mcu_as_sc_mcu7t3v3__buff_12'.
+Generating RTLIL representation for module `\gf180mcu_as_sc_mcu7t3v3__buff_2'.
+Generating RTLIL representation for module `\gf180mcu_as_sc_mcu7t3v3__buff_4'.
+Generating RTLIL representation for module `\gf180mcu_as_sc_mcu7t3v3__buff_8'.
+Generating RTLIL representation for module `\gf180mcu_as_sc_mcu7t3v3__clkbuff_12'.
+Generating RTLIL representation for module `\gf180mcu_as_sc_mcu7t3v3__clkbuff_4'.
+Generating RTLIL representation for module `\gf180mcu_as_sc_mcu7t3v3__clkbuff_8'.
+Generating RTLIL representation for module `\gf180mcu_as_sc_mcu7t3v3__dfsrtp_2'.
+Generating RTLIL representation for module `\gf180mcu_as_sc_mcu7t3v3__dfxtn_2'.
+Generating RTLIL representation for module `\gf180mcu_as_sc_mcu7t3v3__dfxtp_2'.
+Generating RTLIL representation for module `\gf180mcu_as_sc_mcu7t3v3__diode_2'.
+Generating RTLIL representation for module `\gf180mcu_as_sc_mcu7t3v3__fill_1'.
+Generating RTLIL representation for module `\gf180mcu_as_sc_mcu7t3v3__fill_2'.
+Generating RTLIL representation for module `\gf180mcu_as_sc_mcu7t3v3__fill_4'.
+Generating RTLIL representation for module `\gf180mcu_as_sc_mcu7t3v3__fill_8'.
+Generating RTLIL representation for module `\gf180mcu_as_sc_mcu7t3v3__fillcap_16'.
+Generating RTLIL representation for module `\gf180mcu_as_sc_mcu7t3v3__fillcap_4'.
+Generating RTLIL representation for module `\gf180mcu_as_sc_mcu7t3v3__fillcap_8'.
+Generating RTLIL representation for module `\gf180mcu_as_sc_mcu7t3v3__inv_2'.
+Generating RTLIL representation for module `\gf180mcu_as_sc_mcu7t3v3__inv_4'.
+Generating RTLIL representation for module `\gf180mcu_as_sc_mcu7t3v3__inv_6'.
+Generating RTLIL representation for module `\gf180mcu_as_sc_mcu7t3v3__invz_2'.
+Generating RTLIL representation for module `\gf180mcu_as_sc_mcu7t3v3__maj3_2'.
+Generating RTLIL representation for module `\gf180mcu_as_sc_mcu7t3v3__maj3_4'.
+Generating RTLIL representation for module `\gf180mcu_as_sc_mcu7t3v3__mux2_2'.
+Generating RTLIL representation for module `\gf180mcu_as_sc_mcu7t3v3__mux2_4'.
+Generating RTLIL representation for module `\gf180mcu_as_sc_mcu7t3v3__nand2_2'.
+Generating RTLIL representation for module `\gf180mcu_as_sc_mcu7t3v3__nand2_4'.
+Generating RTLIL representation for module `\gf180mcu_as_sc_mcu7t3v3__nand2b_2'.
+Generating RTLIL representation for module `\gf180mcu_as_sc_mcu7t3v3__nand2b_4'.
+Generating RTLIL representation for module `\gf180mcu_as_sc_mcu7t3v3__nand3_2'.
+Generating RTLIL representation for module `\gf180mcu_as_sc_mcu7t3v3__nand4_2'.
+Generating RTLIL representation for module `\gf180mcu_as_sc_mcu7t3v3__nor2_2'.
+Generating RTLIL representation for module `\gf180mcu_as_sc_mcu7t3v3__nor2_4'.
+Generating RTLIL representation for module `\gf180mcu_as_sc_mcu7t3v3__nor2b_2'.
+Generating RTLIL representation for module `\gf180mcu_as_sc_mcu7t3v3__nor2b_4'.
+Generating RTLIL representation for module `\gf180mcu_as_sc_mcu7t3v3__nor3_2'.
+Generating RTLIL representation for module `\gf180mcu_as_sc_mcu7t3v3__or2_2'.
+Generating RTLIL representation for module `\gf180mcu_as_sc_mcu7t3v3__or2_4'.
+Generating RTLIL representation for module `\gf180mcu_as_sc_mcu7t3v3__tap_2'.
+Generating RTLIL representation for module `\gf180mcu_as_sc_mcu7t3v3__tieh_4'.
+Generating RTLIL representation for module `\gf180mcu_as_sc_mcu7t3v3__tiel_4'.
+Generating RTLIL representation for module `\gf180mcu_as_sc_mcu7t3v3__xnor2_2'.
+Generating RTLIL representation for module `\gf180mcu_as_sc_mcu7t3v3__xnor2_4'.
+Successfully finished Verilog frontend.
+
+2. Executing Verilog-2005 frontend: /home/etcfranc/NoCNoC/librelane/noc_tile/runs/RUN_2026-05-08_18-38-35/tmp/d43945a3c8e845d3bb09662376f9e96f.bb.v
+Parsing SystemVerilog input from `/home/etcfranc/NoCNoC/librelane/noc_tile/runs/RUN_2026-05-08_18-38-35/tmp/d43945a3c8e845d3bb09662376f9e96f.bb.v' to AST representation.
+Generating RTLIL representation for module `\gf180mcu_ef_io__bi_t'.
+Generating RTLIL representation for module `\gf180mcu_fd_io__asig_5p0'.
+Generating RTLIL representation for module `\gf180mcu_fd_io__bi_24t'.
+Generating RTLIL representation for module `\gf180mcu_fd_io__bi_t'.
+Generating RTLIL representation for module `\gf180mcu_fd_io__brk2'.
+Generating RTLIL representation for module `\gf180mcu_fd_io__brk5'.
+Generating RTLIL representation for module `\gf180mcu_fd_io__cor'.
+Generating RTLIL representation for module `\gf180mcu_fd_io__dvdd'.
+Generating RTLIL representation for module `\gf180mcu_fd_io__dvss'.
+Generating RTLIL representation for module `\gf180mcu_fd_io__fill1'.
+Generating RTLIL representation for module `\gf180mcu_fd_io__fill10'.
+Generating RTLIL representation for module `\gf180mcu_fd_io__fill5'.
+Generating RTLIL representation for module `\gf180mcu_fd_io__fillnc'.
+Generating RTLIL representation for module `\gf180mcu_fd_io__in_c'.
+Generating RTLIL representation for module `\gf180mcu_fd_io__in_s'.
+Generating RTLIL representation for module `\gf180mcu_ws_io__dvdd'.
+Generating RTLIL representation for module `\gf180mcu_ws_io__dvss'.
+Successfully finished Verilog frontend.
+
+3. Executing Verilog-2005 frontend: /home/etcfranc/NoCNoC/libs/gf180mcu_ocd_ip_sram/cells/gf180mcu_ocd_ip_sram__sram1024x8m8wm1/gf180mcu_ocd_ip_sram__sram1024x8m8wm1.blackbox.v
+Parsing SystemVerilog input from `/home/etcfranc/NoCNoC/libs/gf180mcu_ocd_ip_sram/cells/gf180mcu_ocd_ip_sram__sram1024x8m8wm1/gf180mcu_ocd_ip_sram__sram1024x8m8wm1.blackbox.v' to AST representation.
+Generating RTLIL representation for module `\gf180mcu_ocd_ip_sram__sram1024x8m8wm1'.
+Successfully finished Verilog frontend.
+wtaf
+
+4. Executing Verilog-2005 frontend: /home/etcfranc/NoCNoC/src/mesh - Psi&Aan/mesh_tile.v
+Parsing SystemVerilog input from `/home/etcfranc/NoCNoC/src/mesh - Psi&Aan/mesh_tile.v' to AST representation.
+Storing AST representation for module `$abstract\mesh_tile'.
+Successfully finished Verilog frontend.
+
+5. Executing Verilog-2005 frontend: /home/etcfranc/NoCNoC/src/mesh - Psi&Aan/mesh_router.v
+Parsing SystemVerilog input from `/home/etcfranc/NoCNoC/src/mesh - Psi&Aan/mesh_router.v' to AST representation.
+Storing AST representation for module `$abstract\mesh_router'.
+Successfully finished Verilog frontend.
+
+6. Executing Verilog-2005 frontend: /home/etcfranc/NoCNoC/src/serv/rtl/serv_aligner.v
+Parsing SystemVerilog input from `/home/etcfranc/NoCNoC/src/serv/rtl/serv_aligner.v' to AST representation.
+Storing AST representation for module `$abstract\serv_aligner'.
+Successfully finished Verilog frontend.
+
+7. Executing Verilog-2005 frontend: /home/etcfranc/NoCNoC/src/serv/rtl/serv_alu.v
+Parsing SystemVerilog input from `/home/etcfranc/NoCNoC/src/serv/rtl/serv_alu.v' to AST representation.
+Storing AST representation for module `$abstract\serv_alu'.
+Successfully finished Verilog frontend.
+
+8. Executing Verilog-2005 frontend: /home/etcfranc/NoCNoC/src/serv/rtl/serv_bufreg.v
+Parsing SystemVerilog input from `/home/etcfranc/NoCNoC/src/serv/rtl/serv_bufreg.v' to AST representation.
+Storing AST representation for module `$abstract\serv_bufreg'.
+Successfully finished Verilog frontend.
+
+9. Executing Verilog-2005 frontend: /home/etcfranc/NoCNoC/src/serv/rtl/serv_bufreg2.v
+Parsing SystemVerilog input from `/home/etcfranc/NoCNoC/src/serv/rtl/serv_bufreg2.v' to AST representation.
+Storing AST representation for module `$abstract\serv_bufreg2'.
+Successfully finished Verilog frontend.
+
+10. Executing Verilog-2005 frontend: /home/etcfranc/NoCNoC/src/serv/rtl/serv_compdec.v
+Parsing SystemVerilog input from `/home/etcfranc/NoCNoC/src/serv/rtl/serv_compdec.v' to AST representation.
+Storing AST representation for module `$abstract\serv_compdec'.
+Successfully finished Verilog frontend.
+
+11. Executing Verilog-2005 frontend: /home/etcfranc/NoCNoC/src/serv/rtl/serv_csr.v
+Parsing SystemVerilog input from `/home/etcfranc/NoCNoC/src/serv/rtl/serv_csr.v' to AST representation.
+Storing AST representation for module `$abstract\serv_csr'.
+Successfully finished Verilog frontend.
+
+12. Executing Verilog-2005 frontend: /home/etcfranc/NoCNoC/src/serv/rtl/serv_ctrl.v
+Parsing SystemVerilog input from `/home/etcfranc/NoCNoC/src/serv/rtl/serv_ctrl.v' to AST representation.
+Storing AST representation for module `$abstract\serv_ctrl'.
+Successfully finished Verilog frontend.
+
+13. Executing Verilog-2005 frontend: /home/etcfranc/NoCNoC/src/serv/rtl/serv_debug.v
+Parsing SystemVerilog input from `/home/etcfranc/NoCNoC/src/serv/rtl/serv_debug.v' to AST representation.
+Storing AST representation for module `$abstract\serv_debug'.
+Successfully finished Verilog frontend.
+
+14. Executing Verilog-2005 frontend: /home/etcfranc/NoCNoC/src/serv/rtl/serv_decode.v
+Parsing SystemVerilog input from `/home/etcfranc/NoCNoC/src/serv/rtl/serv_decode.v' to AST representation.
+Storing AST representation for module `$abstract\serv_decode'.
+Successfully finished Verilog frontend.
+
+15. Executing Verilog-2005 frontend: /home/etcfranc/NoCNoC/src/serv/rtl/serv_immdec.v
+Parsing SystemVerilog input from `/home/etcfranc/NoCNoC/src/serv/rtl/serv_immdec.v' to AST representation.
+Storing AST representation for module `$abstract\serv_immdec'.
+Successfully finished Verilog frontend.
+
+16. Executing Verilog-2005 frontend: /home/etcfranc/NoCNoC/src/serv/rtl/serv_mem_if.v
+Parsing SystemVerilog input from `/home/etcfranc/NoCNoC/src/serv/rtl/serv_mem_if.v' to AST representation.
+Storing AST representation for module `$abstract\serv_mem_if'.
+Successfully finished Verilog frontend.
+
+17. Executing Verilog-2005 frontend: /home/etcfranc/NoCNoC/src/serv/rtl/serv_rf_if.v
+Parsing SystemVerilog input from `/home/etcfranc/NoCNoC/src/serv/rtl/serv_rf_if.v' to AST representation.
+Storing AST representation for module `$abstract\serv_rf_if'.
+Successfully finished Verilog frontend.
+
+18. Executing Verilog-2005 frontend: /home/etcfranc/NoCNoC/src/serv/rtl/serv_rf_ram.v
+Parsing SystemVerilog input from `/home/etcfranc/NoCNoC/src/serv/rtl/serv_rf_ram.v' to AST representation.
+Storing AST representation for module `$abstract\serv_rf_ram'.
+Successfully finished Verilog frontend.
+
+19. Executing Verilog-2005 frontend: /home/etcfranc/NoCNoC/src/serv/rtl/serv_rf_ram_if.v
+Parsing SystemVerilog input from `/home/etcfranc/NoCNoC/src/serv/rtl/serv_rf_ram_if.v' to AST representation.
+Storing AST representation for module `$abstract\serv_rf_ram_if'.
+Successfully finished Verilog frontend.
+
+20. Executing Verilog-2005 frontend: /home/etcfranc/NoCNoC/src/serv/rtl/serv_rf_top.v
+Parsing SystemVerilog input from `/home/etcfranc/NoCNoC/src/serv/rtl/serv_rf_top.v' to AST representation.
+Storing AST representation for module `$abstract\serv_rf_top'.
+Successfully finished Verilog frontend.
+
+21. Executing Verilog-2005 frontend: /home/etcfranc/NoCNoC/src/serv/rtl/serv_state.v
+Parsing SystemVerilog input from `/home/etcfranc/NoCNoC/src/serv/rtl/serv_state.v' to AST representation.
+Storing AST representation for module `$abstract\serv_state'.
+Successfully finished Verilog frontend.
+
+22. Executing Verilog-2005 frontend: /home/etcfranc/NoCNoC/src/serv/rtl/serv_synth_wrapper.v
+Parsing SystemVerilog input from `/home/etcfranc/NoCNoC/src/serv/rtl/serv_synth_wrapper.v' to AST representation.
+Storing AST representation for module `$abstract\serv_synth_wrapper'.
+Successfully finished Verilog frontend.
+
+23. Executing Verilog-2005 frontend: /home/etcfranc/NoCNoC/src/serv/rtl/serv_top.v
+Parsing SystemVerilog input from `/home/etcfranc/NoCNoC/src/serv/rtl/serv_top.v' to AST representation.
+Storing AST representation for module `$abstract\serv_top'.
+Successfully finished Verilog frontend.
+
+24. Executing Verilog-2005 frontend: /home/etcfranc/NoCNoC/src/serv/servile/servile.v
+Parsing SystemVerilog input from `/home/etcfranc/NoCNoC/src/serv/servile/servile.v' to AST representation.
+Storing AST representation for module `$abstract\servile'.
+Successfully finished Verilog frontend.
+
+25. Executing Verilog-2005 frontend: /home/etcfranc/NoCNoC/src/serv/servile/servile_arbiter.v
+Parsing SystemVerilog input from `/home/etcfranc/NoCNoC/src/serv/servile/servile_arbiter.v' to AST representation.
+Storing AST representation for module `$abstract\servile_arbiter'.
+Successfully finished Verilog frontend.
+
+26. Executing Verilog-2005 frontend: /home/etcfranc/NoCNoC/src/serv/servile/servile_mux.v
+Parsing SystemVerilog input from `/home/etcfranc/NoCNoC/src/serv/servile/servile_mux.v' to AST representation.
+Storing AST representation for module `$abstract\servile_mux'.
+Successfully finished Verilog frontend.
+
+27. Executing Verilog-2005 frontend: /home/etcfranc/NoCNoC/src/serv/servile/servile_rf_mem_if.v
+Parsing SystemVerilog input from `/home/etcfranc/NoCNoC/src/serv/servile/servile_rf_mem_if.v' to AST representation.
+Storing AST representation for module `$abstract\servile_rf_mem_if'.
+Successfully finished Verilog frontend.
+
+28. Executing Verilog-2005 frontend: /home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v
+Parsing SystemVerilog input from `/home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v' to AST representation.
+Storing AST representation for module `$abstract\sram2048x8_gf180'.
+Successfully finished Verilog frontend.
+
+29. Executing Verilog-2005 frontend: /home/etcfranc/NoCNoC/src/subservient/rtl/subservient_core.v
+Parsing SystemVerilog input from `/home/etcfranc/NoCNoC/src/subservient/rtl/subservient_core.v' to AST representation.
+Storing AST representation for module `$abstract\subservient_core'.
+Successfully finished Verilog frontend.
+
+30. Executing Verilog-2005 frontend: /home/etcfranc/NoCNoC/src/subservient/rtl/subservient_rf_ram_if.v
+Parsing SystemVerilog input from `/home/etcfranc/NoCNoC/src/subservient/rtl/subservient_rf_ram_if.v' to AST representation.
+Storing AST representation for module `$abstract\subservient_rf_ram_if'.
+Successfully finished Verilog frontend.
+
+31. Executing HIERARCHY pass (managing design hierarchy).
+
+32. Executing AST frontend in derive mode using pre-parsed AST for module `\mesh_tile'.
+Generating RTLIL representation for module `\mesh_tile'.
+
+32.1. Analyzing design hierarchy..
+Top module:  \mesh_tile
+Parameter \MY_ID = 4'0000
+
+32.2. Executing AST frontend in derive mode using pre-parsed AST for module `\mesh_router'.
+Parameter \MY_ID = 4'0000
+Generating RTLIL representation for module `$paramod\mesh_router\MY_ID=4'0000'.
+
+32.3. Executing AST frontend in derive mode using pre-parsed AST for module `\sram2048x8_gf180'.
+Generating RTLIL representation for module `\sram2048x8_gf180'.
+Parameter \memsize = 2048
+
+32.4. Executing AST frontend in derive mode using pre-parsed AST for module `\subservient_core'.
+Parameter \memsize = 2048
+Generating RTLIL representation for module `$paramod\subservient_core\memsize=s32'00000000000000000000100000000000'.
+
+32.5. Analyzing design hierarchy..
+Top module:  \mesh_tile
+Used module:     $paramod\mesh_router\MY_ID=4'0000
+Used module:     \sram2048x8_gf180
+Used module:     $paramod\subservient_core\memsize=s32'00000000000000000000100000000000
+Parameter \reset_strategy = 1296649801
+Parameter \rf_width = 8
+Parameter \with_csr = 1
+
+32.6. Executing AST frontend in derive mode using pre-parsed AST for module `\servile'.
+Parameter \reset_strategy = 1296649801
+Parameter \rf_width = 8
+Parameter \with_csr = 1
+Generating RTLIL representation for module `$paramod$5d687c93bb8ae2c134ea134003a45acb1754b8ea\servile'.
+Parameter \depth = 2048
+Parameter \rf_regs = 36
+
+32.7. Executing AST frontend in derive mode using pre-parsed AST for module `\servile_rf_mem_if'.
+Parameter \depth = 2048
+Parameter \rf_regs = 36
+Generating RTLIL representation for module `$paramod$66c001530bf531c4d0ead1bd2714da422040d366\servile_rf_mem_if'.
+
+32.8. Analyzing design hierarchy..
+Top module:  \mesh_tile
+Used module:     $paramod\mesh_router\MY_ID=4'0000
+Used module:     \sram2048x8_gf180
+Used module:     $paramod\subservient_core\memsize=s32'00000000000000000000100000000000
+Used module:         $paramod$5d687c93bb8ae2c134ea134003a45acb1754b8ea\servile
+Used module:         $paramod$66c001530bf531c4d0ead1bd2714da422040d366\servile_rf_mem_if
+Parameter \WITH_CSR = 1
+Parameter \W = 1
+Parameter \PRE_REGISTER = 1'1
+Parameter \RESET_STRATEGY = 1296649801
+Parameter \RESET_PC = 0
+Parameter \DEBUG = 1'0
+Parameter \MDU = 1'0
+Parameter \COMPRESSED = 1'0
+
+32.9. Executing AST frontend in derive mode using pre-parsed AST for module `\serv_top'.
+Parameter \WITH_CSR = 1
+Parameter \W = 1
+Parameter \PRE_REGISTER = 1'1
+Parameter \RESET_STRATEGY = 1296649801
+Parameter \RESET_PC = 0
+Parameter \DEBUG = 1'0
+Parameter \MDU = 1'0
+Parameter \COMPRESSED = 1'0
+Generating RTLIL representation for module `$paramod$71071d578d64cf2b9b55dab146290615dbda78fc\serv_top'.
+Parameter \width = 8
+Parameter \W = 1
+Parameter \reset_strategy = 1296649801
+Parameter \csr_regs = 4
+
+32.10. Executing AST frontend in derive mode using pre-parsed AST for module `\serv_rf_ram_if'.
+Parameter \width = 8
+Parameter \W = 1
+Parameter \reset_strategy = 1296649801
+Parameter \csr_regs = 4
+Generating RTLIL representation for module `$paramod$7dfcbd4a24f0bfdcc2f47551222fe0ba6c7d84ba\serv_rf_ram_if'.
+
+32.11. Executing AST frontend in derive mode using pre-parsed AST for module `\servile_arbiter'.
+Generating RTLIL representation for module `\servile_arbiter'.
+Parameter \sim = 1'0
+
+32.12. Executing AST frontend in derive mode using pre-parsed AST for module `\servile_mux'.
+Parameter \sim = 1'0
+Generating RTLIL representation for module `$paramod\servile_mux\sim=1'0'.
+
+32.13. Analyzing design hierarchy..
+Top module:  \mesh_tile
+Used module:     $paramod\mesh_router\MY_ID=4'0000
+Used module:     \sram2048x8_gf180
+Used module:     $paramod\subservient_core\memsize=s32'00000000000000000000100000000000
+Used module:         $paramod$5d687c93bb8ae2c134ea134003a45acb1754b8ea\servile
+Used module:             $paramod$71071d578d64cf2b9b55dab146290615dbda78fc\serv_top
+Used module:             $paramod$7dfcbd4a24f0bfdcc2f47551222fe0ba6c7d84ba\serv_rf_ram_if
+Used module:             \servile_arbiter
+Used module:             $paramod\servile_mux\sim=1'0
+Used module:         $paramod$66c001530bf531c4d0ead1bd2714da422040d366\servile_rf_mem_if
+Parameter \RESET_STRATEGY = 1296649801
+Parameter \W = 1
+
+32.14. Executing AST frontend in derive mode using pre-parsed AST for module `\serv_csr'.
+Parameter \RESET_STRATEGY = 1296649801
+Parameter \W = 1
+Generating RTLIL representation for module `$paramod$3e7b4dd89124d05b1503dd2b902960520f2771f4\serv_csr'.
+Parameter \WITH_CSR = 1'1
+Parameter \W = 1
+
+32.15. Executing AST frontend in derive mode using pre-parsed AST for module `\serv_mem_if'.
+Parameter \WITH_CSR = 1'1
+Parameter \W = 1
+Generating RTLIL representation for module `$paramod\serv_mem_if\WITH_CSR=1'1\W=s32'00000000000000000000000000000001'.
+Parameter \WITH_CSR = 1
+Parameter \W = 1
+
+32.16. Executing AST frontend in derive mode using pre-parsed AST for module `\serv_rf_if'.
+Parameter \WITH_CSR = 1
+Parameter \W = 1
+Generating RTLIL representation for module `$paramod$e1f948ce0562a6173fd622abd894e278bdd3effe\serv_rf_if'.
+Parameter \W = 1
+
+32.17. Executing AST frontend in derive mode using pre-parsed AST for module `\serv_alu'.
+Parameter \W = 1
+Generating RTLIL representation for module `$paramod\serv_alu\W=s32'00000000000000000000000000000001'.
+Parameter \RESET_STRATEGY = 1296649801
+Parameter \RESET_PC = 0
+Parameter \WITH_CSR = 1
+Parameter \W = 1
+
+32.18. Executing AST frontend in derive mode using pre-parsed AST for module `\serv_ctrl'.
+Parameter \RESET_STRATEGY = 1296649801
+Parameter \RESET_PC = 0
+Parameter \WITH_CSR = 1
+Parameter \W = 1
+Generating RTLIL representation for module `$paramod$9612b4840d8ba9073515f47ec1c47f8b049edc33\serv_ctrl'.
+Parameter \W = 1
+
+32.19. Executing AST frontend in derive mode using pre-parsed AST for module `\serv_bufreg2'.
+Parameter \W = 1
+Generating RTLIL representation for module `$paramod\serv_bufreg2\W=s32'00000000000000000000000000000001'.
+Parameter \MDU = 1'0
+Parameter \W = 1
+
+32.20. Executing AST frontend in derive mode using pre-parsed AST for module `\serv_bufreg'.
+Parameter \MDU = 1'0
+Parameter \W = 1
+Generating RTLIL representation for module `$paramod\serv_bufreg\MDU=1'0\W=s32'00000000000000000000000000000001'.
+Parameter \W = 1
+
+32.21. Executing AST frontend in derive mode using pre-parsed AST for module `\serv_immdec'.
+Parameter \W = 1
+Generating RTLIL representation for module `$paramod\serv_immdec\W=s32'00000000000000000000000000000001'.
+Parameter \PRE_REGISTER = 1'1
+Parameter \MDU = 1'0
+
+32.22. Executing AST frontend in derive mode using pre-parsed AST for module `\serv_decode'.
+Parameter \PRE_REGISTER = 1'1
+Parameter \MDU = 1'0
+Generating RTLIL representation for module `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0'.
+Parameter \RESET_STRATEGY = 1296649801
+Parameter \WITH_CSR = 1'1
+Parameter \ALIGN = 1'0
+Parameter \MDU = 1'0
+Parameter \W = 1
+
+32.23. Executing AST frontend in derive mode using pre-parsed AST for module `\serv_state'.
+Parameter \RESET_STRATEGY = 1296649801
+Parameter \WITH_CSR = 1'1
+Parameter \ALIGN = 1'0
+Parameter \MDU = 1'0
+Parameter \W = 1
+Generating RTLIL representation for module `$paramod$f3cec78d1cfbbfc8778027792a43ce84e0717e5d\serv_state'.
+
+32.24. Analyzing design hierarchy..
+Top module:  \mesh_tile
+Used module:     $paramod\mesh_router\MY_ID=4'0000
+Used module:     \sram2048x8_gf180
+Used module:     $paramod\subservient_core\memsize=s32'00000000000000000000100000000000
+Used module:         $paramod$5d687c93bb8ae2c134ea134003a45acb1754b8ea\servile
+Used module:             $paramod$71071d578d64cf2b9b55dab146290615dbda78fc\serv_top
+Used module:                 $paramod$3e7b4dd89124d05b1503dd2b902960520f2771f4\serv_csr
+Used module:                 $paramod\serv_mem_if\WITH_CSR=1'1\W=s32'00000000000000000000000000000001
+Used module:                 $paramod$e1f948ce0562a6173fd622abd894e278bdd3effe\serv_rf_if
+Used module:                 $paramod\serv_alu\W=s32'00000000000000000000000000000001
+Used module:                 $paramod$9612b4840d8ba9073515f47ec1c47f8b049edc33\serv_ctrl
+Used module:                 $paramod\serv_bufreg2\W=s32'00000000000000000000000000000001
+Used module:                 $paramod\serv_bufreg\MDU=1'0\W=s32'00000000000000000000000000000001
+Used module:                 $paramod\serv_immdec\W=s32'00000000000000000000000000000001
+Used module:                 $paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0
+Used module:                 $paramod$f3cec78d1cfbbfc8778027792a43ce84e0717e5d\serv_state
+Used module:             $paramod$7dfcbd4a24f0bfdcc2f47551222fe0ba6c7d84ba\serv_rf_ram_if
+Used module:             \servile_arbiter
+Used module:             $paramod\servile_mux\sim=1'0
+Used module:         $paramod$66c001530bf531c4d0ead1bd2714da422040d366\servile_rf_mem_if
+
+32.25. Analyzing design hierarchy..
+Top module:  \mesh_tile
+Used module:     $paramod\mesh_router\MY_ID=4'0000
+Used module:     \sram2048x8_gf180
+Used module:     $paramod\subservient_core\memsize=s32'00000000000000000000100000000000
+Used module:         $paramod$5d687c93bb8ae2c134ea134003a45acb1754b8ea\servile
+Used module:             $paramod$71071d578d64cf2b9b55dab146290615dbda78fc\serv_top
+Used module:                 $paramod$3e7b4dd89124d05b1503dd2b902960520f2771f4\serv_csr
+Used module:                 $paramod\serv_mem_if\WITH_CSR=1'1\W=s32'00000000000000000000000000000001
+Used module:                 $paramod$e1f948ce0562a6173fd622abd894e278bdd3effe\serv_rf_if
+Used module:                 $paramod\serv_alu\W=s32'00000000000000000000000000000001
+Used module:                 $paramod$9612b4840d8ba9073515f47ec1c47f8b049edc33\serv_ctrl
+Used module:                 $paramod\serv_bufreg2\W=s32'00000000000000000000000000000001
+Used module:                 $paramod\serv_bufreg\MDU=1'0\W=s32'00000000000000000000000000000001
+Used module:                 $paramod\serv_immdec\W=s32'00000000000000000000000000000001
+Used module:                 $paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0
+Used module:                 $paramod$f3cec78d1cfbbfc8778027792a43ce84e0717e5d\serv_state
+Used module:             $paramod$7dfcbd4a24f0bfdcc2f47551222fe0ba6c7d84ba\serv_rf_ram_if
+Used module:             \servile_arbiter
+Used module:             $paramod\servile_mux\sim=1'0
+Used module:         $paramod$66c001530bf531c4d0ead1bd2714da422040d366\servile_rf_mem_if
+Removing unused module `$abstract\subservient_rf_ram_if'.
+Removing unused module `$abstract\subservient_core'.
+Removing unused module `$abstract\sram2048x8_gf180'.
+Removing unused module `$abstract\servile_rf_mem_if'.
+Removing unused module `$abstract\servile_mux'.
+Removing unused module `$abstract\servile_arbiter'.
+Removing unused module `$abstract\servile'.
+Removing unused module `$abstract\serv_top'.
+Removing unused module `$abstract\serv_synth_wrapper'.
+Removing unused module `$abstract\serv_state'.
+Removing unused module `$abstract\serv_rf_top'.
+Removing unused module `$abstract\serv_rf_ram_if'.
+Removing unused module `$abstract\serv_rf_ram'.
+Removing unused module `$abstract\serv_rf_if'.
+Removing unused module `$abstract\serv_mem_if'.
+Removing unused module `$abstract\serv_immdec'.
+Removing unused module `$abstract\serv_decode'.
+Removing unused module `$abstract\serv_debug'.
+Removing unused module `$abstract\serv_ctrl'.
+Removing unused module `$abstract\serv_csr'.
+Removing unused module `$abstract\serv_compdec'.
+Removing unused module `$abstract\serv_bufreg2'.
+Removing unused module `$abstract\serv_bufreg'.
+Removing unused module `$abstract\serv_alu'.
+Removing unused module `$abstract\serv_aligner'.
+Removing unused module `$abstract\mesh_router'.
+Removing unused module `$abstract\mesh_tile'.
+Removed 27 unused modules.
+Renaming module mesh_tile to mesh_tile.
+
+33. Executing PROC pass (convert processes to netlists).
+
+33.1. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Found and cleaned up 1 empty switch in `$paramod$3e7b4dd89124d05b1503dd2b902960520f2771f4\serv_csr.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_csr.v:98$524'.
+Found and cleaned up 1 empty switch in `$paramod$7dfcbd4a24f0bfdcc2f47551222fe0ba6c7d84ba\serv_rf_ram_if.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_rf_ram_if.v:158$472'.
+Found and cleaned up 1 empty switch in `$paramod$f3cec78d1cfbbfc8778027792a43ce84e0717e5d\serv_state.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_state.v:147$977'.
+Found and cleaned up 1 empty switch in `$paramod$9612b4840d8ba9073515f47ec1c47f8b049edc33\serv_ctrl.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_ctrl.v:101$671'.
+Removing empty process `$paramod$9612b4840d8ba9073515f47ec1c47f8b049edc33\serv_ctrl.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_ctrl.v:101$671'.
+Found and cleaned up 1 empty switch in `$paramod$9612b4840d8ba9073515f47ec1c47f8b049edc33\serv_ctrl.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_ctrl.v:103$660'.
+Cleaned up 5 empty switches.
+
+33.2. Executing PROC_RMDEAD pass (remove dead branches from decision trees).
+Marked 2 switch rules as full_case in process $proc$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_tile.v:123$9 in module mesh_tile.
+Marked 1 switch rules as full_case in process $proc$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_tile.v:81$2 in module mesh_tile.
+Marked 1 switch rules as full_case in process $proc$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:337$425 in module $paramod\mesh_router\MY_ID=4'0000.
+Marked 162 switch rules as full_case in process $proc$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:286$109 in module $paramod\mesh_router\MY_ID=4'0000.
+Marked 1 switch rules as full_case in process $proc$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:231$96 in module $paramod\mesh_router\MY_ID=4'0000.
+Marked 3 switch rules as full_case in process $proc$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:166$68 in module $paramod\mesh_router\MY_ID=4'0000.
+Marked 1 switch rules as full_case in process $proc$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:159$63 in module $paramod\mesh_router\MY_ID=4'0000.
+Marked 1 switch rules as full_case in process $proc$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:88$54 in module $paramod\mesh_router\MY_ID=4'0000.
+Removed a total of 0 dead cases.
+
+33.3. Executing PROC_PRUNE pass (remove redundant assignments in processes).
+Removed 14 redundant assignments.
+Promoted 98 assignments to connections.
+
+33.4. Executing PROC_INIT pass (extract init attributes).
+
+33.5. Executing PROC_ARST pass (detect async resets in processes).
+Found async reset \rst in `\mesh_tile.$proc$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_tile.v:81$2'.
+
+33.6. Executing PROC_ROM pass (convert switches to ROMs).
+Converted 0 switches.
+<suppressed ~213 debug messages>
+
+33.7. Executing PROC_MUX pass (convert decision trees to multiplexers).
+Creating decoders for process `\mesh_tile.$proc$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_tile.v:123$9'.
+     1/5: $0\nb_pop[0:0]
+     2/5: $0\nb_wen[0:0]
+     3/5: $0\nb_data_latch[7:0]
+     4/5: $0\nb_addr_latch[10:0]
+     5/5: $0\nb_state[1:0]
+Creating decoders for process `\mesh_tile.$proc$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_tile.v:81$2'.
+     1/1: $0\boot_mode_q[0:0]
+Creating decoders for process `$paramod\serv_mem_if\WITH_CSR=1'1\W=s32'00000000000000000000000000000001.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_mem_if.v:47$586'.
+     1/1: $0\signbit[0:0]
+Creating decoders for process `$paramod$3e7b4dd89124d05b1503dd2b902960520f2771f4\serv_csr.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_csr.v:98$524'.
+     1/10: $0\mcause3_0[3:0] [1]
+     2/10: $0\mcause3_0[3:0] [0]
+     3/10: $0\mcause3_0[3:0] [2]
+     4/10: $0\mcause3_0[3:0] [3]
+     5/10: $0\timer_irq_r[0:0]
+     6/10: $0\mcause31[0:0]
+     7/10: $0\mie_mtie[0:0]
+     8/10: $0\mstatus_mpie[0:0]
+     9/10: $0\mstatus_mie[0:0]
+    10/10: $0\o_new_irq[0:0]
+Creating decoders for process `$paramod\servile_mux\sim=1'0.$proc$/home/etcfranc/NoCNoC/src/serv/servile/servile_mux.v:96$501'.
+Creating decoders for process `$paramod$7dfcbd4a24f0bfdcc2f47551222fe0ba6c7d84ba\serv_rf_ram_if.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_rf_ram_if.v:148$480'.
+     1/1: $0\rdata1[6:0]
+Creating decoders for process `$paramod$7dfcbd4a24f0bfdcc2f47551222fe0ba6c7d84ba\serv_rf_ram_if.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_rf_ram_if.v:81$477'.
+Creating decoders for process `$paramod$7dfcbd4a24f0bfdcc2f47551222fe0ba6c7d84ba\serv_rf_ram_if.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_rf_ram_if.v:158$472'.
+     1/5: $0\rdata0[7:0]
+     2/5: $0\rgnt[0:0]
+     3/5: $0\rreq_r[0:0]
+     4/5: $0\rcnt[4:0]
+     5/5: $0\rgate[0:0]
+Creating decoders for process `$paramod$7dfcbd4a24f0bfdcc2f47551222fe0ba6c7d84ba\serv_rf_ram_if.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_rf_ram_if.v:102$468'.
+     1/2: $0\wen1_r[0:0]
+     2/2: $0\wen0_r[0:0]
+Creating decoders for process `$paramod$66c001530bf531c4d0ead1bd2714da422040d366\servile_rf_mem_if.$proc$/home/etcfranc/NoCNoC/src/serv/servile/servile_rf_mem_if.v:61$450'.
+     1/5: $0\wb_rdt[23:0] [23:16]
+     2/5: $0\wb_rdt[23:0] [15:8]
+     3/5: $0\wb_rdt[23:0] [7:0]
+     4/5: $0\o_wb_ack[0:0]
+     5/5: $0\bsel[1:0]
+Creating decoders for process `\sram2048x8_gf180.$proc$/home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:92$429'.
+     1/1: $0\bank_sel_q[0:0]
+Creating decoders for process `$paramod\mesh_router\MY_ID=4'0000.$proc$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:337$425'.
+     1/8: $0\se_out[33:0]
+     2/8: $0\sw_out[33:0]
+     3/8: $0\nw_out[33:0]
+     4/8: $0\ne_out[33:0]
+     5/8: $0\w_out[33:0]
+     6/8: $0\e_out[33:0]
+     7/8: $0\s_out[33:0]
+     8/8: $0\n_out[33:0]
+Creating decoders for process `$paramod\mesh_router\MY_ID=4'0000.$proc$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:286$109'.
+     1/585: $90\next_w[33:0]
+     2/585: $90\next_e[33:0]
+     3/585: $89\next_e[33:0]
+     4/585: $89\next_w[33:0]
+     5/585: $81\next_n[33:0]
+     6/585: $80\next_n[33:0]
+     7/585: $88\next_w[33:0]
+     8/585: $88\next_e[33:0]
+     9/585: $72\next_s[33:0]
+    10/585: $71\next_s[33:0]
+    11/585: $87\next_w[33:0]
+    12/585: $87\next_e[33:0]
+    13/585: $79\next_n[33:0]
+    14/585: $63\next_nw[33:0]
+    15/585: $62\next_nw[33:0]
+    16/585: $86\next_w[33:0]
+    17/585: $86\next_e[33:0]
+    18/585: $70\next_s[33:0]
+    19/585: $78\next_n[33:0]
+    20/585: $54\next_ne[33:0]
+    21/585: $53\next_ne[33:0]
+    22/585: $61\next_nw[33:0]
+    23/585: $85\next_w[33:0]
+    24/585: $85\next_e[33:0]
+    25/585: $69\next_s[33:0]
+    26/585: $77\next_n[33:0]
+    27/585: $45\next_sw[33:0]
+    28/585: $44\next_sw[33:0]
+    29/585: $60\next_nw[33:0]
+    30/585: $52\next_ne[33:0]
+    31/585: $84\next_w[33:0]
+    32/585: $84\next_e[33:0]
+    33/585: $68\next_s[33:0]
+    34/585: $76\next_n[33:0]
+    35/585: $36\next_se[33:0]
+    36/585: $35\next_se[33:0]
+    37/585: $43\next_sw[33:0]
+    38/585: $59\next_nw[33:0]
+    39/585: $51\next_ne[33:0]
+    40/585: $83\next_w[33:0]
+    41/585: $83\next_e[33:0]
+    42/585: $67\next_s[33:0]
+    43/585: $75\next_n[33:0]
+    44/585: $27\next_eject[33:0]
+    45/585: $26\next_eject[33:0]
+    46/585: $42\next_sw[33:0]
+    47/585: $34\next_se[33:0]
+    48/585: $58\next_nw[33:0]
+    49/585: $50\next_ne[33:0]
+    50/585: $82\next_w[33:0]
+    51/585: $82\next_e[33:0]
+    52/585: $66\next_s[33:0]
+    53/585: $74\next_n[33:0]
+    54/585: $25\next_eject[33:0]
+    55/585: $41\next_sw[33:0]
+    56/585: $33\next_se[33:0]
+    57/585: $57\next_nw[33:0]
+    58/585: $49\next_ne[33:0]
+    59/585: $81\next_w[33:0]
+    60/585: $81\next_e[33:0]
+    61/585: $65\next_s[33:0]
+    62/585: $73\next_n[33:0]
+    63/585: $1\route_one$func$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:298$45.tgt_col[1:0]$395
+    64/585: $1\route_one$func$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:298$45.tgt_row[1:0]$394
+    65/585: $1\route_one$func$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:298$45.flit[33:0]$393
+    66/585: $80\next_w[33:0]
+    67/585: $80\next_e[33:0]
+    68/585: $79\next_e[33:0]
+    69/585: $79\next_w[33:0]
+    70/585: $72\next_n[33:0]
+    71/585: $71\next_n[33:0]
+    72/585: $78\next_w[33:0]
+    73/585: $78\next_e[33:0]
+    74/585: $64\next_s[33:0]
+    75/585: $63\next_s[33:0]
+    76/585: $77\next_w[33:0]
+    77/585: $77\next_e[33:0]
+    78/585: $70\next_n[33:0]
+    79/585: $56\next_nw[33:0]
+    80/585: $55\next_nw[33:0]
+    81/585: $76\next_w[33:0]
+    82/585: $76\next_e[33:0]
+    83/585: $62\next_s[33:0]
+    84/585: $69\next_n[33:0]
+    85/585: $48\next_ne[33:0]
+    86/585: $47\next_ne[33:0]
+    87/585: $54\next_nw[33:0]
+    88/585: $75\next_w[33:0]
+    89/585: $75\next_e[33:0]
+    90/585: $61\next_s[33:0]
+    91/585: $68\next_n[33:0]
+    92/585: $40\next_sw[33:0]
+    93/585: $39\next_sw[33:0]
+    94/585: $53\next_nw[33:0]
+    95/585: $46\next_ne[33:0]
+    96/585: $74\next_w[33:0]
+    97/585: $74\next_e[33:0]
+    98/585: $60\next_s[33:0]
+    99/585: $67\next_n[33:0]
+   100/585: $32\next_se[33:0]
+   101/585: $31\next_se[33:0]
+   102/585: $38\next_sw[33:0]
+   103/585: $52\next_nw[33:0]
+   104/585: $45\next_ne[33:0]
+   105/585: $73\next_w[33:0]
+   106/585: $73\next_e[33:0]
+   107/585: $59\next_s[33:0]
+   108/585: $66\next_n[33:0]
+   109/585: $24\next_eject[33:0]
+   110/585: $23\next_eject[33:0]
+   111/585: $37\next_sw[33:0]
+   112/585: $30\next_se[33:0]
+   113/585: $51\next_nw[33:0]
+   114/585: $44\next_ne[33:0]
+   115/585: $72\next_w[33:0]
+   116/585: $72\next_e[33:0]
+   117/585: $58\next_s[33:0]
+   118/585: $65\next_n[33:0]
+   119/585: $22\next_eject[33:0]
+   120/585: $36\next_sw[33:0]
+   121/585: $29\next_se[33:0]
+   122/585: $50\next_nw[33:0]
+   123/585: $43\next_ne[33:0]
+   124/585: $71\next_w[33:0]
+   125/585: $71\next_e[33:0]
+   126/585: $57\next_s[33:0]
+   127/585: $64\next_n[33:0]
+   128/585: $1\route_one$func$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:297$44.tgt_col[1:0]$363
+   129/585: $1\route_one$func$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:297$44.tgt_row[1:0]$362
+   130/585: $1\route_one$func$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:297$44.flit[33:0]$361
+   131/585: $70\next_w[33:0]
+   132/585: $70\next_e[33:0]
+   133/585: $69\next_e[33:0]
+   134/585: $69\next_w[33:0]
+   135/585: $63\next_n[33:0]
+   136/585: $62\next_n[33:0]
+   137/585: $68\next_w[33:0]
+   138/585: $68\next_e[33:0]
+   139/585: $56\next_s[33:0]
+   140/585: $55\next_s[33:0]
+   141/585: $67\next_w[33:0]
+   142/585: $67\next_e[33:0]
+   143/585: $61\next_n[33:0]
+   144/585: $49\next_nw[33:0]
+   145/585: $48\next_nw[33:0]
+   146/585: $66\next_w[33:0]
+   147/585: $66\next_e[33:0]
+   148/585: $54\next_s[33:0]
+   149/585: $60\next_n[33:0]
+   150/585: $42\next_ne[33:0]
+   151/585: $41\next_ne[33:0]
+   152/585: $47\next_nw[33:0]
+   153/585: $65\next_w[33:0]
+   154/585: $65\next_e[33:0]
+   155/585: $53\next_s[33:0]
+   156/585: $59\next_n[33:0]
+   157/585: $35\next_sw[33:0]
+   158/585: $34\next_sw[33:0]
+   159/585: $46\next_nw[33:0]
+   160/585: $40\next_ne[33:0]
+   161/585: $64\next_w[33:0]
+   162/585: $64\next_e[33:0]
+   163/585: $52\next_s[33:0]
+   164/585: $58\next_n[33:0]
+   165/585: $28\next_se[33:0]
+   166/585: $27\next_se[33:0]
+   167/585: $33\next_sw[33:0]
+   168/585: $45\next_nw[33:0]
+   169/585: $39\next_ne[33:0]
+   170/585: $63\next_w[33:0]
+   171/585: $63\next_e[33:0]
+   172/585: $51\next_s[33:0]
+   173/585: $57\next_n[33:0]
+   174/585: $21\next_eject[33:0]
+   175/585: $20\next_eject[33:0]
+   176/585: $32\next_sw[33:0]
+   177/585: $26\next_se[33:0]
+   178/585: $44\next_nw[33:0]
+   179/585: $38\next_ne[33:0]
+   180/585: $62\next_w[33:0]
+   181/585: $62\next_e[33:0]
+   182/585: $50\next_s[33:0]
+   183/585: $56\next_n[33:0]
+   184/585: $19\next_eject[33:0]
+   185/585: $31\next_sw[33:0]
+   186/585: $25\next_se[33:0]
+   187/585: $43\next_nw[33:0]
+   188/585: $37\next_ne[33:0]
+   189/585: $61\next_w[33:0]
+   190/585: $61\next_e[33:0]
+   191/585: $49\next_s[33:0]
+   192/585: $55\next_n[33:0]
+   193/585: $1\route_one$func$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:296$43.tgt_col[1:0]$331
+   194/585: $1\route_one$func$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:296$43.tgt_row[1:0]$330
+   195/585: $1\route_one$func$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:296$43.flit[33:0]$329
+   196/585: $60\next_w[33:0]
+   197/585: $60\next_e[33:0]
+   198/585: $59\next_e[33:0]
+   199/585: $59\next_w[33:0]
+   200/585: $54\next_n[33:0]
+   201/585: $53\next_n[33:0]
+   202/585: $58\next_w[33:0]
+   203/585: $58\next_e[33:0]
+   204/585: $48\next_s[33:0]
+   205/585: $47\next_s[33:0]
+   206/585: $57\next_w[33:0]
+   207/585: $57\next_e[33:0]
+   208/585: $52\next_n[33:0]
+   209/585: $42\next_nw[33:0]
+   210/585: $41\next_nw[33:0]
+   211/585: $56\next_w[33:0]
+   212/585: $56\next_e[33:0]
+   213/585: $46\next_s[33:0]
+   214/585: $51\next_n[33:0]
+   215/585: $36\next_ne[33:0]
+   216/585: $35\next_ne[33:0]
+   217/585: $40\next_nw[33:0]
+   218/585: $55\next_w[33:0]
+   219/585: $55\next_e[33:0]
+   220/585: $45\next_s[33:0]
+   221/585: $50\next_n[33:0]
+   222/585: $30\next_sw[33:0]
+   223/585: $29\next_sw[33:0]
+   224/585: $39\next_nw[33:0]
+   225/585: $34\next_ne[33:0]
+   226/585: $54\next_w[33:0]
+   227/585: $54\next_e[33:0]
+   228/585: $44\next_s[33:0]
+   229/585: $49\next_n[33:0]
+   230/585: $24\next_se[33:0]
+   231/585: $23\next_se[33:0]
+   232/585: $28\next_sw[33:0]
+   233/585: $38\next_nw[33:0]
+   234/585: $33\next_ne[33:0]
+   235/585: $53\next_w[33:0]
+   236/585: $53\next_e[33:0]
+   237/585: $43\next_s[33:0]
+   238/585: $48\next_n[33:0]
+   239/585: $18\next_eject[33:0]
+   240/585: $17\next_eject[33:0]
+   241/585: $27\next_sw[33:0]
+   242/585: $22\next_se[33:0]
+   243/585: $37\next_nw[33:0]
+   244/585: $32\next_ne[33:0]
+   245/585: $52\next_w[33:0]
+   246/585: $52\next_e[33:0]
+   247/585: $42\next_s[33:0]
+   248/585: $47\next_n[33:0]
+   249/585: $16\next_eject[33:0]
+   250/585: $26\next_sw[33:0]
+   251/585: $21\next_se[33:0]
+   252/585: $36\next_nw[33:0]
+   253/585: $31\next_ne[33:0]
+   254/585: $51\next_w[33:0]
+   255/585: $51\next_e[33:0]
+   256/585: $41\next_s[33:0]
+   257/585: $46\next_n[33:0]
+   258/585: $1\route_one$func$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:295$42.tgt_col[1:0]$299
+   259/585: $1\route_one$func$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:295$42.tgt_row[1:0]$298
+   260/585: $1\route_one$func$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:295$42.flit[33:0]$297
+   261/585: $50\next_w[33:0]
+   262/585: $50\next_e[33:0]
+   263/585: $49\next_e[33:0]
+   264/585: $49\next_w[33:0]
+   265/585: $45\next_n[33:0]
+   266/585: $44\next_n[33:0]
+   267/585: $48\next_w[33:0]
+   268/585: $48\next_e[33:0]
+   269/585: $40\next_s[33:0]
+   270/585: $39\next_s[33:0]
+   271/585: $47\next_w[33:0]
+   272/585: $47\next_e[33:0]
+   273/585: $43\next_n[33:0]
+   274/585: $35\next_nw[33:0]
+   275/585: $34\next_nw[33:0]
+   276/585: $46\next_w[33:0]
+   277/585: $46\next_e[33:0]
+   278/585: $38\next_s[33:0]
+   279/585: $42\next_n[33:0]
+   280/585: $30\next_ne[33:0]
+   281/585: $29\next_ne[33:0]
+   282/585: $33\next_nw[33:0]
+   283/585: $45\next_w[33:0]
+   284/585: $45\next_e[33:0]
+   285/585: $37\next_s[33:0]
+   286/585: $41\next_n[33:0]
+   287/585: $25\next_sw[33:0]
+   288/585: $24\next_sw[33:0]
+   289/585: $32\next_nw[33:0]
+   290/585: $28\next_ne[33:0]
+   291/585: $44\next_w[33:0]
+   292/585: $44\next_e[33:0]
+   293/585: $36\next_s[33:0]
+   294/585: $40\next_n[33:0]
+   295/585: $20\next_se[33:0]
+   296/585: $19\next_se[33:0]
+   297/585: $23\next_sw[33:0]
+   298/585: $31\next_nw[33:0]
+   299/585: $27\next_ne[33:0]
+   300/585: $43\next_w[33:0]
+   301/585: $43\next_e[33:0]
+   302/585: $35\next_s[33:0]
+   303/585: $39\next_n[33:0]
+   304/585: $15\next_eject[33:0]
+   305/585: $14\next_eject[33:0]
+   306/585: $22\next_sw[33:0]
+   307/585: $18\next_se[33:0]
+   308/585: $30\next_nw[33:0]
+   309/585: $26\next_ne[33:0]
+   310/585: $42\next_w[33:0]
+   311/585: $42\next_e[33:0]
+   312/585: $34\next_s[33:0]
+   313/585: $38\next_n[33:0]
+   314/585: $13\next_eject[33:0]
+   315/585: $21\next_sw[33:0]
+   316/585: $17\next_se[33:0]
+   317/585: $29\next_nw[33:0]
+   318/585: $25\next_ne[33:0]
+   319/585: $41\next_w[33:0]
+   320/585: $41\next_e[33:0]
+   321/585: $33\next_s[33:0]
+   322/585: $37\next_n[33:0]
+   323/585: $1\route_one$func$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:294$41.tgt_col[1:0]$267
+   324/585: $1\route_one$func$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:294$41.tgt_row[1:0]$266
+   325/585: $1\route_one$func$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:294$41.flit[33:0]$265
+   326/585: $40\next_w[33:0]
+   327/585: $40\next_e[33:0]
+   328/585: $39\next_e[33:0]
+   329/585: $39\next_w[33:0]
+   330/585: $36\next_n[33:0]
+   331/585: $35\next_n[33:0]
+   332/585: $38\next_w[33:0]
+   333/585: $38\next_e[33:0]
+   334/585: $32\next_s[33:0]
+   335/585: $31\next_s[33:0]
+   336/585: $37\next_w[33:0]
+   337/585: $37\next_e[33:0]
+   338/585: $34\next_n[33:0]
+   339/585: $28\next_nw[33:0]
+   340/585: $27\next_nw[33:0]
+   341/585: $36\next_w[33:0]
+   342/585: $36\next_e[33:0]
+   343/585: $30\next_s[33:0]
+   344/585: $33\next_n[33:0]
+   345/585: $24\next_ne[33:0]
+   346/585: $23\next_ne[33:0]
+   347/585: $26\next_nw[33:0]
+   348/585: $35\next_w[33:0]
+   349/585: $35\next_e[33:0]
+   350/585: $29\next_s[33:0]
+   351/585: $32\next_n[33:0]
+   352/585: $20\next_sw[33:0]
+   353/585: $19\next_sw[33:0]
+   354/585: $25\next_nw[33:0]
+   355/585: $22\next_ne[33:0]
+   356/585: $34\next_w[33:0]
+   357/585: $34\next_e[33:0]
+   358/585: $28\next_s[33:0]
+   359/585: $31\next_n[33:0]
+   360/585: $16\next_se[33:0]
+   361/585: $15\next_se[33:0]
+   362/585: $18\next_sw[33:0]
+   363/585: $24\next_nw[33:0]
+   364/585: $21\next_ne[33:0]
+   365/585: $33\next_w[33:0]
+   366/585: $33\next_e[33:0]
+   367/585: $27\next_s[33:0]
+   368/585: $30\next_n[33:0]
+   369/585: $12\next_eject[33:0]
+   370/585: $11\next_eject[33:0]
+   371/585: $17\next_sw[33:0]
+   372/585: $14\next_se[33:0]
+   373/585: $23\next_nw[33:0]
+   374/585: $20\next_ne[33:0]
+   375/585: $32\next_w[33:0]
+   376/585: $32\next_e[33:0]
+   377/585: $26\next_s[33:0]
+   378/585: $29\next_n[33:0]
+   379/585: $10\next_eject[33:0]
+   380/585: $16\next_sw[33:0]
+   381/585: $13\next_se[33:0]
+   382/585: $22\next_nw[33:0]
+   383/585: $19\next_ne[33:0]
+   384/585: $31\next_w[33:0]
+   385/585: $31\next_e[33:0]
+   386/585: $25\next_s[33:0]
+   387/585: $28\next_n[33:0]
+   388/585: $1\route_one$func$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:293$40.tgt_col[1:0]$235
+   389/585: $1\route_one$func$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:293$40.tgt_row[1:0]$234
+   390/585: $1\route_one$func$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:293$40.flit[33:0]$233
+   391/585: $30\next_w[33:0]
+   392/585: $30\next_e[33:0]
+   393/585: $29\next_e[33:0]
+   394/585: $29\next_w[33:0]
+   395/585: $27\next_n[33:0]
+   396/585: $26\next_n[33:0]
+   397/585: $28\next_w[33:0]
+   398/585: $28\next_e[33:0]
+   399/585: $24\next_s[33:0]
+   400/585: $23\next_s[33:0]
+   401/585: $27\next_w[33:0]
+   402/585: $27\next_e[33:0]
+   403/585: $25\next_n[33:0]
+   404/585: $21\next_nw[33:0]
+   405/585: $20\next_nw[33:0]
+   406/585: $26\next_w[33:0]
+   407/585: $26\next_e[33:0]
+   408/585: $22\next_s[33:0]
+   409/585: $24\next_n[33:0]
+   410/585: $18\next_ne[33:0]
+   411/585: $17\next_ne[33:0]
+   412/585: $19\next_nw[33:0]
+   413/585: $25\next_w[33:0]
+   414/585: $25\next_e[33:0]
+   415/585: $21\next_s[33:0]
+   416/585: $23\next_n[33:0]
+   417/585: $15\next_sw[33:0]
+   418/585: $14\next_sw[33:0]
+   419/585: $18\next_nw[33:0]
+   420/585: $16\next_ne[33:0]
+   421/585: $24\next_w[33:0]
+   422/585: $24\next_e[33:0]
+   423/585: $20\next_s[33:0]
+   424/585: $22\next_n[33:0]
+   425/585: $12\next_se[33:0]
+   426/585: $11\next_se[33:0]
+   427/585: $13\next_sw[33:0]
+   428/585: $17\next_nw[33:0]
+   429/585: $15\next_ne[33:0]
+   430/585: $23\next_w[33:0]
+   431/585: $23\next_e[33:0]
+   432/585: $19\next_s[33:0]
+   433/585: $21\next_n[33:0]
+   434/585: $9\next_eject[33:0]
+   435/585: $8\next_eject[33:0]
+   436/585: $12\next_sw[33:0]
+   437/585: $10\next_se[33:0]
+   438/585: $16\next_nw[33:0]
+   439/585: $14\next_ne[33:0]
+   440/585: $22\next_w[33:0]
+   441/585: $22\next_e[33:0]
+   442/585: $18\next_s[33:0]
+   443/585: $20\next_n[33:0]
+   444/585: $7\next_eject[33:0]
+   445/585: $11\next_sw[33:0]
+   446/585: $9\next_se[33:0]
+   447/585: $15\next_nw[33:0]
+   448/585: $13\next_ne[33:0]
+   449/585: $21\next_w[33:0]
+   450/585: $21\next_e[33:0]
+   451/585: $17\next_s[33:0]
+   452/585: $19\next_n[33:0]
+   453/585: $1\route_one$func$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:292$39.tgt_col[1:0]$203
+   454/585: $1\route_one$func$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:292$39.tgt_row[1:0]$202
+   455/585: $1\route_one$func$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:292$39.flit[33:0]$201
+   456/585: $20\next_w[33:0]
+   457/585: $20\next_e[33:0]
+   458/585: $19\next_e[33:0]
+   459/585: $19\next_w[33:0]
+   460/585: $18\next_n[33:0]
+   461/585: $17\next_n[33:0]
+   462/585: $18\next_w[33:0]
+   463/585: $18\next_e[33:0]
+   464/585: $16\next_s[33:0]
+   465/585: $15\next_s[33:0]
+   466/585: $17\next_w[33:0]
+   467/585: $17\next_e[33:0]
+   468/585: $16\next_n[33:0]
+   469/585: $14\next_nw[33:0]
+   470/585: $13\next_nw[33:0]
+   471/585: $16\next_w[33:0]
+   472/585: $16\next_e[33:0]
+   473/585: $14\next_s[33:0]
+   474/585: $15\next_n[33:0]
+   475/585: $12\next_ne[33:0]
+   476/585: $11\next_ne[33:0]
+   477/585: $12\next_nw[33:0]
+   478/585: $15\next_w[33:0]
+   479/585: $15\next_e[33:0]
+   480/585: $13\next_s[33:0]
+   481/585: $14\next_n[33:0]
+   482/585: $10\next_sw[33:0]
+   483/585: $9\next_sw[33:0]
+   484/585: $11\next_nw[33:0]
+   485/585: $10\next_ne[33:0]
+   486/585: $14\next_w[33:0]
+   487/585: $14\next_e[33:0]
+   488/585: $12\next_s[33:0]
+   489/585: $13\next_n[33:0]
+   490/585: $8\next_se[33:0]
+   491/585: $7\next_se[33:0]
+   492/585: $8\next_sw[33:0]
+   493/585: $10\next_nw[33:0]
+   494/585: $9\next_ne[33:0]
+   495/585: $13\next_w[33:0]
+   496/585: $13\next_e[33:0]
+   497/585: $11\next_s[33:0]
+   498/585: $12\next_n[33:0]
+   499/585: $6\next_eject[33:0]
+   500/585: $5\next_eject[33:0]
+   501/585: $7\next_sw[33:0]
+   502/585: $6\next_se[33:0]
+   503/585: $9\next_nw[33:0]
+   504/585: $8\next_ne[33:0]
+   505/585: $12\next_w[33:0]
+   506/585: $12\next_e[33:0]
+   507/585: $10\next_s[33:0]
+   508/585: $11\next_n[33:0]
+   509/585: $4\next_eject[33:0]
+   510/585: $6\next_sw[33:0]
+   511/585: $5\next_se[33:0]
+   512/585: $8\next_nw[33:0]
+   513/585: $7\next_ne[33:0]
+   514/585: $11\next_w[33:0]
+   515/585: $11\next_e[33:0]
+   516/585: $9\next_s[33:0]
+   517/585: $10\next_n[33:0]
+   518/585: $1\route_one$func$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:291$38.tgt_col[1:0]$171
+   519/585: $1\route_one$func$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:291$38.tgt_row[1:0]$170
+   520/585: $1\route_one$func$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:291$38.flit[33:0]$169
+   521/585: $10\next_w[33:0]
+   522/585: $10\next_e[33:0]
+   523/585: $9\next_e[33:0]
+   524/585: $9\next_w[33:0]
+   525/585: $9\next_n[33:0]
+   526/585: $8\next_n[33:0]
+   527/585: $8\next_w[33:0]
+   528/585: $8\next_e[33:0]
+   529/585: $8\next_s[33:0]
+   530/585: $7\next_s[33:0]
+   531/585: $7\next_w[33:0]
+   532/585: $7\next_e[33:0]
+   533/585: $7\next_n[33:0]
+   534/585: $7\next_nw[33:0]
+   535/585: $6\next_nw[33:0]
+   536/585: $6\next_w[33:0]
+   537/585: $6\next_e[33:0]
+   538/585: $6\next_s[33:0]
+   539/585: $6\next_n[33:0]
+   540/585: $6\next_ne[33:0]
+   541/585: $5\next_ne[33:0]
+   542/585: $5\next_nw[33:0]
+   543/585: $5\next_w[33:0]
+   544/585: $5\next_e[33:0]
+   545/585: $5\next_s[33:0]
+   546/585: $5\next_n[33:0]
+   547/585: $5\next_sw[33:0]
+   548/585: $4\next_sw[33:0]
+   549/585: $4\next_nw[33:0]
+   550/585: $4\next_ne[33:0]
+   551/585: $4\next_w[33:0]
+   552/585: $4\next_e[33:0]
+   553/585: $4\next_s[33:0]
+   554/585: $4\next_n[33:0]
+   555/585: $4\next_se[33:0]
+   556/585: $3\next_se[33:0]
+   557/585: $3\next_sw[33:0]
+   558/585: $3\next_nw[33:0]
+   559/585: $3\next_ne[33:0]
+   560/585: $3\next_w[33:0]
+   561/585: $3\next_e[33:0]
+   562/585: $3\next_s[33:0]
+   563/585: $3\next_n[33:0]
+   564/585: $3\next_eject[33:0]
+   565/585: $2\next_eject[33:0]
+   566/585: $2\next_sw[33:0]
+   567/585: $2\next_se[33:0]
+   568/585: $2\next_nw[33:0]
+   569/585: $2\next_ne[33:0]
+   570/585: $2\next_w[33:0]
+   571/585: $2\next_e[33:0]
+   572/585: $2\next_s[33:0]
+   573/585: $2\next_n[33:0]
+   574/585: $1\next_eject[33:0]
+   575/585: $1\next_sw[33:0]
+   576/585: $1\next_se[33:0]
+   577/585: $1\next_nw[33:0]
+   578/585: $1\next_ne[33:0]
+   579/585: $1\next_w[33:0]
+   580/585: $1\next_e[33:0]
+   581/585: $1\next_s[33:0]
+   582/585: $1\next_n[33:0]
+   583/585: $1\route_one$func$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:290$37.tgt_col[1:0]$139
+   584/585: $1\route_one$func$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:290$37.tgt_row[1:0]$138
+   585/585: $1\route_one$func$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:290$37.flit[33:0]$137
+Creating decoders for process `$paramod\mesh_router\MY_ID=4'0000.$proc$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:231$96'.
+     1/1: $0\fifo_head_reg[33:0]
+Creating decoders for process `$paramod\mesh_router\MY_ID=4'0000.$proc$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:166$68'.
+     1/14: $2$memwr$\fifo_mem$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:175$50_EN[33:0]$85
+     2/14: $2$memwr$\fifo_mem$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:175$50_DATA[33:0]$84
+     3/14: $2$memwr$\fifo_mem$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:175$50_ADDR[1:0]$83
+     4/14: $1\i[31:0]
+     5/14: $1$memwr$\fifo_mem$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:172$49_EN[33:0]$79
+     6/14: $1$memwr$\fifo_mem$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:172$48_EN[33:0]$78
+     7/14: $1$memwr$\fifo_mem$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:172$47_EN[33:0]$77
+     8/14: $1$memwr$\fifo_mem$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:172$46_EN[33:0]$76
+     9/14: $1$memwr$\fifo_mem$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:175$50_EN[33:0]$82
+    10/14: $1$memwr$\fifo_mem$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:175$50_DATA[33:0]$81
+    11/14: $1$memwr$\fifo_mem$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:175$50_ADDR[1:0]$80
+    12/14: $0\fifo_count[2:0]
+    13/14: $0\fifo_rd_ptr[1:0]
+    14/14: $0\fifo_wr_ptr[1:0]
+Creating decoders for process `$paramod\mesh_router\MY_ID=4'0000.$proc$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:159$63'.
+     1/1: $0\cpu_read_q[0:0]
+Creating decoders for process `$paramod\mesh_router\MY_ID=4'0000.$proc$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:88$54'.
+     1/1: $0\inject_flit[33:0]
+Creating decoders for process `$paramod$f3cec78d1cfbbfc8778027792a43ce84e0717e5d\serv_state.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_state.v:230$994'.
+     1/1: $0\gen_csr.misalign_trap_sync_r[0:0]
+Creating decoders for process `$paramod$f3cec78d1cfbbfc8778027792a43ce84e0717e5d\serv_state.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_state.v:198$987'.
+     1/2: $0\gen_cnt_w_eq_1.cnt_lsb[3:0]
+     2/2: $0\o_cnt[2:0]
+Creating decoders for process `$paramod$f3cec78d1cfbbfc8778027792a43ce84e0717e5d\serv_state.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_state.v:147$977'.
+     1/3: $0\ibus_cyc[0:0]
+     2/3: $0\init_done[0:0]
+     3/3: $0\o_ctrl_jump[0:0]
+Creating decoders for process `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_decode.v:255$902'.
+Creating decoders for process `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_decode.v:242$901'.
+     1/8: $0\imm30[0:0]
+     2/8: $0\imm25[0:0]
+     3/8: $0\op26[0:0]
+     4/8: $0\op22[0:0]
+     5/8: $0\op21[0:0]
+     6/8: $0\op20[0:0]
+     7/8: $0\funct3[2:0]
+     8/8: $0\opcode[4:0]
+Creating decoders for process `$paramod\serv_immdec\W=s32'00000000000000000000000000000001.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_immdec.v:49$745'.
+     1/6: $0\gen_immdec_w_eq_1.imm11_7[4:0]
+     2/6: $0\gen_immdec_w_eq_1.imm24_20[4:0]
+     3/6: $0\gen_immdec_w_eq_1.imm30_25[5:0]
+     4/6: $0\gen_immdec_w_eq_1.imm7[0:0]
+     5/6: $0\gen_immdec_w_eq_1.imm19_12_20[8:0]
+     6/6: $0\gen_immdec_w_eq_1.imm31[0:0]
+Creating decoders for process `$paramod\serv_bufreg\MDU=1'0\W=s32'00000000000000000000000000000001.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_bufreg.v:62$734'.
+     1/2: $0\data[31:0] [31:2]
+     2/2: $0\data[31:0] [1:0]
+Creating decoders for process `$paramod\serv_bufreg\MDU=1'0\W=s32'00000000000000000000000000000001.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_bufreg.v:54$732'.
+Creating decoders for process `$paramod\serv_bufreg2\W=s32'00000000000000000000000000000001.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_bufreg2.v:98$713'.
+     1/2: $0\dlo[23:0]
+     2/2: $0\dhi[7:0]
+Creating decoders for process `$paramod$9612b4840d8ba9073515f47ec1c47f8b049edc33\serv_ctrl.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_ctrl.v:103$660'.
+     1/1: $0\o_ibus_adr[31:0]
+Creating decoders for process `$paramod\serv_alu\W=s32'00000000000000000000000000000001.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_alu.v:79$646'.
+     1/1: $0\cmp_r[0:0]
+
+33.8. Executing PROC_DLATCH pass (convert process syncs to latches).
+No latch inferred for signal `$paramod\servile_mux\sim=1'0.\sim_ack' from process `$paramod\servile_mux\sim=1'0.$proc$/home/etcfranc/NoCNoC/src/serv/servile/servile_mux.v:96$501'.
+No latch inferred for signal `$paramod\mesh_router\MY_ID=4'0000.\next_n' from process `$paramod\mesh_router\MY_ID=4'0000.$proc$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:286$109'.
+No latch inferred for signal `$paramod\mesh_router\MY_ID=4'0000.\next_s' from process `$paramod\mesh_router\MY_ID=4'0000.$proc$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:286$109'.
+No latch inferred for signal `$paramod\mesh_router\MY_ID=4'0000.\next_e' from process `$paramod\mesh_router\MY_ID=4'0000.$proc$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:286$109'.
+No latch inferred for signal `$paramod\mesh_router\MY_ID=4'0000.\next_w' from process `$paramod\mesh_router\MY_ID=4'0000.$proc$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:286$109'.
+No latch inferred for signal `$paramod\mesh_router\MY_ID=4'0000.\next_ne' from process `$paramod\mesh_router\MY_ID=4'0000.$proc$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:286$109'.
+No latch inferred for signal `$paramod\mesh_router\MY_ID=4'0000.\next_nw' from process `$paramod\mesh_router\MY_ID=4'0000.$proc$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:286$109'.
+No latch inferred for signal `$paramod\mesh_router\MY_ID=4'0000.\next_se' from process `$paramod\mesh_router\MY_ID=4'0000.$proc$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:286$109'.
+No latch inferred for signal `$paramod\mesh_router\MY_ID=4'0000.\next_sw' from process `$paramod\mesh_router\MY_ID=4'0000.$proc$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:286$109'.
+No latch inferred for signal `$paramod\mesh_router\MY_ID=4'0000.\next_eject' from process `$paramod\mesh_router\MY_ID=4'0000.$proc$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:286$109'.
+No latch inferred for signal `$paramod\mesh_router\MY_ID=4'0000.\route_one$func$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:290$37.flit' from process `$paramod\mesh_router\MY_ID=4'0000.$proc$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:286$109'.
+No latch inferred for signal `$paramod\mesh_router\MY_ID=4'0000.\route_one$func$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:290$37.tgt_row' from process `$paramod\mesh_router\MY_ID=4'0000.$proc$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:286$109'.
+No latch inferred for signal `$paramod\mesh_router\MY_ID=4'0000.\route_one$func$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:290$37.tgt_col' from process `$paramod\mesh_router\MY_ID=4'0000.$proc$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:286$109'.
+No latch inferred for signal `$paramod\mesh_router\MY_ID=4'0000.\route_one$func$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:291$38.flit' from process `$paramod\mesh_router\MY_ID=4'0000.$proc$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:286$109'.
+No latch inferred for signal `$paramod\mesh_router\MY_ID=4'0000.\route_one$func$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:291$38.tgt_row' from process `$paramod\mesh_router\MY_ID=4'0000.$proc$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:286$109'.
+No latch inferred for signal `$paramod\mesh_router\MY_ID=4'0000.\route_one$func$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:291$38.tgt_col' from process `$paramod\mesh_router\MY_ID=4'0000.$proc$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:286$109'.
+No latch inferred for signal `$paramod\mesh_router\MY_ID=4'0000.\route_one$func$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:292$39.flit' from process `$paramod\mesh_router\MY_ID=4'0000.$proc$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:286$109'.
+No latch inferred for signal `$paramod\mesh_router\MY_ID=4'0000.\route_one$func$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:292$39.tgt_row' from process `$paramod\mesh_router\MY_ID=4'0000.$proc$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:286$109'.
+No latch inferred for signal `$paramod\mesh_router\MY_ID=4'0000.\route_one$func$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:292$39.tgt_col' from process `$paramod\mesh_router\MY_ID=4'0000.$proc$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:286$109'.
+No latch inferred for signal `$paramod\mesh_router\MY_ID=4'0000.\route_one$func$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:293$40.flit' from process `$paramod\mesh_router\MY_ID=4'0000.$proc$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:286$109'.
+No latch inferred for signal `$paramod\mesh_router\MY_ID=4'0000.\route_one$func$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:293$40.tgt_row' from process `$paramod\mesh_router\MY_ID=4'0000.$proc$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:286$109'.
+No latch inferred for signal `$paramod\mesh_router\MY_ID=4'0000.\route_one$func$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:293$40.tgt_col' from process `$paramod\mesh_router\MY_ID=4'0000.$proc$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:286$109'.
+No latch inferred for signal `$paramod\mesh_router\MY_ID=4'0000.\route_one$func$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:294$41.flit' from process `$paramod\mesh_router\MY_ID=4'0000.$proc$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:286$109'.
+No latch inferred for signal `$paramod\mesh_router\MY_ID=4'0000.\route_one$func$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:294$41.tgt_row' from process `$paramod\mesh_router\MY_ID=4'0000.$proc$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:286$109'.
+No latch inferred for signal `$paramod\mesh_router\MY_ID=4'0000.\route_one$func$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:294$41.tgt_col' from process `$paramod\mesh_router\MY_ID=4'0000.$proc$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:286$109'.
+No latch inferred for signal `$paramod\mesh_router\MY_ID=4'0000.\route_one$func$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:295$42.flit' from process `$paramod\mesh_router\MY_ID=4'0000.$proc$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:286$109'.
+No latch inferred for signal `$paramod\mesh_router\MY_ID=4'0000.\route_one$func$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:295$42.tgt_row' from process `$paramod\mesh_router\MY_ID=4'0000.$proc$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:286$109'.
+No latch inferred for signal `$paramod\mesh_router\MY_ID=4'0000.\route_one$func$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:295$42.tgt_col' from process `$paramod\mesh_router\MY_ID=4'0000.$proc$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:286$109'.
+No latch inferred for signal `$paramod\mesh_router\MY_ID=4'0000.\route_one$func$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:296$43.flit' from process `$paramod\mesh_router\MY_ID=4'0000.$proc$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:286$109'.
+No latch inferred for signal `$paramod\mesh_router\MY_ID=4'0000.\route_one$func$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:296$43.tgt_row' from process `$paramod\mesh_router\MY_ID=4'0000.$proc$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:286$109'.
+No latch inferred for signal `$paramod\mesh_router\MY_ID=4'0000.\route_one$func$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:296$43.tgt_col' from process `$paramod\mesh_router\MY_ID=4'0000.$proc$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:286$109'.
+No latch inferred for signal `$paramod\mesh_router\MY_ID=4'0000.\route_one$func$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:297$44.flit' from process `$paramod\mesh_router\MY_ID=4'0000.$proc$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:286$109'.
+No latch inferred for signal `$paramod\mesh_router\MY_ID=4'0000.\route_one$func$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:297$44.tgt_row' from process `$paramod\mesh_router\MY_ID=4'0000.$proc$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:286$109'.
+No latch inferred for signal `$paramod\mesh_router\MY_ID=4'0000.\route_one$func$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:297$44.tgt_col' from process `$paramod\mesh_router\MY_ID=4'0000.$proc$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:286$109'.
+No latch inferred for signal `$paramod\mesh_router\MY_ID=4'0000.\route_one$func$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:298$45.flit' from process `$paramod\mesh_router\MY_ID=4'0000.$proc$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:286$109'.
+No latch inferred for signal `$paramod\mesh_router\MY_ID=4'0000.\route_one$func$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:298$45.tgt_row' from process `$paramod\mesh_router\MY_ID=4'0000.$proc$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:286$109'.
+No latch inferred for signal `$paramod\mesh_router\MY_ID=4'0000.\route_one$func$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:298$45.tgt_col' from process `$paramod\mesh_router\MY_ID=4'0000.$proc$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:286$109'.
+No latch inferred for signal `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.\o_ext_funct3' from process `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_decode.v:255$902'.
+No latch inferred for signal `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.\o_bne_or_bge' from process `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_decode.v:255$902'.
+No latch inferred for signal `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.\o_cond_branch' from process `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_decode.v:255$902'.
+No latch inferred for signal `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.\o_dbus_en' from process `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_decode.v:255$902'.
+No latch inferred for signal `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.\o_e_op' from process `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_decode.v:255$902'.
+No latch inferred for signal `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.\o_ebreak' from process `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_decode.v:255$902'.
+No latch inferred for signal `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.\o_branch_op' from process `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_decode.v:255$902'.
+No latch inferred for signal `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.\o_shift_op' from process `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_decode.v:255$902'.
+No latch inferred for signal `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.\o_rd_op' from process `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_decode.v:255$902'.
+No latch inferred for signal `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.\o_sh_right' from process `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_decode.v:255$902'.
+No latch inferred for signal `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.\o_mdu_op' from process `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_decode.v:255$902'.
+No latch inferred for signal `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.\o_two_stage_op' from process `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_decode.v:255$902'.
+No latch inferred for signal `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.\o_bufreg_rs1_en' from process `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_decode.v:255$902'.
+No latch inferred for signal `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.\o_bufreg_imm_en' from process `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_decode.v:255$902'.
+No latch inferred for signal `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.\o_bufreg_clr_lsb' from process `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_decode.v:255$902'.
+No latch inferred for signal `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.\o_bufreg_sh_signed' from process `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_decode.v:255$902'.
+No latch inferred for signal `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.\o_op_b_source' from process `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_decode.v:255$902'.
+No latch inferred for signal `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.\o_ctrl_jal_or_jalr' from process `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_decode.v:255$902'.
+No latch inferred for signal `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.\o_ctrl_utype' from process `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_decode.v:255$902'.
+No latch inferred for signal `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.\o_ctrl_pc_rel' from process `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_decode.v:255$902'.
+No latch inferred for signal `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.\o_ctrl_mret' from process `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_decode.v:255$902'.
+No latch inferred for signal `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.\o_alu_sub' from process `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_decode.v:255$902'.
+No latch inferred for signal `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.\o_alu_bool_op' from process `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_decode.v:255$902'.
+No latch inferred for signal `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.\o_alu_cmp_eq' from process `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_decode.v:255$902'.
+No latch inferred for signal `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.\o_alu_cmp_sig' from process `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_decode.v:255$902'.
+No latch inferred for signal `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.\o_alu_rd_sel' from process `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_decode.v:255$902'.
+No latch inferred for signal `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.\o_mem_cmd' from process `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_decode.v:255$902'.
+No latch inferred for signal `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.\o_mem_signed' from process `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_decode.v:255$902'.
+No latch inferred for signal `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.\o_mem_word' from process `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_decode.v:255$902'.
+No latch inferred for signal `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.\o_mem_half' from process `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_decode.v:255$902'.
+No latch inferred for signal `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.\o_csr_en' from process `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_decode.v:255$902'.
+No latch inferred for signal `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.\o_csr_addr' from process `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_decode.v:255$902'.
+No latch inferred for signal `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.\o_csr_mstatus_en' from process `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_decode.v:255$902'.
+No latch inferred for signal `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.\o_csr_mie_en' from process `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_decode.v:255$902'.
+No latch inferred for signal `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.\o_csr_mcause_en' from process `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_decode.v:255$902'.
+No latch inferred for signal `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.\o_csr_source' from process `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_decode.v:255$902'.
+No latch inferred for signal `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.\o_csr_d_sel' from process `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_decode.v:255$902'.
+No latch inferred for signal `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.\o_csr_imm_en' from process `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_decode.v:255$902'.
+No latch inferred for signal `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.\o_mtval_pc' from process `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_decode.v:255$902'.
+No latch inferred for signal `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.\o_immdec_ctrl' from process `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_decode.v:255$902'.
+No latch inferred for signal `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.\o_immdec_en' from process `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_decode.v:255$902'.
+No latch inferred for signal `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.\o_rd_mem_en' from process `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_decode.v:255$902'.
+No latch inferred for signal `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.\o_rd_csr_en' from process `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_decode.v:255$902'.
+No latch inferred for signal `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.\o_rd_alu_en' from process `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_decode.v:255$902'.
+
+33.9. Executing PROC_DFF pass (convert process syncs to FFs).
+Creating register for signal `\mesh_tile.\nb_state' using process `\mesh_tile.$proc$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_tile.v:123$9'.
+  created $dff cell `$procdff$8655' with positive edge clock.
+Creating register for signal `\mesh_tile.\nb_addr_latch' using process `\mesh_tile.$proc$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_tile.v:123$9'.
+  created $dff cell `$procdff$8656' with positive edge clock.
+Creating register for signal `\mesh_tile.\nb_data_latch' using process `\mesh_tile.$proc$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_tile.v:123$9'.
+  created $dff cell `$procdff$8657' with positive edge clock.
+Creating register for signal `\mesh_tile.\nb_wen' using process `\mesh_tile.$proc$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_tile.v:123$9'.
+  created $dff cell `$procdff$8658' with positive edge clock.
+Creating register for signal `\mesh_tile.\nb_pop' using process `\mesh_tile.$proc$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_tile.v:123$9'.
+  created $dff cell `$procdff$8659' with positive edge clock.
+Creating register for signal `\mesh_tile.\boot_mode_q' using process `\mesh_tile.$proc$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_tile.v:81$2'.
+  created $adff cell `$procdff$8662' with positive edge clock and positive level reset.
+Creating register for signal `$paramod\serv_mem_if\WITH_CSR=1'1\W=s32'00000000000000000000000000000001.\signbit' using process `$paramod\serv_mem_if\WITH_CSR=1'1\W=s32'00000000000000000000000000000001.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_mem_if.v:47$586'.
+  created $dff cell `$procdff$8663' with positive edge clock.
+Creating register for signal `$paramod$3e7b4dd89124d05b1503dd2b902960520f2771f4\serv_csr.\o_new_irq' using process `$paramod$3e7b4dd89124d05b1503dd2b902960520f2771f4\serv_csr.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_csr.v:98$524'.
+  created $dff cell `$procdff$8664' with positive edge clock.
+Creating register for signal `$paramod$3e7b4dd89124d05b1503dd2b902960520f2771f4\serv_csr.\mstatus_mie' using process `$paramod$3e7b4dd89124d05b1503dd2b902960520f2771f4\serv_csr.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_csr.v:98$524'.
+  created $dff cell `$procdff$8665' with positive edge clock.
+Creating register for signal `$paramod$3e7b4dd89124d05b1503dd2b902960520f2771f4\serv_csr.\mstatus_mpie' using process `$paramod$3e7b4dd89124d05b1503dd2b902960520f2771f4\serv_csr.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_csr.v:98$524'.
+  created $dff cell `$procdff$8666' with positive edge clock.
+Creating register for signal `$paramod$3e7b4dd89124d05b1503dd2b902960520f2771f4\serv_csr.\mie_mtie' using process `$paramod$3e7b4dd89124d05b1503dd2b902960520f2771f4\serv_csr.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_csr.v:98$524'.
+  created $dff cell `$procdff$8667' with positive edge clock.
+Creating register for signal `$paramod$3e7b4dd89124d05b1503dd2b902960520f2771f4\serv_csr.\mcause31' using process `$paramod$3e7b4dd89124d05b1503dd2b902960520f2771f4\serv_csr.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_csr.v:98$524'.
+  created $dff cell `$procdff$8668' with positive edge clock.
+Creating register for signal `$paramod$3e7b4dd89124d05b1503dd2b902960520f2771f4\serv_csr.\mcause3_0' using process `$paramod$3e7b4dd89124d05b1503dd2b902960520f2771f4\serv_csr.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_csr.v:98$524'.
+  created $dff cell `$procdff$8669' with positive edge clock.
+Creating register for signal `$paramod$3e7b4dd89124d05b1503dd2b902960520f2771f4\serv_csr.\timer_irq_r' using process `$paramod$3e7b4dd89124d05b1503dd2b902960520f2771f4\serv_csr.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_csr.v:98$524'.
+  created $dff cell `$procdff$8670' with positive edge clock.
+Creating register for signal `$paramod$7dfcbd4a24f0bfdcc2f47551222fe0ba6c7d84ba\serv_rf_ram_if.\rdata1' using process `$paramod$7dfcbd4a24f0bfdcc2f47551222fe0ba6c7d84ba\serv_rf_ram_if.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_rf_ram_if.v:148$480'.
+  created $dff cell `$procdff$8671' with positive edge clock.
+Creating register for signal `$paramod$7dfcbd4a24f0bfdcc2f47551222fe0ba6c7d84ba\serv_rf_ram_if.\gen_wtrig_ratio_neq_2.wtrig0_r' using process `$paramod$7dfcbd4a24f0bfdcc2f47551222fe0ba6c7d84ba\serv_rf_ram_if.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_rf_ram_if.v:81$477'.
+  created $dff cell `$procdff$8672' with positive edge clock.
+Creating register for signal `$paramod$7dfcbd4a24f0bfdcc2f47551222fe0ba6c7d84ba\serv_rf_ram_if.\rdata0' using process `$paramod$7dfcbd4a24f0bfdcc2f47551222fe0ba6c7d84ba\serv_rf_ram_if.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_rf_ram_if.v:158$472'.
+  created $dff cell `$procdff$8673' with positive edge clock.
+Creating register for signal `$paramod$7dfcbd4a24f0bfdcc2f47551222fe0ba6c7d84ba\serv_rf_ram_if.\rgnt' using process `$paramod$7dfcbd4a24f0bfdcc2f47551222fe0ba6c7d84ba\serv_rf_ram_if.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_rf_ram_if.v:158$472'.
+  created $dff cell `$procdff$8674' with positive edge clock.
+Creating register for signal `$paramod$7dfcbd4a24f0bfdcc2f47551222fe0ba6c7d84ba\serv_rf_ram_if.\rcnt' using process `$paramod$7dfcbd4a24f0bfdcc2f47551222fe0ba6c7d84ba\serv_rf_ram_if.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_rf_ram_if.v:158$472'.
+  created $dff cell `$procdff$8675' with positive edge clock.
+Creating register for signal `$paramod$7dfcbd4a24f0bfdcc2f47551222fe0ba6c7d84ba\serv_rf_ram_if.\rtrig1' using process `$paramod$7dfcbd4a24f0bfdcc2f47551222fe0ba6c7d84ba\serv_rf_ram_if.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_rf_ram_if.v:158$472'.
+  created $dff cell `$procdff$8676' with positive edge clock.
+Creating register for signal `$paramod$7dfcbd4a24f0bfdcc2f47551222fe0ba6c7d84ba\serv_rf_ram_if.\rgate' using process `$paramod$7dfcbd4a24f0bfdcc2f47551222fe0ba6c7d84ba\serv_rf_ram_if.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_rf_ram_if.v:158$472'.
+  created $dff cell `$procdff$8677' with positive edge clock.
+Creating register for signal `$paramod$7dfcbd4a24f0bfdcc2f47551222fe0ba6c7d84ba\serv_rf_ram_if.\rreq_r' using process `$paramod$7dfcbd4a24f0bfdcc2f47551222fe0ba6c7d84ba\serv_rf_ram_if.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_rf_ram_if.v:158$472'.
+  created $dff cell `$procdff$8678' with positive edge clock.
+Creating register for signal `$paramod$7dfcbd4a24f0bfdcc2f47551222fe0ba6c7d84ba\serv_rf_ram_if.\wdata0_r' using process `$paramod$7dfcbd4a24f0bfdcc2f47551222fe0ba6c7d84ba\serv_rf_ram_if.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_rf_ram_if.v:102$468'.
+  created $dff cell `$procdff$8679' with positive edge clock.
+Creating register for signal `$paramod$7dfcbd4a24f0bfdcc2f47551222fe0ba6c7d84ba\serv_rf_ram_if.\wdata1_r' using process `$paramod$7dfcbd4a24f0bfdcc2f47551222fe0ba6c7d84ba\serv_rf_ram_if.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_rf_ram_if.v:102$468'.
+  created $dff cell `$procdff$8680' with positive edge clock.
+Creating register for signal `$paramod$7dfcbd4a24f0bfdcc2f47551222fe0ba6c7d84ba\serv_rf_ram_if.\wen0_r' using process `$paramod$7dfcbd4a24f0bfdcc2f47551222fe0ba6c7d84ba\serv_rf_ram_if.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_rf_ram_if.v:102$468'.
+  created $dff cell `$procdff$8681' with positive edge clock.
+Creating register for signal `$paramod$7dfcbd4a24f0bfdcc2f47551222fe0ba6c7d84ba\serv_rf_ram_if.\wen1_r' using process `$paramod$7dfcbd4a24f0bfdcc2f47551222fe0ba6c7d84ba\serv_rf_ram_if.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_rf_ram_if.v:102$468'.
+  created $dff cell `$procdff$8682' with positive edge clock.
+Creating register for signal `$paramod$66c001530bf531c4d0ead1bd2714da422040d366\servile_rf_mem_if.\o_wb_ack' using process `$paramod$66c001530bf531c4d0ead1bd2714da422040d366\servile_rf_mem_if.$proc$/home/etcfranc/NoCNoC/src/serv/servile/servile_rf_mem_if.v:61$450'.
+  created $dff cell `$procdff$8683' with positive edge clock.
+Creating register for signal `$paramod$66c001530bf531c4d0ead1bd2714da422040d366\servile_rf_mem_if.\bsel' using process `$paramod$66c001530bf531c4d0ead1bd2714da422040d366\servile_rf_mem_if.$proc$/home/etcfranc/NoCNoC/src/serv/servile/servile_rf_mem_if.v:61$450'.
+  created $dff cell `$procdff$8684' with positive edge clock.
+Creating register for signal `$paramod$66c001530bf531c4d0ead1bd2714da422040d366\servile_rf_mem_if.\wb_rdt' using process `$paramod$66c001530bf531c4d0ead1bd2714da422040d366\servile_rf_mem_if.$proc$/home/etcfranc/NoCNoC/src/serv/servile/servile_rf_mem_if.v:61$450'.
+  created $dff cell `$procdff$8685' with positive edge clock.
+Creating register for signal `$paramod$66c001530bf531c4d0ead1bd2714da422040d366\servile_rf_mem_if.\regzero' using process `$paramod$66c001530bf531c4d0ead1bd2714da422040d366\servile_rf_mem_if.$proc$/home/etcfranc/NoCNoC/src/serv/servile/servile_rf_mem_if.v:61$450'.
+  created $dff cell `$procdff$8686' with positive edge clock.
+Creating register for signal `\sram2048x8_gf180.\bank_sel_q' using process `\sram2048x8_gf180.$proc$/home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:92$429'.
+  created $dff cell `$procdff$8687' with positive edge clock.
+Creating register for signal `$paramod\mesh_router\MY_ID=4'0000.\ne_out' using process `$paramod\mesh_router\MY_ID=4'0000.$proc$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:337$425'.
+  created $dff cell `$procdff$8688' with positive edge clock.
+Creating register for signal `$paramod\mesh_router\MY_ID=4'0000.\nw_out' using process `$paramod\mesh_router\MY_ID=4'0000.$proc$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:337$425'.
+  created $dff cell `$procdff$8689' with positive edge clock.
+Creating register for signal `$paramod\mesh_router\MY_ID=4'0000.\se_out' using process `$paramod\mesh_router\MY_ID=4'0000.$proc$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:337$425'.
+  created $dff cell `$procdff$8690' with positive edge clock.
+Creating register for signal `$paramod\mesh_router\MY_ID=4'0000.\sw_out' using process `$paramod\mesh_router\MY_ID=4'0000.$proc$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:337$425'.
+  created $dff cell `$procdff$8691' with positive edge clock.
+Creating register for signal `$paramod\mesh_router\MY_ID=4'0000.\n_out' using process `$paramod\mesh_router\MY_ID=4'0000.$proc$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:337$425'.
+  created $dff cell `$procdff$8692' with positive edge clock.
+Creating register for signal `$paramod\mesh_router\MY_ID=4'0000.\s_out' using process `$paramod\mesh_router\MY_ID=4'0000.$proc$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:337$425'.
+  created $dff cell `$procdff$8693' with positive edge clock.
+Creating register for signal `$paramod\mesh_router\MY_ID=4'0000.\e_out' using process `$paramod\mesh_router\MY_ID=4'0000.$proc$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:337$425'.
+  created $dff cell `$procdff$8694' with positive edge clock.
+Creating register for signal `$paramod\mesh_router\MY_ID=4'0000.\w_out' using process `$paramod\mesh_router\MY_ID=4'0000.$proc$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:337$425'.
+  created $dff cell `$procdff$8695' with positive edge clock.
+Creating register for signal `$paramod\mesh_router\MY_ID=4'0000.\fifo_head_reg' using process `$paramod\mesh_router\MY_ID=4'0000.$proc$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:231$96'.
+  created $dff cell `$procdff$8696' with positive edge clock.
+Creating register for signal `$paramod\mesh_router\MY_ID=4'0000.\i' using process `$paramod\mesh_router\MY_ID=4'0000.$proc$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:166$68'.
+  created $dff cell `$procdff$8697' with positive edge clock.
+Creating register for signal `$paramod\mesh_router\MY_ID=4'0000.\fifo_wr_ptr' using process `$paramod\mesh_router\MY_ID=4'0000.$proc$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:166$68'.
+  created $dff cell `$procdff$8698' with positive edge clock.
+Creating register for signal `$paramod\mesh_router\MY_ID=4'0000.\fifo_rd_ptr' using process `$paramod\mesh_router\MY_ID=4'0000.$proc$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:166$68'.
+  created $dff cell `$procdff$8699' with positive edge clock.
+Creating register for signal `$paramod\mesh_router\MY_ID=4'0000.\fifo_count' using process `$paramod\mesh_router\MY_ID=4'0000.$proc$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:166$68'.
+  created $dff cell `$procdff$8700' with positive edge clock.
+Creating register for signal `$paramod\mesh_router\MY_ID=4'0000.$memwr$\fifo_mem$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:172$46_EN' using process `$paramod\mesh_router\MY_ID=4'0000.$proc$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:166$68'.
+  created $dff cell `$procdff$8701' with positive edge clock.
+Creating register for signal `$paramod\mesh_router\MY_ID=4'0000.$memwr$\fifo_mem$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:172$47_EN' using process `$paramod\mesh_router\MY_ID=4'0000.$proc$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:166$68'.
+  created $dff cell `$procdff$8702' with positive edge clock.
+Creating register for signal `$paramod\mesh_router\MY_ID=4'0000.$memwr$\fifo_mem$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:172$48_EN' using process `$paramod\mesh_router\MY_ID=4'0000.$proc$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:166$68'.
+  created $dff cell `$procdff$8703' with positive edge clock.
+Creating register for signal `$paramod\mesh_router\MY_ID=4'0000.$memwr$\fifo_mem$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:172$49_EN' using process `$paramod\mesh_router\MY_ID=4'0000.$proc$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:166$68'.
+  created $dff cell `$procdff$8704' with positive edge clock.
+Creating register for signal `$paramod\mesh_router\MY_ID=4'0000.$memwr$\fifo_mem$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:175$50_ADDR' using process `$paramod\mesh_router\MY_ID=4'0000.$proc$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:166$68'.
+  created $dff cell `$procdff$8705' with positive edge clock.
+Creating register for signal `$paramod\mesh_router\MY_ID=4'0000.$memwr$\fifo_mem$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:175$50_DATA' using process `$paramod\mesh_router\MY_ID=4'0000.$proc$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:166$68'.
+  created $dff cell `$procdff$8706' with positive edge clock.
+Creating register for signal `$paramod\mesh_router\MY_ID=4'0000.$memwr$\fifo_mem$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:175$50_EN' using process `$paramod\mesh_router\MY_ID=4'0000.$proc$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:166$68'.
+  created $dff cell `$procdff$8707' with positive edge clock.
+Creating register for signal `$paramod\mesh_router\MY_ID=4'0000.\cpu_read_q' using process `$paramod\mesh_router\MY_ID=4'0000.$proc$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:159$63'.
+  created $dff cell `$procdff$8708' with positive edge clock.
+Creating register for signal `$paramod\mesh_router\MY_ID=4'0000.\inject_flit' using process `$paramod\mesh_router\MY_ID=4'0000.$proc$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:88$54'.
+  created $dff cell `$procdff$8709' with positive edge clock.
+Creating register for signal `$paramod$f3cec78d1cfbbfc8778027792a43ce84e0717e5d\serv_state.\gen_csr.misalign_trap_sync_r' using process `$paramod$f3cec78d1cfbbfc8778027792a43ce84e0717e5d\serv_state.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_state.v:230$994'.
+  created $dff cell `$procdff$8710' with positive edge clock.
+Creating register for signal `$paramod$f3cec78d1cfbbfc8778027792a43ce84e0717e5d\serv_state.\o_cnt' using process `$paramod$f3cec78d1cfbbfc8778027792a43ce84e0717e5d\serv_state.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_state.v:198$987'.
+  created $dff cell `$procdff$8711' with positive edge clock.
+Creating register for signal `$paramod$f3cec78d1cfbbfc8778027792a43ce84e0717e5d\serv_state.\gen_cnt_w_eq_1.cnt_lsb' using process `$paramod$f3cec78d1cfbbfc8778027792a43ce84e0717e5d\serv_state.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_state.v:198$987'.
+  created $dff cell `$procdff$8712' with positive edge clock.
+Creating register for signal `$paramod$f3cec78d1cfbbfc8778027792a43ce84e0717e5d\serv_state.\o_ctrl_jump' using process `$paramod$f3cec78d1cfbbfc8778027792a43ce84e0717e5d\serv_state.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_state.v:147$977'.
+  created $dff cell `$procdff$8713' with positive edge clock.
+Creating register for signal `$paramod$f3cec78d1cfbbfc8778027792a43ce84e0717e5d\serv_state.\init_done' using process `$paramod$f3cec78d1cfbbfc8778027792a43ce84e0717e5d\serv_state.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_state.v:147$977'.
+  created $dff cell `$procdff$8714' with positive edge clock.
+Creating register for signal `$paramod$f3cec78d1cfbbfc8778027792a43ce84e0717e5d\serv_state.\ibus_cyc' using process `$paramod$f3cec78d1cfbbfc8778027792a43ce84e0717e5d\serv_state.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_state.v:147$977'.
+  created $dff cell `$procdff$8715' with positive edge clock.
+Creating register for signal `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.\opcode' using process `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_decode.v:242$901'.
+  created $dff cell `$procdff$8716' with positive edge clock.
+Creating register for signal `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.\funct3' using process `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_decode.v:242$901'.
+  created $dff cell `$procdff$8717' with positive edge clock.
+Creating register for signal `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.\op20' using process `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_decode.v:242$901'.
+  created $dff cell `$procdff$8718' with positive edge clock.
+Creating register for signal `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.\op21' using process `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_decode.v:242$901'.
+  created $dff cell `$procdff$8719' with positive edge clock.
+Creating register for signal `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.\op22' using process `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_decode.v:242$901'.
+  created $dff cell `$procdff$8720' with positive edge clock.
+Creating register for signal `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.\op26' using process `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_decode.v:242$901'.
+  created $dff cell `$procdff$8721' with positive edge clock.
+Creating register for signal `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.\imm25' using process `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_decode.v:242$901'.
+  created $dff cell `$procdff$8722' with positive edge clock.
+Creating register for signal `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.\imm30' using process `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_decode.v:242$901'.
+  created $dff cell `$procdff$8723' with positive edge clock.
+Creating register for signal `$paramod\serv_immdec\W=s32'00000000000000000000000000000001.\gen_immdec_w_eq_1.imm31' using process `$paramod\serv_immdec\W=s32'00000000000000000000000000000001.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_immdec.v:49$745'.
+  created $dff cell `$procdff$8724' with positive edge clock.
+Creating register for signal `$paramod\serv_immdec\W=s32'00000000000000000000000000000001.\gen_immdec_w_eq_1.imm19_12_20' using process `$paramod\serv_immdec\W=s32'00000000000000000000000000000001.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_immdec.v:49$745'.
+  created $dff cell `$procdff$8725' with positive edge clock.
+Creating register for signal `$paramod\serv_immdec\W=s32'00000000000000000000000000000001.\gen_immdec_w_eq_1.imm7' using process `$paramod\serv_immdec\W=s32'00000000000000000000000000000001.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_immdec.v:49$745'.
+  created $dff cell `$procdff$8726' with positive edge clock.
+Creating register for signal `$paramod\serv_immdec\W=s32'00000000000000000000000000000001.\gen_immdec_w_eq_1.imm30_25' using process `$paramod\serv_immdec\W=s32'00000000000000000000000000000001.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_immdec.v:49$745'.
+  created $dff cell `$procdff$8727' with positive edge clock.
+Creating register for signal `$paramod\serv_immdec\W=s32'00000000000000000000000000000001.\gen_immdec_w_eq_1.imm24_20' using process `$paramod\serv_immdec\W=s32'00000000000000000000000000000001.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_immdec.v:49$745'.
+  created $dff cell `$procdff$8728' with positive edge clock.
+Creating register for signal `$paramod\serv_immdec\W=s32'00000000000000000000000000000001.\gen_immdec_w_eq_1.imm11_7' using process `$paramod\serv_immdec\W=s32'00000000000000000000000000000001.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_immdec.v:49$745'.
+  created $dff cell `$procdff$8729' with positive edge clock.
+Creating register for signal `$paramod\serv_bufreg\MDU=1'0\W=s32'00000000000000000000000000000001.\data' using process `$paramod\serv_bufreg\MDU=1'0\W=s32'00000000000000000000000000000001.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_bufreg.v:62$734'.
+  created $dff cell `$procdff$8730' with positive edge clock.
+Creating register for signal `$paramod\serv_bufreg\MDU=1'0\W=s32'00000000000000000000000000000001.\c_r' using process `$paramod\serv_bufreg\MDU=1'0\W=s32'00000000000000000000000000000001.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_bufreg.v:54$732'.
+  created $dff cell `$procdff$8731' with positive edge clock.
+Creating register for signal `$paramod\serv_bufreg2\W=s32'00000000000000000000000000000001.\dhi' using process `$paramod\serv_bufreg2\W=s32'00000000000000000000000000000001.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_bufreg2.v:98$713'.
+  created $dff cell `$procdff$8732' with positive edge clock.
+Creating register for signal `$paramod\serv_bufreg2\W=s32'00000000000000000000000000000001.\dlo' using process `$paramod\serv_bufreg2\W=s32'00000000000000000000000000000001.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_bufreg2.v:98$713'.
+  created $dff cell `$procdff$8733' with positive edge clock.
+Creating register for signal `$paramod$9612b4840d8ba9073515f47ec1c47f8b049edc33\serv_ctrl.\o_ibus_adr' using process `$paramod$9612b4840d8ba9073515f47ec1c47f8b049edc33\serv_ctrl.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_ctrl.v:103$660'.
+  created $dff cell `$procdff$8734' with positive edge clock.
+Creating register for signal `$paramod$9612b4840d8ba9073515f47ec1c47f8b049edc33\serv_ctrl.\pc_plus_4_cy_r' using process `$paramod$9612b4840d8ba9073515f47ec1c47f8b049edc33\serv_ctrl.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_ctrl.v:103$660'.
+  created $dff cell `$procdff$8735' with positive edge clock.
+Creating register for signal `$paramod$9612b4840d8ba9073515f47ec1c47f8b049edc33\serv_ctrl.\pc_plus_offset_cy_r' using process `$paramod$9612b4840d8ba9073515f47ec1c47f8b049edc33\serv_ctrl.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_ctrl.v:103$660'.
+  created $dff cell `$procdff$8736' with positive edge clock.
+Creating register for signal `$paramod\serv_alu\W=s32'00000000000000000000000000000001.\cmp_r' using process `$paramod\serv_alu\W=s32'00000000000000000000000000000001.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_alu.v:79$646'.
+  created $dff cell `$procdff$8737' with positive edge clock.
+Creating register for signal `$paramod\serv_alu\W=s32'00000000000000000000000000000001.\add_cy_r' using process `$paramod\serv_alu\W=s32'00000000000000000000000000000001.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_alu.v:79$646'.
+  created $dff cell `$procdff$8738' with positive edge clock.
+
+33.10. Executing PROC_MEMWR pass (convert process memory writes to cells).
+
+33.11. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Found and cleaned up 3 empty switches in `\mesh_tile.$proc$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_tile.v:123$9'.
+Removing empty process `mesh_tile.$proc$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_tile.v:123$9'.
+Removing empty process `mesh_tile.$proc$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_tile.v:81$2'.
+Found and cleaned up 1 empty switch in `$paramod\serv_mem_if\WITH_CSR=1'1\W=s32'00000000000000000000000000000001.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_mem_if.v:47$586'.
+Removing empty process `$paramod\serv_mem_if\WITH_CSR=1'1\W=s32'00000000000000000000000000000001.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_mem_if.v:47$586'.
+Found and cleaned up 7 empty switches in `$paramod$3e7b4dd89124d05b1503dd2b902960520f2771f4\serv_csr.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_csr.v:98$524'.
+Removing empty process `$paramod$3e7b4dd89124d05b1503dd2b902960520f2771f4\serv_csr.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_csr.v:98$524'.
+Removing empty process `$paramod\servile_mux\sim=1'0.$proc$/home/etcfranc/NoCNoC/src/serv/servile/servile_mux.v:96$501'.
+Found and cleaned up 1 empty switch in `$paramod$7dfcbd4a24f0bfdcc2f47551222fe0ba6c7d84ba\serv_rf_ram_if.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_rf_ram_if.v:148$480'.
+Removing empty process `$paramod$7dfcbd4a24f0bfdcc2f47551222fe0ba6c7d84ba\serv_rf_ram_if.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_rf_ram_if.v:148$480'.
+Removing empty process `$paramod$7dfcbd4a24f0bfdcc2f47551222fe0ba6c7d84ba\serv_rf_ram_if.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_rf_ram_if.v:81$477'.
+Found and cleaned up 4 empty switches in `$paramod$7dfcbd4a24f0bfdcc2f47551222fe0ba6c7d84ba\serv_rf_ram_if.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_rf_ram_if.v:158$472'.
+Removing empty process `$paramod$7dfcbd4a24f0bfdcc2f47551222fe0ba6c7d84ba\serv_rf_ram_if.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_rf_ram_if.v:158$472'.
+Found and cleaned up 1 empty switch in `$paramod$7dfcbd4a24f0bfdcc2f47551222fe0ba6c7d84ba\serv_rf_ram_if.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_rf_ram_if.v:102$468'.
+Removing empty process `$paramod$7dfcbd4a24f0bfdcc2f47551222fe0ba6c7d84ba\serv_rf_ram_if.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_rf_ram_if.v:102$468'.
+Found and cleaned up 5 empty switches in `$paramod$66c001530bf531c4d0ead1bd2714da422040d366\servile_rf_mem_if.$proc$/home/etcfranc/NoCNoC/src/serv/servile/servile_rf_mem_if.v:61$450'.
+Removing empty process `$paramod$66c001530bf531c4d0ead1bd2714da422040d366\servile_rf_mem_if.$proc$/home/etcfranc/NoCNoC/src/serv/servile/servile_rf_mem_if.v:61$450'.
+Found and cleaned up 1 empty switch in `\sram2048x8_gf180.$proc$/home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:92$429'.
+Removing empty process `sram2048x8_gf180.$proc$/home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:92$429'.
+Found and cleaned up 1 empty switch in `$paramod\mesh_router\MY_ID=4'0000.$proc$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:337$425'.
+Removing empty process `$paramod\mesh_router\MY_ID=4'0000.$proc$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:337$425'.
+Found and cleaned up 162 empty switches in `$paramod\mesh_router\MY_ID=4'0000.$proc$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:286$109'.
+Removing empty process `$paramod\mesh_router\MY_ID=4'0000.$proc$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:286$109'.
+Found and cleaned up 1 empty switch in `$paramod\mesh_router\MY_ID=4'0000.$proc$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:231$96'.
+Removing empty process `$paramod\mesh_router\MY_ID=4'0000.$proc$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:231$96'.
+Found and cleaned up 5 empty switches in `$paramod\mesh_router\MY_ID=4'0000.$proc$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:166$68'.
+Removing empty process `$paramod\mesh_router\MY_ID=4'0000.$proc$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:166$68'.
+Found and cleaned up 1 empty switch in `$paramod\mesh_router\MY_ID=4'0000.$proc$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:159$63'.
+Removing empty process `$paramod\mesh_router\MY_ID=4'0000.$proc$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:159$63'.
+Found and cleaned up 2 empty switches in `$paramod\mesh_router\MY_ID=4'0000.$proc$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:88$54'.
+Removing empty process `$paramod\mesh_router\MY_ID=4'0000.$proc$/home/etcfranc/NoCNoC/src/mesh$20-$20Psi&Aan/mesh_router.v:88$54'.
+Found and cleaned up 1 empty switch in `$paramod$f3cec78d1cfbbfc8778027792a43ce84e0717e5d\serv_state.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_state.v:230$994'.
+Removing empty process `$paramod$f3cec78d1cfbbfc8778027792a43ce84e0717e5d\serv_state.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_state.v:230$994'.
+Found and cleaned up 1 empty switch in `$paramod$f3cec78d1cfbbfc8778027792a43ce84e0717e5d\serv_state.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_state.v:198$987'.
+Removing empty process `$paramod$f3cec78d1cfbbfc8778027792a43ce84e0717e5d\serv_state.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_state.v:198$987'.
+Found and cleaned up 3 empty switches in `$paramod$f3cec78d1cfbbfc8778027792a43ce84e0717e5d\serv_state.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_state.v:147$977'.
+Removing empty process `$paramod$f3cec78d1cfbbfc8778027792a43ce84e0717e5d\serv_state.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_state.v:147$977'.
+Removing empty process `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_decode.v:255$902'.
+Found and cleaned up 1 empty switch in `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_decode.v:242$901'.
+Removing empty process `$paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_decode.v:242$901'.
+Found and cleaned up 6 empty switches in `$paramod\serv_immdec\W=s32'00000000000000000000000000000001.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_immdec.v:49$745'.
+Removing empty process `$paramod\serv_immdec\W=s32'00000000000000000000000000000001.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_immdec.v:49$745'.
+Found and cleaned up 2 empty switches in `$paramod\serv_bufreg\MDU=1'0\W=s32'00000000000000000000000000000001.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_bufreg.v:62$734'.
+Removing empty process `$paramod\serv_bufreg\MDU=1'0\W=s32'00000000000000000000000000000001.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_bufreg.v:62$734'.
+Removing empty process `$paramod\serv_bufreg\MDU=1'0\W=s32'00000000000000000000000000000001.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_bufreg.v:54$732'.
+Found and cleaned up 2 empty switches in `$paramod\serv_bufreg2\W=s32'00000000000000000000000000000001.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_bufreg2.v:98$713'.
+Removing empty process `$paramod\serv_bufreg2\W=s32'00000000000000000000000000000001.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_bufreg2.v:98$713'.
+Found and cleaned up 1 empty switch in `$paramod$9612b4840d8ba9073515f47ec1c47f8b049edc33\serv_ctrl.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_ctrl.v:103$660'.
+Removing empty process `$paramod$9612b4840d8ba9073515f47ec1c47f8b049edc33\serv_ctrl.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_ctrl.v:103$660'.
+Found and cleaned up 1 empty switch in `$paramod\serv_alu\W=s32'00000000000000000000000000000001.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_alu.v:79$646'.
+Removing empty process `$paramod\serv_alu\W=s32'00000000000000000000000000000001.$proc$/home/etcfranc/NoCNoC/src/serv/rtl/serv_alu.v:79$646'.
+Cleaned up 213 empty switches.
+
+33.12. Executing OPT_EXPR pass (perform const folding).
+Optimizing module mesh_tile.
+<suppressed ~9 debug messages>
+Optimizing module $paramod\serv_mem_if\WITH_CSR=1'1\W=s32'00000000000000000000000000000001.
+<suppressed ~3 debug messages>
+Optimizing module $paramod$3e7b4dd89124d05b1503dd2b902960520f2771f4\serv_csr.
+<suppressed ~1 debug messages>
+Optimizing module $paramod\servile_mux\sim=1'0.
+<suppressed ~8 debug messages>
+Optimizing module servile_arbiter.
+Optimizing module $paramod$7dfcbd4a24f0bfdcc2f47551222fe0ba6c7d84ba\serv_rf_ram_if.
+<suppressed ~1 debug messages>
+Optimizing module $paramod$71071d578d64cf2b9b55dab146290615dbda78fc\serv_top.
+Optimizing module $paramod$66c001530bf531c4d0ead1bd2714da422040d366\servile_rf_mem_if.
+Optimizing module $paramod$5d687c93bb8ae2c134ea134003a45acb1754b8ea\servile.
+<suppressed ~1 debug messages>
+Optimizing module $paramod\subservient_core\memsize=s32'00000000000000000000100000000000.
+Optimizing module sram2048x8_gf180.
+<suppressed ~1 debug messages>
+Optimizing module $paramod\mesh_router\MY_ID=4'0000.
+<suppressed ~102 debug messages>
+Optimizing module $paramod$e1f948ce0562a6173fd622abd894e278bdd3effe\serv_rf_if.
+<suppressed ~1 debug messages>
+Optimizing module $paramod$f3cec78d1cfbbfc8778027792a43ce84e0717e5d\serv_state.
+<suppressed ~14 debug messages>
+Optimizing module $paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.
+<suppressed ~15 debug messages>
+Optimizing module $paramod\serv_immdec\W=s32'00000000000000000000000000000001.
+Optimizing module $paramod\serv_bufreg\MDU=1'0\W=s32'00000000000000000000000000000001.
+<suppressed ~2 debug messages>
+Optimizing module $paramod\serv_bufreg2\W=s32'00000000000000000000000000000001.
+<suppressed ~2 debug messages>
+Optimizing module $paramod$9612b4840d8ba9073515f47ec1c47f8b049edc33\serv_ctrl.
+Optimizing module $paramod\serv_alu\W=s32'00000000000000000000000000000001.
+<suppressed ~1 debug messages>
+
+34. Executing FLATTEN pass (flatten design).
+Deleting now unused module $paramod\serv_mem_if\WITH_CSR=1'1\W=s32'00000000000000000000000000000001.
+Deleting now unused module $paramod$3e7b4dd89124d05b1503dd2b902960520f2771f4\serv_csr.
+Deleting now unused module $paramod\servile_mux\sim=1'0.
+Deleting now unused module servile_arbiter.
+Deleting now unused module $paramod$7dfcbd4a24f0bfdcc2f47551222fe0ba6c7d84ba\serv_rf_ram_if.
+Deleting now unused module $paramod$71071d578d64cf2b9b55dab146290615dbda78fc\serv_top.
+Deleting now unused module $paramod$66c001530bf531c4d0ead1bd2714da422040d366\servile_rf_mem_if.
+Deleting now unused module $paramod$5d687c93bb8ae2c134ea134003a45acb1754b8ea\servile.
+Deleting now unused module $paramod\subservient_core\memsize=s32'00000000000000000000100000000000.
+Deleting now unused module sram2048x8_gf180.
+Deleting now unused module $paramod\mesh_router\MY_ID=4'0000.
+Deleting now unused module $paramod$e1f948ce0562a6173fd622abd894e278bdd3effe\serv_rf_if.
+Deleting now unused module $paramod$f3cec78d1cfbbfc8778027792a43ce84e0717e5d\serv_state.
+Deleting now unused module $paramod\serv_decode\PRE_REGISTER=1'1\MDU=1'0.
+Deleting now unused module $paramod\serv_immdec\W=s32'00000000000000000000000000000001.
+Deleting now unused module $paramod\serv_bufreg\MDU=1'0\W=s32'00000000000000000000000000000001.
+Deleting now unused module $paramod\serv_bufreg2\W=s32'00000000000000000000000000000001.
+Deleting now unused module $paramod$9612b4840d8ba9073515f47ec1c47f8b049edc33\serv_ctrl.
+Deleting now unused module $paramod\serv_alu\W=s32'00000000000000000000000000000001.
+<suppressed ~19 debug messages>
+
+35. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \mesh_tile..
+Removed 151 unused cells and 4285 unused wires.
+<suppressed ~746 debug messages>

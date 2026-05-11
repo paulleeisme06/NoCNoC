@@ -1,0 +1,2 @@
+magic -dnull -noconsole -rcfile /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.tech/magic/gf180mcuD.magicrc /nix/store/xjkk69lna4pw6jkb6bhsvqkgmfkjqxg5-python3-3.13.9-env/lib/python3.13/site-packages/librelane/scripts/magic/wrapper.tcl
+magic -dnull -noconsole -rcfile /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.tech/magic/gf180mcuD.magicrc /nix/store/xjkk69lna4pw6jkb6bhsvqkgmfkjqxg5-python3-3.13.9-env/lib/python3.13/site-packages/librelane/scripts/magic/wrapper.tcl
