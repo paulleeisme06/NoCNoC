@@ -91,10 +91,10 @@ module chip_core #(
     wire [35:0] monitor_out;
 
     // Bidir pad directions: flash(3) + host_miso(1) + dft_miso(1) + monitor(34) = 39
-    assign bidir_oe  = {{(NUM_BIDIR_PADS-41){1'b0}}, {36{1'b1}}, 1'b1, 1'b1, 3'b111};
+    assign bidir_oe  = {{(NUM_BIDIR_PADS-40){1'b0}}, {36{1'b1}}, 1'b1, 3'b111};
     assign bidir_ie  = ~bidir_oe;
-    assign bidir_out = {{(NUM_BIDIR_PADS-41){1'b0}}, monitor_out,
-                        spi_miso, host_miso_out,
+    assign bidir_out = {{(NUM_BIDIR_PADS-40){1'b0}}, monitor_out,
+                        host_miso_out,
                         flash_mosi_out, flash_clk, flash_cs_n};
 
     logic _unused;
@@ -106,18 +106,12 @@ module chip_core #(
     mesh_rxc u_mesh (
         .clk          (clk),
         .rst          (~rst_n),
-        .inject_00_nw (34'b0),
+        .inject_00_nw (36'b0),
         .monitor_se(monitor_out),
         .flash_miso   (flash_miso),
         .flash_cs_n   (flash_cs_n),
         .flash_clk    (flash_clk),
-        .flash_mosi   (flash_mosi_out),
-        .dft_mode     (dft_mode),
-        .dft_tile_id  (dbg_tile_id),
-        .dft_we       (dbg_we & dbg_req),
-        .dft_addr     (dbg_addr),
-        .dft_wdata    (dbg_wdata),
-        .dft_rdata    (dbg_rdata)
+        .flash_mosi   (flash_mosi_out)
     );
 
     // -------------------------------------------------------------------------
