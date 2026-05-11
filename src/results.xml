@@ -1,5 +1,6 @@
 <testsuites name="results">
   <testsuite name="all" package="all">
+<<<<<<< HEAD
     <property name="random_seed" value="1778483020" />
     <testcase name="test_magic_check" classname="test_mesh" file="/home/psi19/NoCNoC/cocotb/test_mesh.py" lineno="224" time="0" sim_time_ns="0" ratio_time="0">
       <skipped />
@@ -7,6 +8,15 @@
     <testcase name="test_iter0_seed_only" classname="test_mesh" file="/home/psi19/NoCNoC/cocotb/test_mesh.py" lineno="260" time="179.43737530708313" sim_time_ns="4700000.0" ratio_time="26192.9823257645" />
     <testcase name="test_checkerboard_iter1_iter2" classname="test_mesh" file="/home/psi19/NoCNoC/cocotb/test_mesh.py" lineno="286" time="0" sim_time_ns="0" ratio_time="0">
       <skipped />
+=======
+    <property name="random_seed" value="1778540296" />
+    <testcase name="test_magic_check" classname="test_mesh" file="/home/psi19/NoCNoC/cocotb/test_mesh.py" lineno="233" time="340.88884377479553" sim_time_ns="4700000.0" ratio_time="13787.48552740847" />
+    <testcase name="test_iter0_seed_only" classname="test_mesh" file="/home/psi19/NoCNoC/cocotb/test_mesh.py" lineno="269" time="322.6961479187012" sim_time_ns="4700000.0" ratio_time="14564.784954247734">
+      <failure error_type="AssertionError" error_msg="Seed mismatch: 250 cells wrong." />
+    </testcase>
+    <testcase name="test_checkerboard_iter1_iter2" classname="test_mesh" file="/home/psi19/NoCNoC/cocotb/test_mesh.py" lineno="295" time="374.06600308418274" sim_time_ns="6539310.0" ratio_time="17481.700946044923">
+      <failure error_type="AssertionError" error_msg="Checkerboard test failed: iter0=250, iter1=250, iter2=250" />
+>>>>>>> 06bccc0baeec48cc38eef76246e09b260f0934de
     </testcase>
   </testsuite>
 </testsuites>

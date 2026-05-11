@@ -25,6 +25,10 @@ MESH_C = 3
 ACTIVE_R = 3
 ACTIVE_C = 3
 
+# ── Must match ACTIVE_ROWS / ACTIVE_COLS in main.c ────────────────────────
+ACTIVE_R = 3
+ACTIVE_C = 3
+
 FIRMWARE_BIN_NAME = "firmware.bin"
 RESET_HOLD_MS     = 2
 SEED_SAMPLE_US    = 2000
@@ -32,6 +36,7 @@ ITER_TIMEOUT_US   = 5000
 
 SRAM_GRID_BASE = 0x0500
 print(f"[testbench] current_grid @ 0x{SRAM_GRID_BASE:04x}")
+print(f"[testbench] active mesh = {ACTIVE_R}x{ACTIVE_C}  physical = {MESH_R}x{MESH_C}")
 print(f"[testbench] active mesh = {ACTIVE_R}x{ACTIVE_C}  physical = {MESH_R}x{MESH_C}")
 
 DEBUG_BASE           = 0x0700
@@ -53,10 +58,18 @@ DEBUG_PRE_OR_S8      = DEBUG_BASE + 60
 DEBUG_PRE_OR_S9      = DEBUG_BASE + 64
 DEBUG_CELL9_RAW      = DEBUG_BASE + 68
 DEBUG_BIT9_VAL       = DEBUG_BASE + 72
+DEBUG_ROW_TRACE_BASE = DEBUG_BASE + 52
+DEBUG_ROW8_AT_CALL   = DEBUG_BASE + 52
+DEBUG_ROW9_AT_CALL   = DEBUG_BASE + 56
+DEBUG_PRE_OR_S8      = DEBUG_BASE + 60
+DEBUG_PRE_OR_S9      = DEBUG_BASE + 64
+DEBUG_CELL9_RAW      = DEBUG_BASE + 68
+DEBUG_BIT9_VAL       = DEBUG_BASE + 72
 
 
 def load_firmware_binary():
     candidates = [
+        os.path.abspath(FIRMWARE_BIN_NAME),
         os.path.abspath(FIRMWARE_BIN_NAME),
         os.path.abspath(os.path.join(os.getcwd(), FIRMWARE_BIN_NAME)),
         os.path.abspath(os.path.join(os.path.dirname(__file__), FIRMWARE_BIN_NAME)),
@@ -71,6 +84,7 @@ def load_firmware_binary():
             if len(data) < 2048:
                 data += [0] * (2048 - len(data))
             return data[:2048]
+    raise FileNotFoundError("Could not find firmware.bin. Checked:\n" + "\n".join(candidates))
     raise FileNotFoundError("Could not find firmware.bin. Checked:\n" + "\n".join(candidates))
 
 
@@ -162,7 +176,7 @@ def dump_region(tile, base, count_bytes=64):
     for off in range(0, count_bytes, 16):
         chunk = [sram_read_byte(tile, base + off + i)
                  for i in range(min(16, count_bytes - off))]
-        p("  0x{:04x}: ".format(base + off) + " ".join(f"{b:02x}" for b in chunk))
+        print("0x{:04x}: ".format(base + off) + " ".join(f"{b:02x}" for b in chunk))
 
 
 def read_debug_info(tile, label=""):
@@ -212,9 +226,16 @@ def expected_checkerboard(r, c, iteration):
 
 def print_iter_comparison(dut, r, c, iteration):
     """Compare expected checkerboard vs actual SRAM. Returns mismatch count."""
+    """Compare expected checkerboard vs actual SRAM. Returns mismatch count."""
     tile = get_tile(dut, r, c)
     exp  = expected_checkerboard(r, c, iteration)
+    exp  = expected_checkerboard(r, c, iteration)
     act  = read_grid_from_sram(tile)
+
+    fill_val = hw_tile_id(r, c)
+    is_idle  = (r >= ACTIVE_R or c >= ACTIVE_C)
+    status   = "IDLE" if is_idle else f"ACTIVE fill=0x{fill_val:02x}"
+
 
     fill_val = hw_tile_id(r, c)
     is_idle  = (r >= ACTIVE_R or c >= ACTIVE_C)
@@ -223,7 +244,10 @@ def print_iter_comparison(dut, r, c, iteration):
     print(f"\n===================================================")
     print(f"TILE ({r},{c})  hw_id=0x{fill_val:x}  [{status}]  ITERATION {iteration}")
     print("EXPECTED (checkerboard)   ACTUAL (SRAM)")
+    print(f"TILE ({r},{c})  hw_id=0x{fill_val:x}  [{status}]  ITERATION {iteration}")
+    print("EXPECTED (checkerboard)   ACTUAL (SRAM)")
     print("---------------------------------------------------")
+
 
     mismatches = 0
     for y in range(SIZE):
@@ -234,8 +258,16 @@ def print_iter_comparison(dut, r, c, iteration):
 
         exp_row = "".join(fmt(exp[y][x]) for x in range(SIZE))
         act_row = "".join(fmt(act[y][x]) for x in range(SIZE))
+        def fmt(v):
+            if v == 0:
+                return '.'
+            return f"{v:x}"[0]  # single hex digit of tile ID
+
+        exp_row = "".join(fmt(exp[y][x]) for x in range(SIZE))
+        act_row = "".join(fmt(act[y][x]) for x in range(SIZE))
         marker  = "" if exp_row == act_row else "  <- MISMATCH"
         if marker:
+            mismatches += sum(1 for x in range(SIZE) if exp[y][x] != act[y][x])
             mismatches += sum(1 for x in range(SIZE) if exp[y][x] != act[y][x])
         print(f"{exp_row}    {act_row}{marker}")
     print("===================================================")
@@ -257,8 +289,10 @@ async def boot_mesh(dut):
 
 
 # ── Test 1: magic check — confirms testbench can read SRAM at all ─────────
+# ── Test 1: magic check — confirms testbench can read SRAM at all ─────────
 @cocotb.test()
 async def test_magic_check(dut):
+    """Firmware writes 0xDEADBEEF/0xCAFEBABE; confirms address mapping."""
     """Firmware writes 0xDEADBEEF/0xCAFEBABE; confirms address mapping."""
     await boot_mesh(dut)
     await Timer(SEED_WAIT_US, unit="us")
@@ -280,24 +314,38 @@ async def test_magic_check(dut):
             print(f"\nTILE ({r},{c}) [{role}]:")
             print(f"  {label1} 0x0730 = 0x{magic1:08x}  (expect 0xDEADBEEF)")
             print(f"  {label2} 0x0734 = 0x{magic2:08x}  (expect 0xCAFEBABE)")
+            label1 = "[OK]  " if ok1 else "[FAIL]"
+            label2 = "[OK]  " if ok2 else "[FAIL]"
+            is_idle = (r >= ACTIVE_R or c >= ACTIVE_C)
+            role   = "IDLE" if is_idle else "ACTIVE"
+            print(f"\nTILE ({r},{c}) [{role}]:")
+            print(f"  {label1} 0x0730 = 0x{magic1:08x}  (expect 0xDEADBEEF)")
+            print(f"  {label2} 0x0734 = 0x{magic2:08x}  (expect 0xCAFEBABE)")
             if not (ok1 and ok2):
                 all_pass = False
 
     p()
     if all_pass:
         dut._log.info("MAGIC CHECK PASSED on all tiles")
-        dut._log.info("MAGIC CHECK PASSED on all tiles")
     else:
+        dut._log.error("MAGIC CHECK FAILED — fix address mapping before debugging firmware")
+    assert all_pass, "Magic check failed"
         dut._log.error("MAGIC CHECK FAILED — fix address mapping before debugging firmware")
     assert all_pass, "Magic check failed"
 
 
 # ── Test 2: seed check ────────────────────────────────────────────────────
+# ── Test 2: seed check ────────────────────────────────────────────────────
 @cocotb.test()
 async def test_iter0_seed_only(dut):
     """Each tile should have checkerboard[iter=0] in SRAM at seed time."""
+    """Each tile should have checkerboard[iter=0] in SRAM at seed time."""
     await boot_mesh(dut)
     await Timer(SEED_SAMPLE_US, unit="us")
+
+    print("\n\n******** ITERATION 0 (seed checkerboard) ********")
+    print(f"Active tiles: rows 0..{ACTIVE_R-1}, cols 0..{ACTIVE_C-1}")
+    print(f"Idle  tiles: SRAM should be all-zero\n")
 
     print("\n\n******** ITERATION 0 (seed checkerboard) ********")
     print(f"Active tiles: rows 0..{ACTIVE_R-1}, cols 0..{ACTIVE_C-1}")
@@ -315,11 +363,22 @@ async def test_iter0_seed_only(dut):
         for r in range(MESH_R):
             for c in range(MESH_C):
                 dump_region(get_tile(dut, r, c), SRAM_GRID_BASE, 100)
+        for r in range(MESH_R):
+            for c in range(MESH_C):
+                dump_region(get_tile(dut, r, c), SRAM_GRID_BASE, 100)
     assert total == 0, f"Seed mismatch: {total} cells wrong."
 
 
 # ── Test 3: iter 1 and iter 2 ─────────────────────────────────────────────
+# ── Test 3: iter 1 and iter 2 ─────────────────────────────────────────────
 @cocotb.test()
+async def test_checkerboard_iter1_iter2(dut):
+    """
+    Each generation the checkerboard parity flips.
+    No ghost exchange — every tile runs independently.
+    If a tile fails here, that tile's firmware loop is broken or
+    it's stuck in idle_tile_forever() when it shouldn't be.
+    """
 async def test_checkerboard_iter1_iter2(dut):
     """
     Each generation the checkerboard parity flips.
@@ -333,6 +392,8 @@ async def test_checkerboard_iter1_iter2(dut):
     tile00 = get_tile(dut, 0, 0)
 
     # ── iter 0 ────────────────────────────────────────────────────────────
+
+    # ── iter 0 ────────────────────────────────────────────────────────────
     print("\n\n******** ITERATION 0 (seed) ********")
     iter0_mismatches = 0
     for r in range(MESH_R):
@@ -340,13 +401,17 @@ async def test_checkerboard_iter1_iter2(dut):
             iter0_mismatches += print_iter_comparison(dut, r, c, 0)
     if iter0_mismatches == 0:
         dut._log.info("Iter 0: ALL tiles match")
+        dut._log.info("Iter 0: ALL tiles match")
     else:
         dut._log.error(f"Iter 0: {iter0_mismatches} mismatches")
 
     # ── iter 1 ────────────────────────────────────────────────────────────
     dut._log.info("Waiting for iter_count >= 1 on tile(0,0)...")
+    # ── iter 1 ────────────────────────────────────────────────────────────
+    dut._log.info("Waiting for iter_count >= 1 on tile(0,0)...")
     seen = await wait_for_iter(tile00, 1)
     if not seen:
+        dut._log.warning("iter_count did not advance to 1 — tile(0,0) may be hung")
         dut._log.warning("iter_count did not advance to 1 — tile(0,0) may be hung")
     await Timer(10, unit="us")
 
@@ -362,12 +427,19 @@ async def test_checkerboard_iter1_iter2(dut):
                 itr   = sram_read_word(tile, DEBUG_ITER_COUNT)
                 print(f"  -> tile({r},{c}) hw_id=0x{my_id:x} iter_count={itr}")
                 dump_region(tile, SRAM_GRID_BASE, 100)
+                tile = get_tile(dut, r, c)
+                my_id = sram_read_word(tile, DEBUG_MY_ID)
+                itr   = sram_read_word(tile, DEBUG_ITER_COUNT)
+                print(f"  -> tile({r},{c}) hw_id=0x{my_id:x} iter_count={itr}")
+                dump_region(tile, SRAM_GRID_BASE, 100)
 
     if iter1_mismatches == 0:
         dut._log.info("Iter 1: ALL tiles match")
     else:
         dut._log.error(f"Iter 1: {iter1_mismatches} mismatches")
 
+    # ── iter 2 ────────────────────────────────────────────────────────────
+    dut._log.info("Waiting for iter_count >= 2 on tile(0,0)...")
     # ── iter 2 ────────────────────────────────────────────────────────────
     dut._log.info("Waiting for iter_count >= 2 on tile(0,0)...")
     seen = await wait_for_iter(tile00, 2)
@@ -386,6 +458,10 @@ async def test_checkerboard_iter1_iter2(dut):
                 my_id = sram_read_word(tile, DEBUG_MY_ID)
                 itr   = sram_read_word(tile, DEBUG_ITER_COUNT)
                 print(f"  -> tile({r},{c}) hw_id=0x{my_id:x} iter_count={itr}")
+                tile = get_tile(dut, r, c)
+                my_id = sram_read_word(tile, DEBUG_MY_ID)
+                itr   = sram_read_word(tile, DEBUG_ITER_COUNT)
+                print(f"  -> tile({r},{c}) hw_id=0x{my_id:x} iter_count={itr}")
 
     if iter2_mismatches == 0:
         dut._log.info("Iter 2: ALL tiles match")
@@ -394,6 +470,8 @@ async def test_checkerboard_iter1_iter2(dut):
 
     total = iter0_mismatches + iter1_mismatches + iter2_mismatches
     assert total == 0, (
+        f"Checkerboard test failed: "
+        f"iter0={iter0_mismatches}, iter1={iter1_mismatches}, iter2={iter2_mismatches}"
         f"Checkerboard test failed: "
         f"iter0={iter0_mismatches}, iter1={iter1_mismatches}, iter2={iter2_mismatches}"
     )
