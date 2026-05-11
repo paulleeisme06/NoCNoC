@@ -57,7 +57,7 @@ VERILOG_EXTRA_DIRS = \
 VERILOG_EXTRA = $(wildcard $(addsuffix /*.v,$(VERILOG_EXTRA_DIRS)))
 
 VERILOG_SOURCES = \
-	$(RTL_DIR)/mesh_3x3.v \
+	$(RTL_DIR)/mesh_rxc.v \
 	$(RTL_DIR)/mesh_tile.v \
 	$(RTL_DIR)/mesh_router.v \
 	$(RTL_DIR)/boot_controller.v \
