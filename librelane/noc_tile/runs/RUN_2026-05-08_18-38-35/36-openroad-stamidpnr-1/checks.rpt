@@ -1,0 +1,471 @@
+
+===========================================================================
+report_checks -unconstrained
+===========================================================================
+======================= nom_tt_025C_3v30 Corner ===================================
+
+Startpoint: sram2048.u_bank0 (rising edge-triggered flip-flop clocked by clk)
+Endpoint: dft_rdata[0] (output port clocked by clk)
+Path Group: clk
+Path Type: max
+
+Fanout         Cap        Slew       Delay        Time   Description
+---------------------------------------------------------------------------------------------
+                                  0.000000    0.000000   clock clk (rise edge)
+                                  0.000000    0.000000   clock source latency
+     2    0.183646    0.278380    0.239095    0.239095 ^ clk (in)
+                                                         clk (net)
+                      0.278381    0.000000    0.239095 ^ delaybuf_0_clk/A (gf180mcu_as_sc_mcu7t3v3__clkbuff_12)
+     1    0.022793    0.028495    0.149115    0.388211 ^ delaybuf_0_clk/Y (gf180mcu_as_sc_mcu7t3v3__clkbuff_12)
+                                                         delaynet_0_clk (net)
+                      0.028502    0.000737    0.388948 ^ delaybuf_1_clk/A (gf180mcu_as_sc_mcu7t3v3__clkbuff_12)
+     1    0.022793    0.027530    0.115418    0.504366 ^ delaybuf_1_clk/Y (gf180mcu_as_sc_mcu7t3v3__clkbuff_12)
+                                                         delaynet_1_clk (net)
+                      0.027538    0.000737    0.505102 ^ clkbuf_0_clk/A (gf180mcu_as_sc_mcu7t3v3__clkbuff_12)
+     2    0.144143    0.084686    0.168673    0.673775 ^ clkbuf_0_clk/Y (gf180mcu_as_sc_mcu7t3v3__clkbuff_12)
+                                                         clknet_0_clk (net)
+                      0.084946    0.002875    0.676651 ^ clkbuf_1_1__f_clk/A (gf180mcu_as_sc_mcu7t3v3__clkbuff_12)
+     1    0.293159    0.129739    0.245443    0.922094 ^ clkbuf_1_1__f_clk/Y (gf180mcu_as_sc_mcu7t3v3__clkbuff_12)
+                                                         clknet_1_1__leaf_clk (net)
+                      0.129739    0.000000    0.922094 ^ sram2048.u_bank0/CLK (gf180mcu_ocd_ip_sram__sram1024x8m8wm1)
+     1    0.061760    0.289548    7.243647    8.165740 v sram2048.u_bank0/Q[0] (gf180mcu_ocd_ip_sram__sram1024x8m8wm1)
+                                                         sram2048.q_bank0[0] (net)
+                      0.289548    0.000083    8.165824 v _2478_/A (gf180mcu_as_sc_mcu7t3v3__mux2_2)
+     9    0.154054    0.309054    0.566732    8.732556 v _2478_/Y (gf180mcu_as_sc_mcu7t3v3__mux2_2)
+                                                         core_inst.rf_mem_if.o_wb_rdt[24] (net)
+                      0.309126    0.002705    8.735261 v _5478_/A (gf180mcu_as_sc_mcu7t3v3__buff_2)
+     1    0.006066    0.026393    0.164371    8.899632 v _5478_/Y (gf180mcu_as_sc_mcu7t3v3__buff_2)
+                                                         net317 (net)
+                      0.026396    0.000191    8.899822 v output317/A (gf180mcu_as_sc_mcu7t3v3__buff_2)
+     1    0.072910    0.112494    0.231831    9.131653 v output317/Y (gf180mcu_as_sc_mcu7t3v3__buff_2)
+                                                         dft_rdata[0] (net)
+                      0.112494    0.000000    9.131653 v dft_rdata[0] (out)
+                                              9.131653   data arrival time
+
+                                 40.000000   40.000000   clock clk (rise edge)
+                                  0.000000   40.000000   clock network delay (propagated)
+                                 -0.250000   39.750000   clock uncertainty
+                                  0.000000   39.750000   clock reconvergence pessimism
+                                 -8.000000   31.750000   output external delay
+                                             31.750000   data required time
+---------------------------------------------------------------------------------------------
+                                             31.750000   data required time
+                                             -9.131653   data arrival time
+---------------------------------------------------------------------------------------------
+                                             22.618345   slack (MET)
+
+
+
+
+===========================================================================
+report_checks --slack_max -0.01
+============================================================================
+======================= nom_tt_025C_3v30 Corner ===================================
+
+No paths found.
+
+
+===========================================================================
+ report_check_types -max_slew -max_cap -max_fanout -violators
+============================================================================
+======================= nom_tt_025C_3v30 Corner ===================================
+
+max fanout
+
+Pin                                   Limit Fanout  Slack
+---------------------------------------------------------
+clkbuf_leaf_11_clk_regs/Y                 9     18     -9 (VIOLATED)
+clkbuf_leaf_10_clk_regs/Y                 9     17     -8 (VIOLATED)
+clkbuf_leaf_19_clk_regs/Y                 9     17     -8 (VIOLATED)
+clkbuf_leaf_23_clk_regs/Y                 9     17     -8 (VIOLATED)
+clkbuf_leaf_3_clk_regs/Y                  9     17     -8 (VIOLATED)
+clkbuf_leaf_14_clk_regs/Y                 9     16     -7 (VIOLATED)
+clkbuf_leaf_18_clk_regs/Y                 9     16     -7 (VIOLATED)
+clkbuf_leaf_22_clk_regs/Y                 9     16     -7 (VIOLATED)
+clkbuf_leaf_2_clk_regs/Y                  9     16     -7 (VIOLATED)
+clkbuf_leaf_6_clk_regs/Y                  9     16     -7 (VIOLATED)
+clkbuf_leaf_8_clk_regs/Y                  9     16     -7 (VIOLATED)
+clkbuf_leaf_9_clk_regs/Y                  9     16     -7 (VIOLATED)
+clkbuf_leaf_15_clk_regs/Y                 9     15     -6 (VIOLATED)
+clkbuf_leaf_20_clk_regs/Y                 9     15     -6 (VIOLATED)
+clkbuf_leaf_26_clk_regs/Y                 9     15     -6 (VIOLATED)
+clkbuf_leaf_35_clk_regs/Y                 9     15     -6 (VIOLATED)
+clkbuf_leaf_36_clk_regs/Y                 9     15     -6 (VIOLATED)
+clkbuf_leaf_4_clk_regs/Y                  9     15     -6 (VIOLATED)
+clkbuf_leaf_0_clk_regs/Y                  9     14     -5 (VIOLATED)
+clkbuf_leaf_12_clk_regs/Y                 9     14     -5 (VIOLATED)
+clkbuf_leaf_13_clk_regs/Y                 9     14     -5 (VIOLATED)
+clkbuf_leaf_1_clk_regs/Y                  9     14     -5 (VIOLATED)
+clkbuf_leaf_25_clk_regs/Y                 9     14     -5 (VIOLATED)
+clkbuf_leaf_27_clk_regs/Y                 9     14     -5 (VIOLATED)
+clkbuf_leaf_29_clk_regs/Y                 9     14     -5 (VIOLATED)
+clkbuf_leaf_30_clk_regs/Y                 9     14     -5 (VIOLATED)
+clkbuf_leaf_32_clk_regs/Y                 9     14     -5 (VIOLATED)
+clkbuf_leaf_5_clk_regs/Y                  9     14     -5 (VIOLATED)
+clkbuf_leaf_21_clk_regs/Y                 9     13     -4 (VIOLATED)
+clkbuf_leaf_24_clk_regs/Y                 9     13     -4 (VIOLATED)
+clkbuf_leaf_28_clk_regs/Y                 9     13     -4 (VIOLATED)
+clkbuf_leaf_34_clk_regs/Y                 9     13     -4 (VIOLATED)
+clkbuf_leaf_37_clk_regs/Y                 9     13     -4 (VIOLATED)
+clkbuf_leaf_16_clk_regs/Y                 9     12     -3 (VIOLATED)
+clkbuf_leaf_17_clk_regs/Y                 9     12     -3 (VIOLATED)
+clkbuf_leaf_33_clk_regs/Y                 9     12     -3 (VIOLATED)
+clkbuf_leaf_7_clk_regs/Y                  9     12     -3 (VIOLATED)
+clkbuf_leaf_31_clk_regs/Y                 9     11     -2 (VIOLATED)
+
+max capacitance
+
+Pin                                        Limit         Cap       Slack
+------------------------------------------------------------------------
+clkbuf_1_0__f_clk/Y                     0.200000    0.293159   -0.093159 (VIOLATED)
+clkbuf_1_1__f_clk/Y                     0.200000    0.293159   -0.093159 (VIOLATED)
+clkbuf_0_clk_regs/Y                     0.200000    0.281068   -0.081068 (VIOLATED)
+clkbuf_3_0_0_clk_regs/Y                 0.200000    0.224150   -0.024150 (VIOLATED)
+clkbuf_3_1_0_clk_regs/Y                 0.200000    0.219718   -0.019718 (VIOLATED)
+
+
+
+===========================================================================
+report_parasitic_annotation -report_unannotated
+============================================================================
+Found 31 unannotated drivers.
+ clkload0/Y
+ clkload1/Y
+ clkload10/Y
+ clkload11/Y
+ clkload12/Y
+ clkload13/Y
+ clkload14/Y
+ clkload15/Y
+ clkload16/Y
+ clkload17/Y
+ clkload18/Y
+ clkload19/Y
+ clkload2/Y
+ clkload20/Y
+ clkload21/Y
+ clkload22/Y
+ clkload23/Y
+ clkload24/Y
+ clkload25/Y
+ clkload26/Y
+ clkload27/Y
+ clkload28/Y
+ clkload29/Y
+ clkload3/Y
+ clkload30/Y
+ clkload4/Y
+ clkload5/Y
+ clkload6/Y
+ clkload7/Y
+ clkload8/Y
+ clkload9/Y
+Found 295 partially unannotated drivers.
+ _2587_/Y
+ _2588_/Y
+ _2629_/Y
+ _2668_/Y
+ _2672_/Y
+ _2676_/Y
+ clkbuf_1_0__f_clk/Y
+ clkbuf_1_1__f_clk/Y
+ mesh_tile/ZERO
+ mesh_tile_826/ZERO
+ mesh_tile_827/ZERO
+ mesh_tile_828/ZERO
+ mesh_tile_829/ZERO
+ mesh_tile_830/ZERO
+ mesh_tile_831/ZERO
+ mesh_tile_832/ZERO
+ mesh_tile_833/ZERO
+ mesh_tile_834/ZERO
+ mesh_tile_835/ZERO
+ mesh_tile_836/ZERO
+ mesh_tile_837/ZERO
+ mesh_tile_838/ZERO
+ mesh_tile_839/ZERO
+ mesh_tile_840/ZERO
+ mesh_tile_841/ZERO
+ mesh_tile_842/ZERO
+ mesh_tile_843/ZERO
+ mesh_tile_844/ZERO
+ mesh_tile_845/ZERO
+ mesh_tile_846/ZERO
+ mesh_tile_847/ZERO
+ mesh_tile_848/ZERO
+ mesh_tile_849/ZERO
+ mesh_tile_850/ZERO
+ mesh_tile_851/ZERO
+ mesh_tile_852/ZERO
+ mesh_tile_853/ZERO
+ mesh_tile_854/ZERO
+ mesh_tile_855/ZERO
+ mesh_tile_856/ZERO
+ mesh_tile_857/ZERO
+ mesh_tile_858/ZERO
+ mesh_tile_859/ZERO
+ mesh_tile_860/ZERO
+ mesh_tile_861/ZERO
+ mesh_tile_862/ZERO
+ mesh_tile_863/ZERO
+ mesh_tile_864/ZERO
+ mesh_tile_865/ZERO
+ mesh_tile_866/ZERO
+ mesh_tile_867/ZERO
+ mesh_tile_868/ZERO
+ mesh_tile_869/ZERO
+ mesh_tile_870/ZERO
+ mesh_tile_871/ZERO
+ mesh_tile_872/ZERO
+ mesh_tile_873/ZERO
+ mesh_tile_874/ZERO
+ mesh_tile_875/ZERO
+ mesh_tile_876/ZERO
+ mesh_tile_877/ZERO
+ mesh_tile_878/ZERO
+ mesh_tile_879/ZERO
+ mesh_tile_880/ZERO
+ mesh_tile_881/ZERO
+ mesh_tile_882/ZERO
+ mesh_tile_883/ZERO
+ mesh_tile_884/ZERO
+ mesh_tile_885/ZERO
+ mesh_tile_886/ZERO
+ mesh_tile_887/ZERO
+ mesh_tile_888/ZERO
+ mesh_tile_889/ZERO
+ mesh_tile_890/ZERO
+ mesh_tile_891/ZERO
+ mesh_tile_892/ZERO
+ mesh_tile_893/ZERO
+ mesh_tile_894/ZERO
+ mesh_tile_895/ZERO
+ mesh_tile_896/ZERO
+ mesh_tile_897/ZERO
+ mesh_tile_898/ZERO
+ mesh_tile_899/ZERO
+ mesh_tile_900/ZERO
+ mesh_tile_901/ZERO
+ mesh_tile_902/ZERO
+ mesh_tile_903/ZERO
+ mesh_tile_904/ZERO
+ mesh_tile_905/ZERO
+ mesh_tile_906/ZERO
+ mesh_tile_907/ZERO
+ mesh_tile_908/ZERO
+ mesh_tile_909/ZERO
+ mesh_tile_910/ZERO
+ mesh_tile_911/ZERO
+ mesh_tile_912/ZERO
+ mesh_tile_913/ZERO
+ mesh_tile_914/ZERO
+ mesh_tile_915/ZERO
+ mesh_tile_916/ZERO
+ mesh_tile_917/ZERO
+ mesh_tile_918/ZERO
+ mesh_tile_919/ZERO
+ mesh_tile_920/ZERO
+ mesh_tile_921/ZERO
+ mesh_tile_922/ZERO
+ mesh_tile_923/ZERO
+ mesh_tile_924/ZERO
+ mesh_tile_925/ZERO
+ mesh_tile_926/ZERO
+ mesh_tile_927/ZERO
+ mesh_tile_928/ZERO
+ mesh_tile_929/ZERO
+ mesh_tile_930/ZERO
+ mesh_tile_931/ZERO
+ mesh_tile_932/ZERO
+ mesh_tile_933/ZERO
+ mesh_tile_934/ZERO
+ mesh_tile_935/ZERO
+ mesh_tile_936/ZERO
+ mesh_tile_937/ZERO
+ mesh_tile_938/ZERO
+ mesh_tile_939/ZERO
+ mesh_tile_940/ZERO
+ mesh_tile_941/ZERO
+ mesh_tile_942/ZERO
+ mesh_tile_943/ZERO
+ mesh_tile_944/ZERO
+ mesh_tile_945/ZERO
+ mesh_tile_946/ZERO
+ mesh_tile_947/ZERO
+ mesh_tile_948/ZERO
+ mesh_tile_949/ZERO
+ mesh_tile_950/ZERO
+ mesh_tile_951/ZERO
+ mesh_tile_952/ZERO
+ mesh_tile_953/ZERO
+ mesh_tile_954/ZERO
+ mesh_tile_955/ZERO
+ mesh_tile_956/ZERO
+ mesh_tile_957/ZERO
+ mesh_tile_958/ZERO
+ mesh_tile_959/ZERO
+ mesh_tile_960/ZERO
+ output317/Y
+ output318/Y
+ output319/Y
+ output320/Y
+ output321/Y
+ output322/Y
+ output323/Y
+ output324/Y
+ output325/Y
+ output326/Y
+ output327/Y
+ output328/Y
+ output329/Y
+ output330/Y
+ output331/Y
+ output332/Y
+ output333/Y
+ output334/Y
+ output335/Y
+ output336/Y
+ output337/Y
+ output338/Y
+ output339/Y
+ output340/Y
+ output341/Y
+ output342/Y
+ output343/Y
+ output344/Y
+ output345/Y
+ output346/Y
+ output347/Y
+ output348/Y
+ output349/Y
+ output350/Y
+ output351/Y
+ output352/Y
+ output353/Y
+ output354/Y
+ output355/Y
+ output356/Y
+ output357/Y
+ output358/Y
+ output359/Y
+ output360/Y
+ output361/Y
+ output362/Y
+ output363/Y
+ output364/Y
+ output365/Y
+ output366/Y
+ output367/Y
+ output368/Y
+ output369/Y
+ output370/Y
+ output371/Y
+ output372/Y
+ output373/Y
+ output374/Y
+ output375/Y
+ output376/Y
+ output377/Y
+ output378/Y
+ output379/Y
+ output380/Y
+ output381/Y
+ output382/Y
+ output383/Y
+ output384/Y
+ output385/Y
+ output386/Y
+ output387/Y
+ output388/Y
+ output389/Y
+ output390/Y
+ output391/Y
+ output392/Y
+ output393/Y
+ output394/Y
+ output395/Y
+ output396/Y
+ output397/Y
+ output398/Y
+ output399/Y
+ output400/Y
+ output401/Y
+ output402/Y
+ output403/Y
+ output404/Y
+ output405/Y
+ output406/Y
+ output407/Y
+ output408/Y
+ output409/Y
+ output410/Y
+ output411/Y
+ output412/Y
+ output413/Y
+ output414/Y
+ output415/Y
+ output416/Y
+ output417/Y
+ output418/Y
+ output419/Y
+ output420/Y
+ output421/Y
+ output422/Y
+ output423/Y
+ output424/Y
+ output425/Y
+ output426/Y
+ output427/Y
+ output428/Y
+ output429/Y
+ output430/Y
+ output431/Y
+ output432/Y
+ output433/Y
+ output434/Y
+ output435/Y
+ output436/Y
+ output437/Y
+ output438/Y
+ output439/Y
+ output440/Y
+ output441/Y
+ output442/Y
+ output443/Y
+ output444/Y
+ output445/Y
+ output446/Y
+ output447/Y
+ output448/Y
+ output449/Y
+ output450/Y
+ output451/Y
+ output452/Y
+ output453/Y
+ output454/Y
+ output455/Y
+ output456/Y
+ output457/Y
+ output458/Y
+ output459/Y
+ output460/Y
+ wire461/Y
+ wire462/Y
+ wire463/Y
+ wire464/Y
+ wire465/Y
+ wire466/Y
+ wire512/Y
+
+===========================================================================
+max slew violation count 0
+Writing metric design__max_slew_violation__count__corner:nom_tt_025C_3v30: 0
+max fanout violation count 38
+Writing metric design__max_fanout_violation__count__corner:nom_tt_025C_3v30: 38
+max cap violation count 5
+Writing metric design__max_cap_violation__count__corner:nom_tt_025C_3v30: 5
+============================================================================
+
+===========================================================================
+check_setup -verbose -unconstrained_endpoints -multiple_clock -no_clock -no_input_delay -loops -generated_clocks
+===========================================================================

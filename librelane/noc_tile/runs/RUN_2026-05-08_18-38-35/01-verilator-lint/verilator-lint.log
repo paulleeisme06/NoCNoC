@@ -1,0 +1,816 @@
+%Warning-PINMISSING: /home/etcfranc/NoCNoC/src/mesh - Psi&Aan/mesh_tile.v:210:40: Instance has missing pin: 'o_wb_sel'
+  210 |     subservient_core #(.memsize(2048)) core_inst (
+      |                                        ^~~~~~~~~
+                     /home/etcfranc/NoCNoC/src/subservient/rtl/subservient_core.v:31:23: ... Location of port declaration
+   31 |    output wire [3:0]  o_wb_sel,
+      |                       ^~~~~~~~
+                     ... For warning description see https://verilator.org/warn/PINMISSING?v=5.044
+                     ... Use "/* verilator lint_off PINMISSING */" and lint_on around source to disable this message.
+%Warning-PINMISSING: /home/etcfranc/NoCNoC/src/serv/rtl/serv_synth_wrapper.v:68:4: Instance has missing pin: 'o_ren'
+   68 |    rf_ram_if
+      |    ^~~~~~~~~
+                     /home/etcfranc/NoCNoC/src/serv/rtl/serv_rf_ram_if.v:49:20: ... Location of port declaration
+   49 |    output wire     o_ren,
+      |                    ^~~~~
+%Warning-PINCONNECTEMPTY: /home/etcfranc/NoCNoC/src/serv/rtl/serv_synth_wrapper.v:129:8: Instance pin connected by name with empty reference: 'o_ext_funct3'
+  129 |       .o_ext_funct3 (),
+      |        ^~~~~~~~~~~~
+                          ... For warning description see https://verilator.org/warn/PINCONNECTEMPTY?v=5.044
+                          ... Use "/* verilator lint_off PINCONNECTEMPTY */" and lint_on around source to disable this message.
+%Warning-PINCONNECTEMPTY: /home/etcfranc/NoCNoC/src/serv/rtl/serv_synth_wrapper.v:132:8: Instance pin connected by name with empty reference: 'o_ext_rs1'
+  132 |       .o_ext_rs1    (),
+      |        ^~~~~~~~~
+%Warning-PINCONNECTEMPTY: /home/etcfranc/NoCNoC/src/serv/rtl/serv_synth_wrapper.v:133:8: Instance pin connected by name with empty reference: 'o_ext_rs2'
+  133 |       .o_ext_rs2    (),
+      |        ^~~~~~~~~
+%Warning-PINCONNECTEMPTY: /home/etcfranc/NoCNoC/src/serv/rtl/serv_synth_wrapper.v:135:8: Instance pin connected by name with empty reference: 'o_mdu_valid'
+  135 |       .o_mdu_valid  ());
+      |        ^~~~~~~~~~~
+%Warning-TIMESCALEMOD: /home/etcfranc/NoCNoC/librelane/noc_tile/runs/RUN_2026-05-08_18-38-35/tmp/41835ff3bba04c30bce78734ad64bba7.bb.v:3:8: Timescale missing on this module as other modules have it (IEEE 1800-2023 3.14.2.3)
+    3 | module gf180mcu_as_sc_mcu7t3v3__and2_2(VPW, VNW, VDD, VSS, A, B, Y);
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                       /home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:28:8: ... Location of module with timescale
+   28 | module sram2048x8_gf180 (
+      |        ^~~~~~~~~~~~~~~~
+                       ... For warning description see https://verilator.org/warn/TIMESCALEMOD?v=5.044
+                       ... Use "/* verilator lint_off TIMESCALEMOD */" and lint_on around source to disable this message.
+%Warning-TIMESCALEMOD: /home/etcfranc/NoCNoC/librelane/noc_tile/runs/RUN_2026-05-08_18-38-35/tmp/41835ff3bba04c30bce78734ad64bba7.bb.v:20:8: Timescale missing on this module as other modules have it (IEEE 1800-2023 3.14.2.3)
+   20 | module gf180mcu_as_sc_mcu7t3v3__and2_4(VPW, VNW, VDD, VSS, A, B, Y);
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                       /home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:28:8: ... Location of module with timescale
+   28 | module sram2048x8_gf180 (
+      |        ^~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /home/etcfranc/NoCNoC/librelane/noc_tile/runs/RUN_2026-05-08_18-38-35/tmp/41835ff3bba04c30bce78734ad64bba7.bb.v:37:8: Timescale missing on this module as other modules have it (IEEE 1800-2023 3.14.2.3)
+   37 | module gf180mcu_as_sc_mcu7t3v3__ao21_2(VPW, VNW, VDD, VSS, A, B, C, Y);
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                       /home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:28:8: ... Location of module with timescale
+   28 | module sram2048x8_gf180 (
+      |        ^~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /home/etcfranc/NoCNoC/librelane/noc_tile/runs/RUN_2026-05-08_18-38-35/tmp/41835ff3bba04c30bce78734ad64bba7.bb.v:56:8: Timescale missing on this module as other modules have it (IEEE 1800-2023 3.14.2.3)
+   56 | module gf180mcu_as_sc_mcu7t3v3__ao21_4(VPW, VNW, VDD, VSS, A, B, C, Y);
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                       /home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:28:8: ... Location of module with timescale
+   28 | module sram2048x8_gf180 (
+      |        ^~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /home/etcfranc/NoCNoC/librelane/noc_tile/runs/RUN_2026-05-08_18-38-35/tmp/41835ff3bba04c30bce78734ad64bba7.bb.v:75:8: Timescale missing on this module as other modules have it (IEEE 1800-2023 3.14.2.3)
+   75 | module gf180mcu_as_sc_mcu7t3v3__ao21b_2(VPW, VNW, VDD, VSS, A, B, C, Y);
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                       /home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:28:8: ... Location of module with timescale
+   28 | module sram2048x8_gf180 (
+      |        ^~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /home/etcfranc/NoCNoC/librelane/noc_tile/runs/RUN_2026-05-08_18-38-35/tmp/41835ff3bba04c30bce78734ad64bba7.bb.v:94:8: Timescale missing on this module as other modules have it (IEEE 1800-2023 3.14.2.3)
+   94 | module gf180mcu_as_sc_mcu7t3v3__ao21b_4(VPW, VNW, VDD, VSS, A, B, C, Y);
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                       /home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:28:8: ... Location of module with timescale
+   28 | module sram2048x8_gf180 (
+      |        ^~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /home/etcfranc/NoCNoC/librelane/noc_tile/runs/RUN_2026-05-08_18-38-35/tmp/41835ff3bba04c30bce78734ad64bba7.bb.v:113:8: Timescale missing on this module as other modules have it (IEEE 1800-2023 3.14.2.3)
+  113 | module gf180mcu_as_sc_mcu7t3v3__ao22_2(VPW, VNW, VDD, VSS, A, B, C, D, Y);
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                       /home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:28:8: ... Location of module with timescale
+   28 | module sram2048x8_gf180 (
+      |        ^~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /home/etcfranc/NoCNoC/librelane/noc_tile/runs/RUN_2026-05-08_18-38-35/tmp/41835ff3bba04c30bce78734ad64bba7.bb.v:134:8: Timescale missing on this module as other modules have it (IEEE 1800-2023 3.14.2.3)
+  134 | module gf180mcu_as_sc_mcu7t3v3__ao22_4(VPW, VNW, VDD, VSS, A, B, C, D, Y);
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                       /home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:28:8: ... Location of module with timescale
+   28 | module sram2048x8_gf180 (
+      |        ^~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /home/etcfranc/NoCNoC/librelane/noc_tile/runs/RUN_2026-05-08_18-38-35/tmp/41835ff3bba04c30bce78734ad64bba7.bb.v:155:8: Timescale missing on this module as other modules have it (IEEE 1800-2023 3.14.2.3)
+  155 | module gf180mcu_as_sc_mcu7t3v3__ao31_2(VPW, VNW, VDD, VSS, A, B, C, D, Y);
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                       /home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:28:8: ... Location of module with timescale
+   28 | module sram2048x8_gf180 (
+      |        ^~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /home/etcfranc/NoCNoC/librelane/noc_tile/runs/RUN_2026-05-08_18-38-35/tmp/41835ff3bba04c30bce78734ad64bba7.bb.v:176:8: Timescale missing on this module as other modules have it (IEEE 1800-2023 3.14.2.3)
+  176 | module gf180mcu_as_sc_mcu7t3v3__ao31_4(VPW, VNW, VDD, VSS, A, B, C, D, Y);
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                       /home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:28:8: ... Location of module with timescale
+   28 | module sram2048x8_gf180 (
+      |        ^~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /home/etcfranc/NoCNoC/librelane/noc_tile/runs/RUN_2026-05-08_18-38-35/tmp/41835ff3bba04c30bce78734ad64bba7.bb.v:197:8: Timescale missing on this module as other modules have it (IEEE 1800-2023 3.14.2.3)
+  197 | module gf180mcu_as_sc_mcu7t3v3__aoi21_2(VPW, VNW, VDD, VSS, A, B, C, Y);
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                       /home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:28:8: ... Location of module with timescale
+   28 | module sram2048x8_gf180 (
+      |        ^~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /home/etcfranc/NoCNoC/librelane/noc_tile/runs/RUN_2026-05-08_18-38-35/tmp/41835ff3bba04c30bce78734ad64bba7.bb.v:216:8: Timescale missing on this module as other modules have it (IEEE 1800-2023 3.14.2.3)
+  216 | module gf180mcu_as_sc_mcu7t3v3__aoi21_4(VPW, VNW, VDD, VSS, A, B, C, Y);
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                       /home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:28:8: ... Location of module with timescale
+   28 | module sram2048x8_gf180 (
+      |        ^~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /home/etcfranc/NoCNoC/librelane/noc_tile/runs/RUN_2026-05-08_18-38-35/tmp/41835ff3bba04c30bce78734ad64bba7.bb.v:235:8: Timescale missing on this module as other modules have it (IEEE 1800-2023 3.14.2.3)
+  235 | module gf180mcu_as_sc_mcu7t3v3__aoi21b_2(VPW, VNW, VDD, VSS, A, B, C, Y);
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                       /home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:28:8: ... Location of module with timescale
+   28 | module sram2048x8_gf180 (
+      |        ^~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /home/etcfranc/NoCNoC/librelane/noc_tile/runs/RUN_2026-05-08_18-38-35/tmp/41835ff3bba04c30bce78734ad64bba7.bb.v:254:8: Timescale missing on this module as other modules have it (IEEE 1800-2023 3.14.2.3)
+  254 | module gf180mcu_as_sc_mcu7t3v3__aoi21b_4(VPW, VNW, VDD, VSS, A, B, C, Y);
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                       /home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:28:8: ... Location of module with timescale
+   28 | module sram2048x8_gf180 (
+      |        ^~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /home/etcfranc/NoCNoC/librelane/noc_tile/runs/RUN_2026-05-08_18-38-35/tmp/41835ff3bba04c30bce78734ad64bba7.bb.v:273:8: Timescale missing on this module as other modules have it (IEEE 1800-2023 3.14.2.3)
+  273 | module gf180mcu_as_sc_mcu7t3v3__aoi22_2(VPW, VNW, VDD, VSS, A, B, C, D, Y);
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                       /home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:28:8: ... Location of module with timescale
+   28 | module sram2048x8_gf180 (
+      |        ^~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /home/etcfranc/NoCNoC/librelane/noc_tile/runs/RUN_2026-05-08_18-38-35/tmp/41835ff3bba04c30bce78734ad64bba7.bb.v:294:8: Timescale missing on this module as other modules have it (IEEE 1800-2023 3.14.2.3)
+  294 | module gf180mcu_as_sc_mcu7t3v3__aoi22_4(VPW, VNW, VDD, VSS, A, B, C, D, Y);
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                       /home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:28:8: ... Location of module with timescale
+   28 | module sram2048x8_gf180 (
+      |        ^~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /home/etcfranc/NoCNoC/librelane/noc_tile/runs/RUN_2026-05-08_18-38-35/tmp/41835ff3bba04c30bce78734ad64bba7.bb.v:315:8: Timescale missing on this module as other modules have it (IEEE 1800-2023 3.14.2.3)
+  315 | module gf180mcu_as_sc_mcu7t3v3__aoi31_2(VPW, VNW, VDD, VSS, A, B, C, D, Y);
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                       /home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:28:8: ... Location of module with timescale
+   28 | module sram2048x8_gf180 (
+      |        ^~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /home/etcfranc/NoCNoC/librelane/noc_tile/runs/RUN_2026-05-08_18-38-35/tmp/41835ff3bba04c30bce78734ad64bba7.bb.v:336:8: Timescale missing on this module as other modules have it (IEEE 1800-2023 3.14.2.3)
+  336 | module gf180mcu_as_sc_mcu7t3v3__aoi31_4(VPW, VNW, VDD, VSS, A, B, C, D, Y);
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                       /home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:28:8: ... Location of module with timescale
+   28 | module sram2048x8_gf180 (
+      |        ^~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /home/etcfranc/NoCNoC/librelane/noc_tile/runs/RUN_2026-05-08_18-38-35/tmp/41835ff3bba04c30bce78734ad64bba7.bb.v:357:8: Timescale missing on this module as other modules have it (IEEE 1800-2023 3.14.2.3)
+  357 | module gf180mcu_as_sc_mcu7t3v3__buff_12(VPW, VNW, VDD, VSS, A, Y);
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                       /home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:28:8: ... Location of module with timescale
+   28 | module sram2048x8_gf180 (
+      |        ^~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /home/etcfranc/NoCNoC/librelane/noc_tile/runs/RUN_2026-05-08_18-38-35/tmp/41835ff3bba04c30bce78734ad64bba7.bb.v:372:8: Timescale missing on this module as other modules have it (IEEE 1800-2023 3.14.2.3)
+  372 | module gf180mcu_as_sc_mcu7t3v3__buff_2(VPW, VNW, VDD, VSS, A, Y);
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                       /home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:28:8: ... Location of module with timescale
+   28 | module sram2048x8_gf180 (
+      |        ^~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /home/etcfranc/NoCNoC/librelane/noc_tile/runs/RUN_2026-05-08_18-38-35/tmp/41835ff3bba04c30bce78734ad64bba7.bb.v:387:8: Timescale missing on this module as other modules have it (IEEE 1800-2023 3.14.2.3)
+  387 | module gf180mcu_as_sc_mcu7t3v3__buff_4(VPW, VNW, VDD, VSS, A, Y);
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                       /home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:28:8: ... Location of module with timescale
+   28 | module sram2048x8_gf180 (
+      |        ^~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /home/etcfranc/NoCNoC/librelane/noc_tile/runs/RUN_2026-05-08_18-38-35/tmp/41835ff3bba04c30bce78734ad64bba7.bb.v:402:8: Timescale missing on this module as other modules have it (IEEE 1800-2023 3.14.2.3)
+  402 | module gf180mcu_as_sc_mcu7t3v3__buff_8(VPW, VNW, VDD, VSS, A, Y);
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                       /home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:28:8: ... Location of module with timescale
+   28 | module sram2048x8_gf180 (
+      |        ^~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /home/etcfranc/NoCNoC/librelane/noc_tile/runs/RUN_2026-05-08_18-38-35/tmp/41835ff3bba04c30bce78734ad64bba7.bb.v:417:8: Timescale missing on this module as other modules have it (IEEE 1800-2023 3.14.2.3)
+  417 | module gf180mcu_as_sc_mcu7t3v3__clkbuff_12(VPW, VNW, VDD, VSS, A, Y);
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                       /home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:28:8: ... Location of module with timescale
+   28 | module sram2048x8_gf180 (
+      |        ^~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /home/etcfranc/NoCNoC/librelane/noc_tile/runs/RUN_2026-05-08_18-38-35/tmp/41835ff3bba04c30bce78734ad64bba7.bb.v:432:8: Timescale missing on this module as other modules have it (IEEE 1800-2023 3.14.2.3)
+  432 | module gf180mcu_as_sc_mcu7t3v3__clkbuff_4(VPW, VNW, VDD, VSS, A, Y);
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                       /home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:28:8: ... Location of module with timescale
+   28 | module sram2048x8_gf180 (
+      |        ^~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /home/etcfranc/NoCNoC/librelane/noc_tile/runs/RUN_2026-05-08_18-38-35/tmp/41835ff3bba04c30bce78734ad64bba7.bb.v:447:8: Timescale missing on this module as other modules have it (IEEE 1800-2023 3.14.2.3)
+  447 | module gf180mcu_as_sc_mcu7t3v3__clkbuff_8(VPW, VNW, VDD, VSS, A, Y);
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                       /home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:28:8: ... Location of module with timescale
+   28 | module sram2048x8_gf180 (
+      |        ^~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /home/etcfranc/NoCNoC/librelane/noc_tile/runs/RUN_2026-05-08_18-38-35/tmp/41835ff3bba04c30bce78734ad64bba7.bb.v:462:8: Timescale missing on this module as other modules have it (IEEE 1800-2023 3.14.2.3)
+  462 | module gf180mcu_as_sc_mcu7t3v3__dfsrtp_2(VPW, VNW, VDD, VSS, CLK, D, RN, SN, Q);
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                       /home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:28:8: ... Location of module with timescale
+   28 | module sram2048x8_gf180 (
+      |        ^~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /home/etcfranc/NoCNoC/librelane/noc_tile/runs/RUN_2026-05-08_18-38-35/tmp/41835ff3bba04c30bce78734ad64bba7.bb.v:483:8: Timescale missing on this module as other modules have it (IEEE 1800-2023 3.14.2.3)
+  483 | module gf180mcu_as_sc_mcu7t3v3__dfxtn_2(VPW, VNW, VDD, VSS, CLK, D, Q);
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                       /home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:28:8: ... Location of module with timescale
+   28 | module sram2048x8_gf180 (
+      |        ^~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /home/etcfranc/NoCNoC/librelane/noc_tile/runs/RUN_2026-05-08_18-38-35/tmp/41835ff3bba04c30bce78734ad64bba7.bb.v:500:8: Timescale missing on this module as other modules have it (IEEE 1800-2023 3.14.2.3)
+  500 | module gf180mcu_as_sc_mcu7t3v3__dfxtp_2(VPW, VNW, VDD, VSS, CLK, D, Q);
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                       /home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:28:8: ... Location of module with timescale
+   28 | module sram2048x8_gf180 (
+      |        ^~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /home/etcfranc/NoCNoC/librelane/noc_tile/runs/RUN_2026-05-08_18-38-35/tmp/41835ff3bba04c30bce78734ad64bba7.bb.v:517:8: Timescale missing on this module as other modules have it (IEEE 1800-2023 3.14.2.3)
+  517 | module gf180mcu_as_sc_mcu7t3v3__diode_2(VPW, VNW, VDD, VSS, DIODE);
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                       /home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:28:8: ... Location of module with timescale
+   28 | module sram2048x8_gf180 (
+      |        ^~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /home/etcfranc/NoCNoC/librelane/noc_tile/runs/RUN_2026-05-08_18-38-35/tmp/41835ff3bba04c30bce78734ad64bba7.bb.v:530:8: Timescale missing on this module as other modules have it (IEEE 1800-2023 3.14.2.3)
+  530 | module gf180mcu_as_sc_mcu7t3v3__fill_1(VPW, VNW, VDD, VSS);
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                       /home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:28:8: ... Location of module with timescale
+   28 | module sram2048x8_gf180 (
+      |        ^~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /home/etcfranc/NoCNoC/librelane/noc_tile/runs/RUN_2026-05-08_18-38-35/tmp/41835ff3bba04c30bce78734ad64bba7.bb.v:541:8: Timescale missing on this module as other modules have it (IEEE 1800-2023 3.14.2.3)
+  541 | module gf180mcu_as_sc_mcu7t3v3__fill_2(VPW, VNW, VDD, VSS);
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                       /home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:28:8: ... Location of module with timescale
+   28 | module sram2048x8_gf180 (
+      |        ^~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /home/etcfranc/NoCNoC/librelane/noc_tile/runs/RUN_2026-05-08_18-38-35/tmp/41835ff3bba04c30bce78734ad64bba7.bb.v:552:8: Timescale missing on this module as other modules have it (IEEE 1800-2023 3.14.2.3)
+  552 | module gf180mcu_as_sc_mcu7t3v3__fill_4(VPW, VNW, VDD, VSS);
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                       /home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:28:8: ... Location of module with timescale
+   28 | module sram2048x8_gf180 (
+      |        ^~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /home/etcfranc/NoCNoC/librelane/noc_tile/runs/RUN_2026-05-08_18-38-35/tmp/41835ff3bba04c30bce78734ad64bba7.bb.v:563:8: Timescale missing on this module as other modules have it (IEEE 1800-2023 3.14.2.3)
+  563 | module gf180mcu_as_sc_mcu7t3v3__fill_8(VPW, VNW, VDD, VSS);
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                       /home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:28:8: ... Location of module with timescale
+   28 | module sram2048x8_gf180 (
+      |        ^~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /home/etcfranc/NoCNoC/librelane/noc_tile/runs/RUN_2026-05-08_18-38-35/tmp/41835ff3bba04c30bce78734ad64bba7.bb.v:574:8: Timescale missing on this module as other modules have it (IEEE 1800-2023 3.14.2.3)
+  574 | module gf180mcu_as_sc_mcu7t3v3__fillcap_16(VPW, VNW, VDD, VSS);
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                       /home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:28:8: ... Location of module with timescale
+   28 | module sram2048x8_gf180 (
+      |        ^~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /home/etcfranc/NoCNoC/librelane/noc_tile/runs/RUN_2026-05-08_18-38-35/tmp/41835ff3bba04c30bce78734ad64bba7.bb.v:585:8: Timescale missing on this module as other modules have it (IEEE 1800-2023 3.14.2.3)
+  585 | module gf180mcu_as_sc_mcu7t3v3__fillcap_4(VPW, VNW, VDD, VSS);
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                       /home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:28:8: ... Location of module with timescale
+   28 | module sram2048x8_gf180 (
+      |        ^~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /home/etcfranc/NoCNoC/librelane/noc_tile/runs/RUN_2026-05-08_18-38-35/tmp/41835ff3bba04c30bce78734ad64bba7.bb.v:596:8: Timescale missing on this module as other modules have it (IEEE 1800-2023 3.14.2.3)
+  596 | module gf180mcu_as_sc_mcu7t3v3__fillcap_8(VPW, VNW, VDD, VSS);
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                       /home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:28:8: ... Location of module with timescale
+   28 | module sram2048x8_gf180 (
+      |        ^~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /home/etcfranc/NoCNoC/librelane/noc_tile/runs/RUN_2026-05-08_18-38-35/tmp/41835ff3bba04c30bce78734ad64bba7.bb.v:607:8: Timescale missing on this module as other modules have it (IEEE 1800-2023 3.14.2.3)
+  607 | module gf180mcu_as_sc_mcu7t3v3__inv_2(VPW, VNW, VDD, VSS, A, Y);
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                       /home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:28:8: ... Location of module with timescale
+   28 | module sram2048x8_gf180 (
+      |        ^~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /home/etcfranc/NoCNoC/librelane/noc_tile/runs/RUN_2026-05-08_18-38-35/tmp/41835ff3bba04c30bce78734ad64bba7.bb.v:622:8: Timescale missing on this module as other modules have it (IEEE 1800-2023 3.14.2.3)
+  622 | module gf180mcu_as_sc_mcu7t3v3__inv_4(VPW, VNW, VDD, VSS, A, Y);
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                       /home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:28:8: ... Location of module with timescale
+   28 | module sram2048x8_gf180 (
+      |        ^~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /home/etcfranc/NoCNoC/librelane/noc_tile/runs/RUN_2026-05-08_18-38-35/tmp/41835ff3bba04c30bce78734ad64bba7.bb.v:637:8: Timescale missing on this module as other modules have it (IEEE 1800-2023 3.14.2.3)
+  637 | module gf180mcu_as_sc_mcu7t3v3__inv_6(VPW, VNW, VDD, VSS, A, Y);
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                       /home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:28:8: ... Location of module with timescale
+   28 | module sram2048x8_gf180 (
+      |        ^~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /home/etcfranc/NoCNoC/librelane/noc_tile/runs/RUN_2026-05-08_18-38-35/tmp/41835ff3bba04c30bce78734ad64bba7.bb.v:652:8: Timescale missing on this module as other modules have it (IEEE 1800-2023 3.14.2.3)
+  652 | module gf180mcu_as_sc_mcu7t3v3__invz_2(VPW, VNW, VDD, VSS, A, EN, Y);
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                       /home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:28:8: ... Location of module with timescale
+   28 | module sram2048x8_gf180 (
+      |        ^~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /home/etcfranc/NoCNoC/librelane/noc_tile/runs/RUN_2026-05-08_18-38-35/tmp/41835ff3bba04c30bce78734ad64bba7.bb.v:669:8: Timescale missing on this module as other modules have it (IEEE 1800-2023 3.14.2.3)
+  669 | module gf180mcu_as_sc_mcu7t3v3__maj3_2(VPW, VNW, VDD, VSS, A, B, C, Y);
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                       /home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:28:8: ... Location of module with timescale
+   28 | module sram2048x8_gf180 (
+      |        ^~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /home/etcfranc/NoCNoC/librelane/noc_tile/runs/RUN_2026-05-08_18-38-35/tmp/41835ff3bba04c30bce78734ad64bba7.bb.v:688:8: Timescale missing on this module as other modules have it (IEEE 1800-2023 3.14.2.3)
+  688 | module gf180mcu_as_sc_mcu7t3v3__maj3_4(VPW, VNW, VDD, VSS, A, B, C, Y);
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                       /home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:28:8: ... Location of module with timescale
+   28 | module sram2048x8_gf180 (
+      |        ^~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /home/etcfranc/NoCNoC/librelane/noc_tile/runs/RUN_2026-05-08_18-38-35/tmp/41835ff3bba04c30bce78734ad64bba7.bb.v:707:8: Timescale missing on this module as other modules have it (IEEE 1800-2023 3.14.2.3)
+  707 | module gf180mcu_as_sc_mcu7t3v3__mux2_2(VPW, VNW, VDD, VSS, A, B, S, Y);
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                       /home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:28:8: ... Location of module with timescale
+   28 | module sram2048x8_gf180 (
+      |        ^~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /home/etcfranc/NoCNoC/librelane/noc_tile/runs/RUN_2026-05-08_18-38-35/tmp/41835ff3bba04c30bce78734ad64bba7.bb.v:726:8: Timescale missing on this module as other modules have it (IEEE 1800-2023 3.14.2.3)
+  726 | module gf180mcu_as_sc_mcu7t3v3__mux2_4(VPW, VNW, VDD, VSS, A, B, S, Y);
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                       /home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:28:8: ... Location of module with timescale
+   28 | module sram2048x8_gf180 (
+      |        ^~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /home/etcfranc/NoCNoC/librelane/noc_tile/runs/RUN_2026-05-08_18-38-35/tmp/41835ff3bba04c30bce78734ad64bba7.bb.v:745:8: Timescale missing on this module as other modules have it (IEEE 1800-2023 3.14.2.3)
+  745 | module gf180mcu_as_sc_mcu7t3v3__nand2_2(VPW, VNW, VDD, VSS, A, B, Y);
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                       /home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:28:8: ... Location of module with timescale
+   28 | module sram2048x8_gf180 (
+      |        ^~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /home/etcfranc/NoCNoC/librelane/noc_tile/runs/RUN_2026-05-08_18-38-35/tmp/41835ff3bba04c30bce78734ad64bba7.bb.v:762:8: Timescale missing on this module as other modules have it (IEEE 1800-2023 3.14.2.3)
+  762 | module gf180mcu_as_sc_mcu7t3v3__nand2_4(VPW, VNW, VDD, VSS, A, B, Y);
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                       /home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:28:8: ... Location of module with timescale
+   28 | module sram2048x8_gf180 (
+      |        ^~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /home/etcfranc/NoCNoC/librelane/noc_tile/runs/RUN_2026-05-08_18-38-35/tmp/41835ff3bba04c30bce78734ad64bba7.bb.v:779:8: Timescale missing on this module as other modules have it (IEEE 1800-2023 3.14.2.3)
+  779 | module gf180mcu_as_sc_mcu7t3v3__nand2b_2(VPW, VNW, VDD, VSS, A, B, Y);
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                       /home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:28:8: ... Location of module with timescale
+   28 | module sram2048x8_gf180 (
+      |        ^~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /home/etcfranc/NoCNoC/librelane/noc_tile/runs/RUN_2026-05-08_18-38-35/tmp/41835ff3bba04c30bce78734ad64bba7.bb.v:796:8: Timescale missing on this module as other modules have it (IEEE 1800-2023 3.14.2.3)
+  796 | module gf180mcu_as_sc_mcu7t3v3__nand2b_4(VPW, VNW, VDD, VSS, A, B, Y);
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                       /home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:28:8: ... Location of module with timescale
+   28 | module sram2048x8_gf180 (
+      |        ^~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /home/etcfranc/NoCNoC/librelane/noc_tile/runs/RUN_2026-05-08_18-38-35/tmp/41835ff3bba04c30bce78734ad64bba7.bb.v:813:8: Timescale missing on this module as other modules have it (IEEE 1800-2023 3.14.2.3)
+  813 | module gf180mcu_as_sc_mcu7t3v3__nand3_2(VPW, VNW, VDD, VSS, A, B, C, Y);
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                       /home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:28:8: ... Location of module with timescale
+   28 | module sram2048x8_gf180 (
+      |        ^~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /home/etcfranc/NoCNoC/librelane/noc_tile/runs/RUN_2026-05-08_18-38-35/tmp/41835ff3bba04c30bce78734ad64bba7.bb.v:832:8: Timescale missing on this module as other modules have it (IEEE 1800-2023 3.14.2.3)
+  832 | module gf180mcu_as_sc_mcu7t3v3__nand4_2(VPW, VNW, VDD, VSS, A, B, C, D, Y);
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                       /home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:28:8: ... Location of module with timescale
+   28 | module sram2048x8_gf180 (
+      |        ^~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /home/etcfranc/NoCNoC/librelane/noc_tile/runs/RUN_2026-05-08_18-38-35/tmp/41835ff3bba04c30bce78734ad64bba7.bb.v:853:8: Timescale missing on this module as other modules have it (IEEE 1800-2023 3.14.2.3)
+  853 | module gf180mcu_as_sc_mcu7t3v3__nor2_2(VPW, VNW, VDD, VSS, A, B, Y);
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                       /home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:28:8: ... Location of module with timescale
+   28 | module sram2048x8_gf180 (
+      |        ^~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /home/etcfranc/NoCNoC/librelane/noc_tile/runs/RUN_2026-05-08_18-38-35/tmp/41835ff3bba04c30bce78734ad64bba7.bb.v:870:8: Timescale missing on this module as other modules have it (IEEE 1800-2023 3.14.2.3)
+  870 | module gf180mcu_as_sc_mcu7t3v3__nor2_4(VPW, VNW, VDD, VSS, A, B, Y);
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                       /home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:28:8: ... Location of module with timescale
+   28 | module sram2048x8_gf180 (
+      |        ^~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /home/etcfranc/NoCNoC/librelane/noc_tile/runs/RUN_2026-05-08_18-38-35/tmp/41835ff3bba04c30bce78734ad64bba7.bb.v:887:8: Timescale missing on this module as other modules have it (IEEE 1800-2023 3.14.2.3)
+  887 | module gf180mcu_as_sc_mcu7t3v3__nor2b_2(VPW, VNW, VDD, VSS, A, B, Y);
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                       /home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:28:8: ... Location of module with timescale
+   28 | module sram2048x8_gf180 (
+      |        ^~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /home/etcfranc/NoCNoC/librelane/noc_tile/runs/RUN_2026-05-08_18-38-35/tmp/41835ff3bba04c30bce78734ad64bba7.bb.v:904:8: Timescale missing on this module as other modules have it (IEEE 1800-2023 3.14.2.3)
+  904 | module gf180mcu_as_sc_mcu7t3v3__nor2b_4(VPW, VNW, VDD, VSS, A, B, Y);
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                       /home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:28:8: ... Location of module with timescale
+   28 | module sram2048x8_gf180 (
+      |        ^~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /home/etcfranc/NoCNoC/librelane/noc_tile/runs/RUN_2026-05-08_18-38-35/tmp/41835ff3bba04c30bce78734ad64bba7.bb.v:921:8: Timescale missing on this module as other modules have it (IEEE 1800-2023 3.14.2.3)
+  921 | module gf180mcu_as_sc_mcu7t3v3__nor3_2(VPW, VNW, VDD, VSS, A, B, C, Y);
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                       /home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:28:8: ... Location of module with timescale
+   28 | module sram2048x8_gf180 (
+      |        ^~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /home/etcfranc/NoCNoC/librelane/noc_tile/runs/RUN_2026-05-08_18-38-35/tmp/41835ff3bba04c30bce78734ad64bba7.bb.v:940:8: Timescale missing on this module as other modules have it (IEEE 1800-2023 3.14.2.3)
+  940 | module gf180mcu_as_sc_mcu7t3v3__or2_2(VPW, VNW, VDD, VSS, A, B, Y);
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                       /home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:28:8: ... Location of module with timescale
+   28 | module sram2048x8_gf180 (
+      |        ^~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /home/etcfranc/NoCNoC/librelane/noc_tile/runs/RUN_2026-05-08_18-38-35/tmp/41835ff3bba04c30bce78734ad64bba7.bb.v:957:8: Timescale missing on this module as other modules have it (IEEE 1800-2023 3.14.2.3)
+  957 | module gf180mcu_as_sc_mcu7t3v3__or2_4(VPW, VNW, VDD, VSS, A, B, Y);
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                       /home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:28:8: ... Location of module with timescale
+   28 | module sram2048x8_gf180 (
+      |        ^~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /home/etcfranc/NoCNoC/librelane/noc_tile/runs/RUN_2026-05-08_18-38-35/tmp/41835ff3bba04c30bce78734ad64bba7.bb.v:974:8: Timescale missing on this module as other modules have it (IEEE 1800-2023 3.14.2.3)
+  974 | module gf180mcu_as_sc_mcu7t3v3__tap_2(VPW, VNW, VDD, VSS);
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                       /home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:28:8: ... Location of module with timescale
+   28 | module sram2048x8_gf180 (
+      |        ^~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /home/etcfranc/NoCNoC/librelane/noc_tile/runs/RUN_2026-05-08_18-38-35/tmp/41835ff3bba04c30bce78734ad64bba7.bb.v:985:8: Timescale missing on this module as other modules have it (IEEE 1800-2023 3.14.2.3)
+  985 | module gf180mcu_as_sc_mcu7t3v3__tieh_4(VPW, VNW, VDD, VSS, ONE);
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                       /home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:28:8: ... Location of module with timescale
+   28 | module sram2048x8_gf180 (
+      |        ^~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /home/etcfranc/NoCNoC/librelane/noc_tile/runs/RUN_2026-05-08_18-38-35/tmp/41835ff3bba04c30bce78734ad64bba7.bb.v:998:8: Timescale missing on this module as other modules have it (IEEE 1800-2023 3.14.2.3)
+  998 | module gf180mcu_as_sc_mcu7t3v3__tiel_4(VPW, VNW, VDD, VSS, ZERO);
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                       /home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:28:8: ... Location of module with timescale
+   28 | module sram2048x8_gf180 (
+      |        ^~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /home/etcfranc/NoCNoC/librelane/noc_tile/runs/RUN_2026-05-08_18-38-35/tmp/41835ff3bba04c30bce78734ad64bba7.bb.v:1011:8: Timescale missing on this module as other modules have it (IEEE 1800-2023 3.14.2.3)
+ 1011 | module gf180mcu_as_sc_mcu7t3v3__xnor2_2(VPW, VNW, VDD, VSS, A, B, Y);
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                       /home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:28:8: ... Location of module with timescale
+   28 | module sram2048x8_gf180 (
+      |        ^~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /home/etcfranc/NoCNoC/librelane/noc_tile/runs/RUN_2026-05-08_18-38-35/tmp/41835ff3bba04c30bce78734ad64bba7.bb.v:1028:8: Timescale missing on this module as other modules have it (IEEE 1800-2023 3.14.2.3)
+ 1028 | module gf180mcu_as_sc_mcu7t3v3__xnor2_4(VPW, VNW, VDD, VSS, A, B, Y);
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                       /home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:28:8: ... Location of module with timescale
+   28 | module sram2048x8_gf180 (
+      |        ^~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /home/etcfranc/NoCNoC/librelane/noc_tile/runs/RUN_2026-05-08_18-38-35/tmp/d43945a3c8e845d3bb09662376f9e96f.bb.v:3:8: Timescale missing on this module as other modules have it (IEEE 1800-2023 3.14.2.3)
+    3 | module gf180mcu_ef_io__bi_t(CS, SL, IE, OE, PU, PD, A, ANA, PDRV0, PDRV1, PAD, Y, DVDD, DVSS, VDD, VSS);
+      |        ^~~~~~~~~~~~~~~~~~~~
+                       /home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:28:8: ... Location of module with timescale
+   28 | module sram2048x8_gf180 (
+      |        ^~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /home/etcfranc/NoCNoC/librelane/noc_tile/runs/RUN_2026-05-08_18-38-35/tmp/d43945a3c8e845d3bb09662376f9e96f.bb.v:38:8: Timescale missing on this module as other modules have it (IEEE 1800-2023 3.14.2.3)
+   38 | module gf180mcu_fd_io__asig_5p0(ASIG5V, DVDD, DVSS, VDD, VSS);
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~
+                       /home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:28:8: ... Location of module with timescale
+   28 | module sram2048x8_gf180 (
+      |        ^~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /home/etcfranc/NoCNoC/librelane/noc_tile/runs/RUN_2026-05-08_18-38-35/tmp/d43945a3c8e845d3bb09662376f9e96f.bb.v:51:8: Timescale missing on this module as other modules have it (IEEE 1800-2023 3.14.2.3)
+   51 | module gf180mcu_fd_io__bi_24t(CS, SL, IE, OE, PU, PD, A, PAD, Y, DVDD, DVSS, VDD, VSS);
+      |        ^~~~~~~~~~~~~~~~~~~~~~
+                       /home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:28:8: ... Location of module with timescale
+   28 | module sram2048x8_gf180 (
+      |        ^~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /home/etcfranc/NoCNoC/librelane/noc_tile/runs/RUN_2026-05-08_18-38-35/tmp/d43945a3c8e845d3bb09662376f9e96f.bb.v:80:8: Timescale missing on this module as other modules have it (IEEE 1800-2023 3.14.2.3)
+   80 | module gf180mcu_fd_io__bi_t(CS, SL, IE, OE, PU, PD, A, PDRV0, PDRV1, PAD, Y, DVDD, DVSS, VDD, VSS);
+      |        ^~~~~~~~~~~~~~~~~~~~
+                       /home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:28:8: ... Location of module with timescale
+   28 | module sram2048x8_gf180 (
+      |        ^~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /home/etcfranc/NoCNoC/librelane/noc_tile/runs/RUN_2026-05-08_18-38-35/tmp/d43945a3c8e845d3bb09662376f9e96f.bb.v:113:8: Timescale missing on this module as other modules have it (IEEE 1800-2023 3.14.2.3)
+  113 | module gf180mcu_fd_io__brk2(VSS);
+      |        ^~~~~~~~~~~~~~~~~~~~
+                       /home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:28:8: ... Location of module with timescale
+   28 | module sram2048x8_gf180 (
+      |        ^~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /home/etcfranc/NoCNoC/librelane/noc_tile/runs/RUN_2026-05-08_18-38-35/tmp/d43945a3c8e845d3bb09662376f9e96f.bb.v:118:8: Timescale missing on this module as other modules have it (IEEE 1800-2023 3.14.2.3)
+  118 | module gf180mcu_fd_io__brk5(VSS);
+      |        ^~~~~~~~~~~~~~~~~~~~
+                       /home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:28:8: ... Location of module with timescale
+   28 | module sram2048x8_gf180 (
+      |        ^~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /home/etcfranc/NoCNoC/librelane/noc_tile/runs/RUN_2026-05-08_18-38-35/tmp/d43945a3c8e845d3bb09662376f9e96f.bb.v:123:8: Timescale missing on this module as other modules have it (IEEE 1800-2023 3.14.2.3)
+  123 | module gf180mcu_fd_io__cor(DVDD, DVSS, VDD, VSS);
+      |        ^~~~~~~~~~~~~~~~~~~
+                       /home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:28:8: ... Location of module with timescale
+   28 | module sram2048x8_gf180 (
+      |        ^~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /home/etcfranc/NoCNoC/librelane/noc_tile/runs/RUN_2026-05-08_18-38-35/tmp/d43945a3c8e845d3bb09662376f9e96f.bb.v:134:8: Timescale missing on this module as other modules have it (IEEE 1800-2023 3.14.2.3)
+  134 | module gf180mcu_fd_io__dvdd(DVDD, DVSS, VSS);
+      |        ^~~~~~~~~~~~~~~~~~~~
+                       /home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:28:8: ... Location of module with timescale
+   28 | module sram2048x8_gf180 (
+      |        ^~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /home/etcfranc/NoCNoC/librelane/noc_tile/runs/RUN_2026-05-08_18-38-35/tmp/d43945a3c8e845d3bb09662376f9e96f.bb.v:143:8: Timescale missing on this module as other modules have it (IEEE 1800-2023 3.14.2.3)
+  143 | module gf180mcu_fd_io__dvss(DVDD, DVSS, VDD);
+      |        ^~~~~~~~~~~~~~~~~~~~
+                       /home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:28:8: ... Location of module with timescale
+   28 | module sram2048x8_gf180 (
+      |        ^~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /home/etcfranc/NoCNoC/librelane/noc_tile/runs/RUN_2026-05-08_18-38-35/tmp/d43945a3c8e845d3bb09662376f9e96f.bb.v:152:8: Timescale missing on this module as other modules have it (IEEE 1800-2023 3.14.2.3)
+  152 | module gf180mcu_fd_io__fill1(DVDD, DVSS, VDD, VSS);
+      |        ^~~~~~~~~~~~~~~~~~~~~
+                       /home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:28:8: ... Location of module with timescale
+   28 | module sram2048x8_gf180 (
+      |        ^~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /home/etcfranc/NoCNoC/librelane/noc_tile/runs/RUN_2026-05-08_18-38-35/tmp/d43945a3c8e845d3bb09662376f9e96f.bb.v:163:8: Timescale missing on this module as other modules have it (IEEE 1800-2023 3.14.2.3)
+  163 | module gf180mcu_fd_io__fill10(DVDD, DVSS, VDD, VSS);
+      |        ^~~~~~~~~~~~~~~~~~~~~~
+                       /home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:28:8: ... Location of module with timescale
+   28 | module sram2048x8_gf180 (
+      |        ^~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /home/etcfranc/NoCNoC/librelane/noc_tile/runs/RUN_2026-05-08_18-38-35/tmp/d43945a3c8e845d3bb09662376f9e96f.bb.v:174:8: Timescale missing on this module as other modules have it (IEEE 1800-2023 3.14.2.3)
+  174 | module gf180mcu_fd_io__fill5(DVDD, DVSS, VDD, VSS);
+      |        ^~~~~~~~~~~~~~~~~~~~~
+                       /home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:28:8: ... Location of module with timescale
+   28 | module sram2048x8_gf180 (
+      |        ^~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /home/etcfranc/NoCNoC/librelane/noc_tile/runs/RUN_2026-05-08_18-38-35/tmp/d43945a3c8e845d3bb09662376f9e96f.bb.v:185:8: Timescale missing on this module as other modules have it (IEEE 1800-2023 3.14.2.3)
+  185 | module gf180mcu_fd_io__fillnc(DVDD, DVSS, VDD, VSS);
+      |        ^~~~~~~~~~~~~~~~~~~~~~
+                       /home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:28:8: ... Location of module with timescale
+   28 | module sram2048x8_gf180 (
+      |        ^~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /home/etcfranc/NoCNoC/librelane/noc_tile/runs/RUN_2026-05-08_18-38-35/tmp/d43945a3c8e845d3bb09662376f9e96f.bb.v:196:8: Timescale missing on this module as other modules have it (IEEE 1800-2023 3.14.2.3)
+  196 | module gf180mcu_fd_io__in_c(PU, PD, PAD, Y, DVDD, DVSS, VDD, VSS);
+      |        ^~~~~~~~~~~~~~~~~~~~
+                       /home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:28:8: ... Location of module with timescale
+   28 | module sram2048x8_gf180 (
+      |        ^~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /home/etcfranc/NoCNoC/librelane/noc_tile/runs/RUN_2026-05-08_18-38-35/tmp/d43945a3c8e845d3bb09662376f9e96f.bb.v:215:8: Timescale missing on this module as other modules have it (IEEE 1800-2023 3.14.2.3)
+  215 | module gf180mcu_fd_io__in_s(PU, PD, PAD, Y, DVDD, DVSS, VDD, VSS);
+      |        ^~~~~~~~~~~~~~~~~~~~
+                       /home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:28:8: ... Location of module with timescale
+   28 | module sram2048x8_gf180 (
+      |        ^~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /home/etcfranc/NoCNoC/librelane/noc_tile/runs/RUN_2026-05-08_18-38-35/tmp/d43945a3c8e845d3bb09662376f9e96f.bb.v:234:8: Timescale missing on this module as other modules have it (IEEE 1800-2023 3.14.2.3)
+  234 | module gf180mcu_ws_io__dvdd(DVDD, DVSS, VSS);
+      |        ^~~~~~~~~~~~~~~~~~~~
+                       /home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:28:8: ... Location of module with timescale
+   28 | module sram2048x8_gf180 (
+      |        ^~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /home/etcfranc/NoCNoC/librelane/noc_tile/runs/RUN_2026-05-08_18-38-35/tmp/d43945a3c8e845d3bb09662376f9e96f.bb.v:243:8: Timescale missing on this module as other modules have it (IEEE 1800-2023 3.14.2.3)
+  243 | module gf180mcu_ws_io__dvss(DVDD, DVSS, VDD);
+      |        ^~~~~~~~~~~~~~~~~~~~
+                       /home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:28:8: ... Location of module with timescale
+   28 | module sram2048x8_gf180 (
+      |        ^~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /home/etcfranc/NoCNoC/libs/gf180mcu_ocd_ip_sram/cells/gf180mcu_ocd_ip_sram__sram1024x8m8wm1/gf180mcu_ocd_ip_sram__sram1024x8m8wm1.blackbox.v:44:8: Timescale missing on this module as other modules have it (IEEE 1800-2023 3.14.2.3)
+   44 | module gf180mcu_ocd_ip_sram__sram1024x8m8wm1 (
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                       /home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:28:8: ... Location of module with timescale
+   28 | module sram2048x8_gf180 (
+      |        ^~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /home/etcfranc/NoCNoC/src/mesh - Psi&Aan/mesh_tile.v:3:8: Timescale missing on this module as other modules have it (IEEE 1800-2023 3.14.2.3)
+    3 | module mesh_tile #(
+      |        ^~~~~~~~~
+                       /home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:28:8: ... Location of module with timescale
+   28 | module sram2048x8_gf180 (
+      |        ^~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /home/etcfranc/NoCNoC/src/mesh - Psi&Aan/mesh_router.v:45:8: Timescale missing on this module as other modules have it (IEEE 1800-2023 3.14.2.3)
+   45 | module mesh_router #(
+      |        ^~~~~~~~~~~
+                       /home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:28:8: ... Location of module with timescale
+   28 | module sram2048x8_gf180 (
+      |        ^~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /home/etcfranc/NoCNoC/src/serv/rtl/serv_aligner.v:7:8: Timescale missing on this module as other modules have it (IEEE 1800-2023 3.14.2.3)
+    7 | module serv_aligner
+      |        ^~~~~~~~~~~~
+                       /home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:28:8: ... Location of module with timescale
+   28 | module sram2048x8_gf180 (
+      |        ^~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /home/etcfranc/NoCNoC/src/serv/rtl/serv_alu.v:8:8: Timescale missing on this module as other modules have it (IEEE 1800-2023 3.14.2.3)
+    8 | module serv_alu
+      |        ^~~~~~~~
+                       /home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:28:8: ... Location of module with timescale
+   28 | module sram2048x8_gf180 (
+      |        ^~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /home/etcfranc/NoCNoC/src/serv/rtl/serv_bufreg.v:7:8: Timescale missing on this module as other modules have it (IEEE 1800-2023 3.14.2.3)
+    7 | module serv_bufreg #(
+      |        ^~~~~~~~~~~
+                       /home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:28:8: ... Location of module with timescale
+   28 | module sram2048x8_gf180 (
+      |        ^~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /home/etcfranc/NoCNoC/src/serv/rtl/serv_bufreg2.v:7:8: Timescale missing on this module as other modules have it (IEEE 1800-2023 3.14.2.3)
+    7 | module serv_bufreg2
+      |        ^~~~~~~~~~~~
+                       /home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:28:8: ... Location of module with timescale
+   28 | module sram2048x8_gf180 (
+      |        ^~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /home/etcfranc/NoCNoC/src/serv/rtl/serv_compdec.v:10:8: Timescale missing on this module as other modules have it (IEEE 1800-2023 3.14.2.3)
+   10 | module serv_compdec
+      |        ^~~~~~~~~~~~
+                       /home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:28:8: ... Location of module with timescale
+   28 | module sram2048x8_gf180 (
+      |        ^~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /home/etcfranc/NoCNoC/src/serv/rtl/serv_csr.v:8:8: Timescale missing on this module as other modules have it (IEEE 1800-2023 3.14.2.3)
+    8 | module serv_csr
+      |        ^~~~~~~~
+                       /home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:28:8: ... Location of module with timescale
+   28 | module sram2048x8_gf180 (
+      |        ^~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /home/etcfranc/NoCNoC/src/serv/rtl/serv_ctrl.v:8:8: Timescale missing on this module as other modules have it (IEEE 1800-2023 3.14.2.3)
+    8 | module serv_ctrl
+      |        ^~~~~~~~~
+                       /home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:28:8: ... Location of module with timescale
+   28 | module sram2048x8_gf180 (
+      |        ^~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /home/etcfranc/NoCNoC/src/serv/rtl/serv_debug.v:7:8: Timescale missing on this module as other modules have it (IEEE 1800-2023 3.14.2.3)
+    7 | module serv_debug
+      |        ^~~~~~~~~~
+                       /home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:28:8: ... Location of module with timescale
+   28 | module sram2048x8_gf180 (
+      |        ^~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /home/etcfranc/NoCNoC/src/serv/rtl/serv_decode.v:8:8: Timescale missing on this module as other modules have it (IEEE 1800-2023 3.14.2.3)
+    8 | module serv_decode
+      |        ^~~~~~~~~~~
+                       /home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:28:8: ... Location of module with timescale
+   28 | module sram2048x8_gf180 (
+      |        ^~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /home/etcfranc/NoCNoC/src/serv/rtl/serv_immdec.v:8:8: Timescale missing on this module as other modules have it (IEEE 1800-2023 3.14.2.3)
+    8 | module serv_immdec
+      |        ^~~~~~~~~~~
+                       /home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:28:8: ... Location of module with timescale
+   28 | module sram2048x8_gf180 (
+      |        ^~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /home/etcfranc/NoCNoC/src/serv/rtl/serv_mem_if.v:8:8: Timescale missing on this module as other modules have it (IEEE 1800-2023 3.14.2.3)
+    8 | module serv_mem_if
+      |        ^~~~~~~~~~~
+                       /home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:28:8: ... Location of module with timescale
+   28 | module sram2048x8_gf180 (
+      |        ^~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /home/etcfranc/NoCNoC/src/serv/rtl/serv_rf_if.v:8:8: Timescale missing on this module as other modules have it (IEEE 1800-2023 3.14.2.3)
+    8 | module serv_rf_if
+      |        ^~~~~~~~~~
+                       /home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:28:8: ... Location of module with timescale
+   28 | module sram2048x8_gf180 (
+      |        ^~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /home/etcfranc/NoCNoC/src/serv/rtl/serv_rf_ram.v:7:8: Timescale missing on this module as other modules have it (IEEE 1800-2023 3.14.2.3)
+    7 | module serv_rf_ram
+      |        ^~~~~~~~~~~
+                       /home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:28:8: ... Location of module with timescale
+   28 | module sram2048x8_gf180 (
+      |        ^~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /home/etcfranc/NoCNoC/src/serv/rtl/serv_rf_ram_if.v:8:8: Timescale missing on this module as other modules have it (IEEE 1800-2023 3.14.2.3)
+    8 | module serv_rf_ram_if
+      |        ^~~~~~~~~~~~~~
+                       /home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:28:8: ... Location of module with timescale
+   28 | module sram2048x8_gf180 (
+      |        ^~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /home/etcfranc/NoCNoC/src/serv/rtl/serv_rf_top.v:9:8: Timescale missing on this module as other modules have it (IEEE 1800-2023 3.14.2.3)
+    9 | module serv_rf_top
+      |        ^~~~~~~~~~~
+                       /home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:28:8: ... Location of module with timescale
+   28 | module sram2048x8_gf180 (
+      |        ^~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /home/etcfranc/NoCNoC/src/serv/rtl/serv_state.v:7:8: Timescale missing on this module as other modules have it (IEEE 1800-2023 3.14.2.3)
+    7 | module serv_state
+      |        ^~~~~~~~~~
+                       /home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:28:8: ... Location of module with timescale
+   28 | module sram2048x8_gf180 (
+      |        ^~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /home/etcfranc/NoCNoC/src/serv/rtl/serv_synth_wrapper.v:9:8: Timescale missing on this module as other modules have it (IEEE 1800-2023 3.14.2.3)
+    9 | module serv_synth_wrapper
+      |        ^~~~~~~~~~~~~~~~~~
+                       /home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:28:8: ... Location of module with timescale
+   28 | module sram2048x8_gf180 (
+      |        ^~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /home/etcfranc/NoCNoC/src/serv/rtl/serv_top.v:9:8: Timescale missing on this module as other modules have it (IEEE 1800-2023 3.14.2.3)
+    9 | module serv_top
+      |        ^~~~~~~~
+                       /home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:28:8: ... Location of module with timescale
+   28 | module sram2048x8_gf180 (
+      |        ^~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /home/etcfranc/NoCNoC/src/serv/servile/servile.v:9:8: Timescale missing on this module as other modules have it (IEEE 1800-2023 3.14.2.3)
+    9 | module servile
+      |        ^~~~~~~
+                       /home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:28:8: ... Location of module with timescale
+   28 | module sram2048x8_gf180 (
+      |        ^~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /home/etcfranc/NoCNoC/src/serv/servile/servile_arbiter.v:9:8: Timescale missing on this module as other modules have it (IEEE 1800-2023 3.14.2.3)
+    9 | module servile_arbiter
+      |        ^~~~~~~~~~~~~~~
+                       /home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:28:8: ... Location of module with timescale
+   28 | module sram2048x8_gf180 (
+      |        ^~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /home/etcfranc/NoCNoC/src/serv/servile/servile_mux.v:8:8: Timescale missing on this module as other modules have it (IEEE 1800-2023 3.14.2.3)
+    8 | module servile_mux
+      |        ^~~~~~~~~~~
+                       /home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:28:8: ... Location of module with timescale
+   28 | module sram2048x8_gf180 (
+      |        ^~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /home/etcfranc/NoCNoC/src/serv/servile/servile_rf_mem_if.v:9:8: Timescale missing on this module as other modules have it (IEEE 1800-2023 3.14.2.3)
+    9 | module servile_rf_mem_if
+      |        ^~~~~~~~~~~~~~~~~
+                       /home/etcfranc/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:28:8: ... Location of module with timescale
+   28 | module sram2048x8_gf180 (
+      |        ^~~~~~~~~~~~~~~~
+%Warning-GENUNNAMED: /home/etcfranc/NoCNoC/src/subservient/rtl/subservient_rf_ram_if.v:58:29: Unnamed generate block 'genblk1' (IEEE 1800-2023 27.6)
+                                                                                            : ... Suggest assign a label with 'begin : gen_<label_name>'
+   58 |    generate if (width == 2) begin
+      |                             ^~~~~
+                     ... For warning description see https://verilator.org/warn/GENUNNAMED?v=5.044
+                     ... Use "/* verilator lint_off GENUNNAMED */" and lint_on around source to disable this message.
+%Warning-GENUNNAMED: /home/etcfranc/NoCNoC/src/subservient/rtl/subservient_rf_ram_if.v:61:13: Unnamed generate block 'genblk1' (IEEE 1800-2023 27.6)
+                                                                                            : ... Suggest assign a label with 'begin : gen_<label_name>'
+   61 |    end else begin
+      |             ^~~~~
+%Warning-GENUNNAMED: /home/etcfranc/NoCNoC/src/subservient/rtl/subservient_rf_ram_if.v:75:21: Unnamed generate block 'genblk2' (IEEE 1800-2023 27.6)
+                                                                                            : ... Suggest assign a label with 'begin : gen_<label_name>'
+   75 |      assign o_waddr = wreg;
+      |                     ^
+%Warning-GENUNNAMED: /home/etcfranc/NoCNoC/src/subservient/rtl/subservient_rf_ram_if.v:77:21: Unnamed generate block 'genblk2' (IEEE 1800-2023 27.6)
+                                                                                            : ... Suggest assign a label with 'begin : gen_<label_name>'
+   77 |      assign o_waddr = {wreg, wcnt[4:l2w]};
+      |                     ^
+%Warning-GENUNNAMED: /home/etcfranc/NoCNoC/src/subservient/rtl/subservient_rf_ram_if.v:83:6: Unnamed generate block 'genblk3' (IEEE 1800-2023 27.6)
+                                                                                           : ... Suggest assign a label with 'begin : gen_<label_name>'
+   83 |      always @(posedge i_clk) wdata0_r  <= {i_wdata0, wdata0_r[width-2:1]};
+      |      ^~~~~~
+%Warning-GENUNNAMED: /home/etcfranc/NoCNoC/src/subservient/rtl/subservient_rf_ram_if.v:85:6: Unnamed generate block 'genblk3' (IEEE 1800-2023 27.6)
+                                                                                           : ... Suggest assign a label with 'begin : gen_<label_name>'
+   85 |      always @(posedge i_clk) wdata0_r  <= i_wdata0;
+      |      ^~~~~~
+%Warning-GENUNNAMED: /home/etcfranc/NoCNoC/src/subservient/rtl/subservient_rf_ram_if.v:107:21: Unnamed generate block 'genblk4' (IEEE 1800-2023 27.6)
+                                                                                             : ... Suggest assign a label with 'begin : gen_<label_name>'
+  107 |      assign o_raddr = rreg;
+      |                     ^
+%Warning-GENUNNAMED: /home/etcfranc/NoCNoC/src/subservient/rtl/subservient_rf_ram_if.v:109:21: Unnamed generate block 'genblk4' (IEEE 1800-2023 27.6)
+                                                                                             : ... Suggest assign a label with 'begin : gen_<label_name>'
+  109 |      assign o_raddr = {rreg, rcnt[4:l2w]};
+      |                     ^
+%Warning-GENUNNAMED: /home/etcfranc/NoCNoC/src/subservient/rtl/subservient_rf_ram_if.v:127:6: Unnamed generate block 'genblk5' (IEEE 1800-2023 27.6)
+                                                                                            : ... Suggest assign a label with 'begin : gen_<label_name>'
+  127 |      always @(posedge i_clk) begin
+      |      ^~~~~~
+%Warning-GENUNNAMED: /home/etcfranc/NoCNoC/src/subservient/rtl/subservient_rf_ram_if.v:133:6: Unnamed generate block 'genblk5' (IEEE 1800-2023 27.6)
+                                                                                            : ... Suggest assign a label with 'begin : gen_<label_name>'
+  133 |      always @(posedge i_clk) if (rtrig1) rdata1 <= i_rdata[1];
+      |      ^~~~~~
+%Warning-GENUNNAMED: /home/etcfranc/NoCNoC/src/serv/servile/servile.v:194:16: Unnamed generate block 'genblk1' (IEEE 1800-2023 27.6)
+                                                                            : ... Suggest assign a label with 'begin : gen_<label_name>'
+  194 |       end else begin
+      |                ^~~~~
+%Warning-GENUNNAMED: /home/etcfranc/NoCNoC/src/serv/servile/servile_mux.v:62:16: Unnamed generate block 'genblk1' (IEEE 1800-2023 27.6)
+                                                                               : ... Suggest assign a label with 'begin : gen_<label_name>'
+   62 |       if (sim) begin
+      |                ^~~~~
+%Warning-GENUNNAMED: /home/etcfranc/NoCNoC/src/serv/servile/servile_mux.v:93:16: Unnamed generate block 'genblk1' (IEEE 1800-2023 27.6)
+                                                                               : ... Suggest assign a label with 'begin : gen_<label_name>'
+   93 |       end else begin
+      |                ^~~~~
+%Warning-UNUSEDSIGNAL: /home/etcfranc/NoCNoC/src/mesh - Psi&Aan/mesh_tile.v:34:17: Signal is not driven, nor used: 'wb_sel'
+                                                                                 : ... note: In instance 'mesh_tile'
+   34 |     wire [3:0]  wb_sel;
+      |                 ^~~~~~
+                       ... For warning description see https://verilator.org/warn/UNUSEDSIGNAL?v=5.044
+                       ... Use "/* verilator lint_off UNUSEDSIGNAL */" and lint_on around source to disable this message.
+%Warning-UNUSEDSIGNAL: /home/etcfranc/NoCNoC/src/mesh - Psi&Aan/mesh_tile.v:39:26: Signal is not used: 'sram_ren'
+                                                                                 : ... note: In instance 'mesh_tile'
+   39 |     wire       sram_wen, sram_ren;
+      |                          ^~~~~~~~
+%Warning-UNUSEDSIGNAL: /home/etcfranc/NoCNoC/src/mesh - Psi&Aan/mesh_tile.v:102:17: Bits of signal are not used: 'router_eject_head'[33:29,13:8]
+                                                                                  : ... note: In instance 'mesh_tile'
+  102 |     wire [33:0] router_eject_head; 
+      |                 ^~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: /home/etcfranc/NoCNoC/src/mesh - Psi&Aan/mesh_router.v:230:17: Signal is not used: 'fifo_head_reg'
+                                                                                    : ... note: In instance 'mesh_tile.router_inst'
+  230 |     reg  [33:0] fifo_head_reg;
+      |                 ^~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: /home/etcfranc/NoCNoC/src/subservient/rtl/subservient_core.v:41:17: Bits of signal are not used: 'wb_mem_adr'[31:11,1:0]
+                                                                                         : ... note: In instance 'mesh_tile.core_inst'
+   41 |    wire [31:0]  wb_mem_adr;
+      |                 ^~~~~~~~~~
+%Warning-UNUSEDSIGNAL: /home/etcfranc/NoCNoC/src/serv/servile/servile.v:92:20: Signal is not used: 'mdu_rs1'
+                                                                             : ... note: In instance 'mesh_tile.core_inst.servile'
+   92 |    wire [31:0]     mdu_rs1;
+      |                    ^~~~~~~
+%Warning-UNUSEDSIGNAL: /home/etcfranc/NoCNoC/src/serv/servile/servile.v:93:20: Signal is not used: 'mdu_rs2'
+                                                                             : ... note: In instance 'mesh_tile.core_inst.servile'
+   93 |    wire [31:0]     mdu_rs2;
+      |                    ^~~~~~~
+%Warning-UNUSEDSIGNAL: /home/etcfranc/NoCNoC/src/serv/servile/servile.v:94:20: Signal is not used: 'mdu_op'
+                                                                             : ... note: In instance 'mesh_tile.core_inst.servile'
+   94 |    wire [ 2:0]     mdu_op;
+      |                    ^~~~~~
+%Warning-UNUSEDSIGNAL: /home/etcfranc/NoCNoC/src/serv/servile/servile.v:95:14: Signal is not used: 'mdu_valid'
+                                                                             : ... note: In instance 'mesh_tile.core_inst.servile'
+   95 |    wire      mdu_valid;
+      |              ^~~~~~~~~
+%Warning-UNUSEDSIGNAL: /home/etcfranc/NoCNoC/src/serv/rtl/serv_rf_ram_if.v:65:24: Bits of signal are not used: 'wcnt'[2:1]
+                                                                                : ... note: In instance 'mesh_tile.core_inst.servile.rf_ram_if'
+   65 |    wire [CMSB:0]       wcnt;
+      |                        ^~~~
+%Warning-UNUSEDSIGNAL: /home/etcfranc/NoCNoC/src/serv/servile/servile_mux.v:13:23: Signal is not used: 'i_clk'
+                                                                                 : ... note: In instance 'mesh_tile.core_inst.servile.mux'
+   13 |     input wire        i_clk,
+      |                       ^~~~~
+%Warning-UNUSEDSIGNAL: /home/etcfranc/NoCNoC/src/serv/servile/servile_mux.v:14:23: Signal is not used: 'i_rst'
+                                                                                 : ... note: In instance 'mesh_tile.core_inst.servile.mux'
+   14 |     input wire        i_rst,
+      |                       ^~~~~
+%Warning-UNUSEDSIGNAL: /home/etcfranc/NoCNoC/src/serv/rtl/serv_top.v:76:23: Signal is not used: 'i_ext_rd'
+                                                                          : ... note: In instance 'mesh_tile.core_inst.servile.cpu'
+   76 |    input wire  [31:0] i_ext_rd,
+      |                       ^~~~~~~~
+%Warning-UNUSEDSIGNAL: /home/etcfranc/NoCNoC/src/serv/rtl/serv_top.v:185:16: Bits of signal are not used: 'i_wb_rdt'[1:0]
+                                                                           : ... note: In instance 'mesh_tile.core_inst.servile.cpu'
+  185 |    wire [31:0] i_wb_rdt;
+      |                ^~~~~~~~
+%Warning-UNUSEDSIGNAL: /home/etcfranc/NoCNoC/src/serv/rtl/serv_decode.v:14:22: Bits of signal are not used: 'i_wb_rdt'[31,29:27,24:23,19:15,11:7]
+                                                                             : ... note: In instance 'mesh_tile.core_inst.servile.cpu.decode'
+   14 |    input wire [31:2] i_wb_rdt,
+      |                      ^~~~~~~~
+%Warning-UNUSEDSIGNAL: /home/etcfranc/NoCNoC/src/serv/rtl/serv_bufreg.v:16:22: Signal is not used: 'i_cnt_done'
+                                                                             : ... note: In instance 'mesh_tile.core_inst.servile.cpu.bufreg'
+   16 |    input wire        i_cnt_done,
+      |                      ^~~~~~~~~~
+%Warning-UNUSEDSIGNAL: /home/etcfranc/NoCNoC/src/serv/rtl/serv_bufreg.v:25:22: Signal is not used: 'i_shift_op'
+                                                                             : ... note: In instance 'mesh_tile.core_inst.servile.cpu.bufreg'
+   25 |    input wire        i_shift_op,
+      |                      ^~~~~~~~~~
+%Warning-UNUSEDSIGNAL: /home/etcfranc/NoCNoC/src/serv/rtl/serv_bufreg.v:26:22: Signal is not used: 'i_right_shift_op'
+                                                                             : ... note: In instance 'mesh_tile.core_inst.servile.cpu.bufreg'
+   26 |    input wire        i_right_shift_op,
+      |                      ^~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: /home/etcfranc/NoCNoC/src/serv/rtl/serv_bufreg.v:27:23: Signal is not used: 'i_shamt'
+                                                                             : ... note: In instance 'mesh_tile.core_inst.servile.cpu.bufreg'
+   27 |    input wire [2:0]   i_shamt,
+      |                       ^~~~~~~
+%Warning-UNSIGNED: /home/etcfranc/NoCNoC/src/mesh - Psi&Aan/mesh_router.v:268:54: Comparison is constant due to unsigned arithmetic
+                                                                                : ... note: In instance 'mesh_tile.router_inst'
+  268 |             end else if (tgt_row > my_row && tgt_col < my_col) begin
+      |                                                      ^
+                   ... For warning description see https://verilator.org/warn/UNSIGNED?v=5.044
+                   ... Use "/* verilator lint_off UNSIGNED */" and lint_on around source to disable this message.
+%Warning-UNSIGNED: /home/etcfranc/NoCNoC/src/mesh - Psi&Aan/mesh_router.v:270:34: Comparison is constant due to unsigned arithmetic
+                                                                                : ... note: In instance 'mesh_tile.router_inst'
+  270 |             end else if (tgt_row < my_row && tgt_col > my_col) begin
+      |                                  ^
+%Warning-UNSIGNED: /home/etcfranc/NoCNoC/src/mesh - Psi&Aan/mesh_router.v:272:34: Comparison is constant due to unsigned arithmetic
+                                                                                : ... note: In instance 'mesh_tile.router_inst'
+  272 |             end else if (tgt_row < my_row && tgt_col < my_col) begin
+      |                                  ^
+%Warning-UNSIGNED: /home/etcfranc/NoCNoC/src/mesh - Psi&Aan/mesh_router.v:276:34: Comparison is constant due to unsigned arithmetic
+                                                                                : ... note: In instance 'mesh_tile.router_inst'
+  276 |             end else if (tgt_row < my_row) begin
+      |                                  ^
+%Warning-SYNCASYNCNET: /home/etcfranc/NoCNoC/src/mesh - Psi&Aan/mesh_tile.v:12:16: Signal flopped as both synchronous and async: 'rst'
+                       /home/etcfranc/NoCNoC/src/mesh - Psi&Aan/mesh_tile.v:82:13: ... Location of async usage
+   82 |         if (rst) boot_mode_q <= 1'b1;
+      |             ^~~
+                       /home/etcfranc/NoCNoC/src/mesh - Psi&Aan/mesh_tile.v:124:13: ... Location of sync usage
+  124 |         if (rst) begin
+      |             ^~~
+                       ... For warning description see https://verilator.org/warn/SYNCASYNCNET?v=5.044
+                       ... Use "/* verilator lint_off SYNCASYNCNET */" and lint_on around source to disable this message.
+- V e r i l a t i o n   R e p o r t: Verilator 5.044 2026-01-01 rev v5.040
+- Verilator: Built from 4.135 MB sources in 109 modules, into 0.301 MB in 3 C++ files needing 0.000 MB
+- Verilator: Walltime 0.057 s (elab=0.010, cvt=0.027, bld=0.000); cpu 0.057 s on 1 threads; alloced 28.371 MB
