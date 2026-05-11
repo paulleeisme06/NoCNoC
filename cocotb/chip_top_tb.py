@@ -120,10 +120,10 @@ def chip_top_runner():
         # Ethan: Added these files:
         proj_path / "../src/dft - Ethan/spi_debug.v",
         proj_path / "../src/dft - Ethan/gf180mcu_fd_ip_sram__sram2048x8m8wm1.v",
-        proj_path / "../src/mesh - Psi&Aan/mesh_3x3.v",
-        proj_path / "../src/mesh - Psi&Aan/mesh_tile.v",
-        proj_path / "../src/mesh - Psi&Aan/mesh_router.v",
-        proj_path / "../src/mesh - Psi&Aan/boot_controller.v",
+        proj_path / "../src/mesh_psi_aan/mesh_3x3.v",
+        proj_path / "../src/mesh_psi_aan/mesh_tile.v",
+        proj_path / "../src/mesh_psi_aan/mesh_router.v",
+        proj_path / "../src/mesh_psi_aan/boot_controller.v",
         # Add all .v files from subservient and serv submodules:
         *sorted((proj_path / "../src/subservient/rtl").glob("*.v")),
         *sorted((proj_path / "../src/serv/rtl").glob("*.v")),
