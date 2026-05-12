@@ -32,8 +32,8 @@ TOPLEVEL      = top
 
 SRC   := $(MAKEFILE_DIR)/src
 FLASH := $(SRC)/flash_Sumi
-MESH  := $(SRC)/mesh
-DFT   := $(SRC)/dft
+MESH  := $(SRC)/mesh_psi_aan
+DFT   := $(SRC)/dft_ethan
 
 VERILOG_EXTRA_DIRS = \
     $(MAKEFILE_DIR)/src/serv/rtl \
@@ -107,9 +107,19 @@ sim-flash: ## Run flash->housekeeping->mesh SRAM test
 	$(MAKE) results.xml \
 		MODULE=test_flash_mesh \
 		SIM_BUILD=sim_build/flash \
-		PYTHONPATH=$(MAKEFILE_DIR)/cocotb:$(PYTHONPATH)
+		PYTHONPATH=$(MAKEFILE_DIR)/cocotb:$(PYTHONPATH) \
 		VERILOG_SOURCES="$(VERILOG_SOURCES)"
 .PHONY: sim-flash
+
+sim-host: ## Run host-to-chip SPI write test: boot flash then write input.pbm to all tile SRAMs
+	$(MAKE) results.xml \
+		MODULE=test_host_write \
+		SIM_BUILD=sim_build/host \
+		PYTHONPATH=$(MAKEFILE_DIR)/cocotb:$(PYTHONPATH) \
+		VERILOG_SOURCES="$(VERILOG_SOURCES)"
+.PHONY: sim-host
+
+
 
 clone-pdk: ## Clone the GF180MCU PDK repository
 	rm -rf $(MAKEFILE_DIR)/gf180mcu

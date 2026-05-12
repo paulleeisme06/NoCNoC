@@ -8,9 +8,9 @@
 //
 //  CMD 0x00  WRITE_SRAM — write one byte to all 9 tile SRAMs simultaneously
 //    Byte 0 : 0x00
-//    Byte 1 : addr[9:8]  (upper 2 bits of 10-bit SRAM address)
-//    Byte 2 : addr[7:0]  (lower 8 bits)
-//    Byte 3 : data[7:0]  (byte to write)
+//    Byte 1 : addr[10:8]  (upper 3 bits of 11-bit SRAM address)
+//    Byte 2 : addr[7:0]   (lower 8 bits)
+//    Byte 3 : data[7:0]   (byte to write)
 //    → pulses sram_wen for one sys_clk, drives sram_waddr / sram_wdata
 //      All 9 tiles share the same boot_addr/boot_data/boot_wen bus so they
 //      all receive the same write simultaneously (matches boot_controller).
@@ -40,7 +40,7 @@ module host_spi_slave (
     output reg         spi_miso,
 
     // Broadcast SRAM write bus (connects to same bus as boot_controller)
-    output reg  [9:0]  sram_waddr,
+    output reg  [10:0] sram_waddr,    // 11-bit: matches 2048×8 SRAM; addr[10:8] from byte 1
     output reg  [7:0]  sram_wdata,
     output reg         sram_wen,      // active-high, one sys_clk pulse
 
@@ -50,7 +50,7 @@ module host_spi_slave (
 
     // Readback interface (to rd_crossbar)
     output reg  [3:0]  rd_tile,       // {tile_row[1:0], tile_col[1:0]}
-    output reg  [9:0]  rd_addr,
+    output reg  [10:0] rd_addr,       // 11-bit address
     output reg         rd_req,        // one sys_clk pulse
     input  wire [7:0]  rd_data
 );
@@ -139,7 +139,7 @@ module host_spi_slave (
     localparam ST_DONE       = 4'd12;
 
     reg [3:0] state;
-    reg [1:0] addr_hi_r;
+    reg [2:0] addr_hi_r;   // holds addr[10:8] (3 bits for 11-bit SRAM)
 
     always @(posedge sys_clk) begin
         sram_wen <= 1'b0;
@@ -150,10 +150,10 @@ module host_spi_slave (
             state       <= ST_IDLE;
             host_rst    <= 1'b0;
             host_rst_en <= 1'b0;
-            sram_waddr  <= 10'h0;
+            sram_waddr  <= 11'h0;
             sram_wdata  <= 8'h0;
             rd_tile     <= 4'h0;
-            rd_addr     <= 10'h0;
+            rd_addr     <= 11'h0;
         end else if (cs_deassert) begin
             state <= ST_IDLE;
         end else begin
@@ -175,13 +175,13 @@ module host_spi_slave (
                 // ---- WRITE_SRAM ----
                 ST_WR_ADDRHI:
                     if (rx_byte_rdy) begin
-                        addr_hi_r <= rx_shift[1:0];
+                        addr_hi_r <= rx_shift[2:0];   // addr[10:8]
                         state     <= ST_WR_ADDRLO;
                     end
 
                 ST_WR_ADDRLO:
                     if (rx_byte_rdy) begin
-                        sram_waddr <= {addr_hi_r, rx_shift};
+                        sram_waddr <= {addr_hi_r, rx_shift};  // 11-bit addr
                         state      <= ST_WR_DATA;
                     end
 
@@ -205,13 +205,13 @@ module host_spi_slave (
 
                 ST_RD_ADDRHI:
                     if (rx_byte_rdy) begin
-                        addr_hi_r <= rx_shift[1:0];
+                        addr_hi_r <= rx_shift[2:0];   // addr[10:8]
                         state     <= ST_RD_ADDRLO;
                     end
 
                 ST_RD_ADDRLO:
                     if (rx_byte_rdy) begin
-                        rd_addr <= {addr_hi_r, rx_shift};
+                        rd_addr <= {addr_hi_r, rx_shift};  // 11-bit addr
                         rd_req  <= 1'b1;
                         state   <= ST_RD_WAIT;
                     end

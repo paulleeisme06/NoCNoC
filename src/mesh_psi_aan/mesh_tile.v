@@ -26,12 +26,20 @@ module mesh_tile #(
     input  wire [35:0] north_in, south_in, east_in, west_in,
     output wire [35:0] north_out, south_out, east_out, west_out,
     input  wire [35:0] ne_in, nw_in, se_in, sw_in,
-    output wire [35:0] ne_out, nw_out, se_out, sw_out
+    output wire [35:0] ne_out, nw_out, se_out, sw_out,
+
+    // DFT SRAM access (stub — full mux implementation by DFT team)
+    input  wire        dft_mode,
+    input  wire        dft_ce,
+    input  wire        dft_we,
+    input  wire [10:0] dft_addr,
+    input  wire [7:0]  dft_wdata,
+    output wire [7:0]  dft_rdata
 );
 
     initial begin
         $display("[TILE_ID_CHECK] TILE_ID param = %0d  (row=%0d col=%0d)",
-                TILE_ID, TILE_ID[5:3], TILE_ID[2:0]);
+                TILE_ID, TILE_ID[3:2], TILE_ID[1:0]);
     end
 
     wire [31:0] wb_adr, wb_dat_c2r, wb_dat_r2c;
@@ -200,6 +208,9 @@ module mesh_tile #(
             end
         end
     end
+
+    // DFT readback: expose SRAM output (dft_we/dft_ce mux to be added by DFT team)
+    assign dft_rdata = sram_rdata;
 
     // -------------------------------------------------------------------------
     // Mesh router

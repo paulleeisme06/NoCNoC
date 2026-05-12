@@ -44,9 +44,10 @@ module mesh_router #(
     input  wire [35:0] ne_in,  nw_in,  se_in,  sw_in
 );
 
-    // Decode this tile's position from MY_ID
-    wire [2:0] my_row = MY_ID[5:3];
-    wire [2:0] my_col = MY_ID[2:0];
+    // Decode this tile's position from MY_ID.
+    // TILE_ID encoding matches firmware: {row[1:0], col[1:0]} in bits [3:0].
+    wire [2:0] my_row = {1'b0, MY_ID[3:2]};
+    wire [2:0] my_col = {1'b0, MY_ID[1:0]};
 
     // -------------------------------------------------------------------------
     // Wishbone ack — registered, fires one cycle after stb
@@ -74,9 +75,12 @@ module mesh_router #(
         end else begin
             inject_flit <= 36'h0;
             if (inject_ack_cycle) begin
+                // Firmware encodes dest as {row[1:0],col[1:0]} in dat_o[31:28]
+                // (FLIT_DEST_SHIFT=28). Place in flit[32:29] with flit[34:33]=0.
                 inject_flit <= {1'b1,
-                                local_wb_dat_o[31:26],   // dest TILE_ID [5:0]
-                                local_wb_dat_o[28:0]};   // payload
+                                2'b00,                      // flit[34:33] pad
+                                local_wb_dat_o[31:28],      // flit[32:29] dest TILE_ID
+                                local_wb_dat_o[28:0]};      // flit[28:0]  payload
             end
         end
     end
@@ -155,8 +159,9 @@ module mesh_router #(
         input [35:0] flit;
         reg [2:0] tgt_row, tgt_col;
         begin
-            tgt_row = flit[34:32];   // dest row  in bits [34:32]
-            tgt_col = flit[31:29];   // dest col  in bits [31:29]
+            // flit[34:33]=pad, flit[32:29]={row[1:0],col[1:0]} (4-bit TILE_ID)
+            tgt_row = {1'b0, flit[32:31]};   // dest row  in bits [32:31]
+            tgt_col = {1'b0, flit[30:29]};   // dest col  in bits [30:29]
             if (tgt_row == my_row && tgt_col == my_col) begin
                 if (!next_eject[35] && !fifo_full) next_eject = flit;
             end else if (tgt_row > my_row) begin

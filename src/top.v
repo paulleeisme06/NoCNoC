@@ -15,22 +15,22 @@ module top (
     output wire host_miso
 );
 
-    wire [33:0] inject_00_nw = 34'h0;
-    wire [33:0] monitor_22_se;
+    wire [35:0] inject_00_nw = 36'h0;
+    wire [35:0] monitor_22_se;
 
-    // host_spi_slave outputs — unused in flash test but needed for compilation
+    // host_spi_slave outputs
     wire        host_rst;
     wire        host_rst_en;
-    wire [9:0]  host_sram_waddr;
+    wire [10:0] host_sram_waddr;
     wire [7:0]  host_sram_wdata;
     wire        host_sram_wen;
     wire [3:0]  rd_tile;
-    wire [9:0]  rd_addr;
+    wire [10:0] rd_addr;
     wire        rd_req;
     wire [7:0]  rd_data_from_xbar;
 
     // -----------------------------------------------------------------------
-    // mesh_3x3 — contains internal boot_controller, flash path, all 9 tiles
+    // mesh_3x3 — boot controller + 9 tiles + host write bus
     // -----------------------------------------------------------------------
     mesh_3x3 mesh_inst (
         .clk           (clk),
@@ -40,11 +40,17 @@ module top (
         .flash_miso    (flash_miso),
         .flash_cs_n    (flash_csb),
         .flash_clk     (flash_clk),
-        .flash_mosi    (flash_mosi)
+        .flash_mosi    (flash_mosi),
+        // Host write bus — connects after boot so host can overwrite tile SRAMs
+        .host_waddr    (host_sram_waddr),
+        .host_wdata    (host_sram_wdata),
+        .host_wen      (host_sram_wen),
+        .host_rst_in   (host_rst),
+        .host_rst_en   (host_rst_en)
     );
 
     // -----------------------------------------------------------------------
-    // host_spi_slave — needed for compilation, inactive during flash test
+    // host_spi_slave — SPI gateway for host SRAM writes and CPU reset control
     // -----------------------------------------------------------------------
     host_spi_slave host_spi (
         .sys_clk     (clk),
@@ -64,8 +70,12 @@ module top (
         .rd_data     (rd_data_from_xbar)
     );
 
+    // rd_data_from_xbar is undriven (readback path not yet wired);
+    // host read commands return 0xFF until rd_crossbar is integrated.
+    assign rd_data_from_xbar = 8'hFF;
+
     // -----------------------------------------------------------------------
-    // SRAM check — fires when internal boot_controller asserts cpu_rst_n
+    // SRAM snapshot — fires when boot_controller asserts cpu_rst_n
     // -----------------------------------------------------------------------
     always @(posedge mesh_inst.cpu_rst_n) begin
         #100;
@@ -80,60 +90,7 @@ module top (
             mesh_inst.rows[2].cols[2].tile_inst.sram_inst.mem[1],
             mesh_inst.rows[2].cols[2].tile_inst.sram_inst.mem[2],
             mesh_inst.rows[2].cols[2].tile_inst.sram_inst.mem[3]);
-        $display("Expected: [0]=40 [1]=00 [2]=01 [3]=13");
+        $display("Expected: [0]=13 [1]=01 [2]=00 [3]=40");
     end
 
-    always @(posedge mesh_inst.cpu_rst_n) begin
-    #200;
-    $display("=== NOC BOOT SRAM CHECK ===");
-    $display("tile(0,0) [0]=%02x [1]=%02x [2]=%02x [3]=%02x",
-        mesh_inst.rows[0].cols[0].tile_inst.sram_inst.mem[0],
-        mesh_inst.rows[0].cols[0].tile_inst.sram_inst.mem[1],
-        mesh_inst.rows[0].cols[0].tile_inst.sram_inst.mem[2],
-        mesh_inst.rows[0].cols[0].tile_inst.sram_inst.mem[3]);
-    $display("tile(0,1) [0]=%02x [1]=%02x [2]=%02x [3]=%02x",
-        mesh_inst.rows[0].cols[1].tile_inst.sram_inst.mem[0],
-        mesh_inst.rows[0].cols[1].tile_inst.sram_inst.mem[1],
-        mesh_inst.rows[0].cols[1].tile_inst.sram_inst.mem[2],
-        mesh_inst.rows[0].cols[1].tile_inst.sram_inst.mem[3]);
-    $display("tile(0,2) [0]=%02x [1]=%02x [2]=%02x [3]=%02x",
-        mesh_inst.rows[0].cols[2].tile_inst.sram_inst.mem[0],
-        mesh_inst.rows[0].cols[2].tile_inst.sram_inst.mem[1],
-        mesh_inst.rows[0].cols[2].tile_inst.sram_inst.mem[2],
-        mesh_inst.rows[0].cols[2].tile_inst.sram_inst.mem[3]);
-    $display("tile(1,0) [0]=%02x [1]=%02x [2]=%02x [3]=%02x",
-        mesh_inst.rows[1].cols[0].tile_inst.sram_inst.mem[0],
-        mesh_inst.rows[1].cols[0].tile_inst.sram_inst.mem[1],
-        mesh_inst.rows[1].cols[0].tile_inst.sram_inst.mem[2],
-        mesh_inst.rows[1].cols[0].tile_inst.sram_inst.mem[3]);
-    $display("tile(1,1) [0]=%02x [1]=%02x [2]=%02x [3]=%02x",
-        mesh_inst.rows[1].cols[1].tile_inst.sram_inst.mem[0],
-        mesh_inst.rows[1].cols[1].tile_inst.sram_inst.mem[1],
-        mesh_inst.rows[1].cols[1].tile_inst.sram_inst.mem[2],
-        mesh_inst.rows[1].cols[1].tile_inst.sram_inst.mem[3]);
-    $display("tile(1,2) [0]=%02x [1]=%02x [2]=%02x [3]=%02x",
-        mesh_inst.rows[1].cols[2].tile_inst.sram_inst.mem[0],
-        mesh_inst.rows[1].cols[2].tile_inst.sram_inst.mem[1],
-        mesh_inst.rows[1].cols[2].tile_inst.sram_inst.mem[2],
-        mesh_inst.rows[1].cols[2].tile_inst.sram_inst.mem[3]);
-    $display("tile(2,0) [0]=%02x [1]=%02x [2]=%02x [3]=%02x",
-        mesh_inst.rows[2].cols[0].tile_inst.sram_inst.mem[0],
-        mesh_inst.rows[2].cols[0].tile_inst.sram_inst.mem[1],
-        mesh_inst.rows[2].cols[0].tile_inst.sram_inst.mem[2],
-        mesh_inst.rows[2].cols[0].tile_inst.sram_inst.mem[3]);
-    $display("tile(2,1) [0]=%02x [1]=%02x [2]=%02x [3]=%02x",
-        mesh_inst.rows[2].cols[1].tile_inst.sram_inst.mem[0],
-        mesh_inst.rows[2].cols[1].tile_inst.sram_inst.mem[1],
-        mesh_inst.rows[2].cols[1].tile_inst.sram_inst.mem[2],
-        mesh_inst.rows[2].cols[1].tile_inst.sram_inst.mem[3]);
-    $display("tile(2,2) [0]=%02x [1]=%02x [2]=%02x [3]=%02x",
-        mesh_inst.rows[2].cols[2].tile_inst.sram_inst.mem[0],
-        mesh_inst.rows[2].cols[2].tile_inst.sram_inst.mem[1],
-        mesh_inst.rows[2].cols[2].tile_inst.sram_inst.mem[2],
-        mesh_inst.rows[2].cols[2].tile_inst.sram_inst.mem[3]);
-    $display("Expected all tiles: [0]=13 [1]=01 [2]=00 [3]=40");
-    $finish;
-end
-
 endmodule
-
