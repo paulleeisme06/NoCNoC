@@ -18,6 +18,7 @@ module mesh_tile #(
 )(
     input wire clk,
     input wire rst,
+    input wire sys_rst,    // power-on reset only (for router)
     input wire boot_mode,
     input wire [10:0] boot_addr,
     input wire [7:0]  boot_data,
@@ -233,7 +234,7 @@ module mesh_tile #(
         .MESH_C(MESH_C)
     ) router_inst (
         .clk            (clk),
-        .rst            (rst),
+        .rst            (sys_rst),
         .local_wb_adr   (wb_adr),
         .local_wb_dat_o (wb_dat_c2r),
         .local_wb_dat_i (wb_dat_r2c),
