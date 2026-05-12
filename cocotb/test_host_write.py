@@ -153,6 +153,17 @@ def sram_read(dut, row, col, addr):
     return int(val) & 0xFF
 
 
+def sram_dump(dut, row, col, length, log, bytes_per_line=16):
+    """Print a hex dump of the first `length` bytes of tile(row,col) SRAM."""
+    log.info(f"--- SRAM dump tile({row},{col}) [{length} bytes] ---")
+    for base in range(0, length, bytes_per_line):
+        chunk = []
+        for a in range(base, min(base + bytes_per_line, length)):
+            v = sram_read(dut, row, col, a)
+            chunk.append(f"{v:02x}" if v is not None else "XX")
+        log.info(f"  {base:04x}: {' '.join(chunk)}")
+
+
 # ---------------------------------------------------------------------------
 # Test
 # ---------------------------------------------------------------------------
@@ -259,6 +270,13 @@ async def host_write_input_pbm(dut):
                 dut._log.info(f"tile({r},{c}): PASS (first {check_len} bytes match)")
             total_errors += tile_errors
         await RisingEdge(dut.clk)
+
+    # ----- Phase 4: SRAM dump for all 9 tiles -----
+    dump_len = min(len(pixels), 64)
+    dut._log.info(f"=== SRAM contents (first {dump_len} bytes per tile) ===")
+    for r in range(3):
+        for c in range(3):
+            sram_dump(dut, r, c, dump_len, dut._log)
 
     if total_errors == 0:
         dut._log.info("ALL 9 TILES PASS — host-to-chip write verified.")
