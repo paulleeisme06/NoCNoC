@@ -1,6 +1,18 @@
 meta:
   version: 3
   flow: Classic
+  substituting_steps:
+    OpenROAD.IRDropReport: null
+
+    # Save time during development
+    # Enable for sign-off
+    OpenROAD.IRDropReport: null
+    Magic.DRC: null
+    Checker.MagicDRC: null
+    KLayout.XOR: null
+    Netgen.LVS: null
+    Checker.LVS: null
+    KLayout.DRC: null
 
 DESIGN_NAME: mesh_tile
 VERILOG_FILES:
@@ -23,8 +35,8 @@ GND_NETS:
   - VSS
 
 FP_SIZING: absolute
-DIE_AREA: [0, 0, 900, 750]
-CORE_AREA: [10, 10, 890, 740]
+DIE_AREA: [0, 0, 900, 950]
+CORE_AREA: [10, 10, 890, 940]
 
 PL_TARGET_DENSITY_PCT: 50
 
@@ -34,8 +46,8 @@ PDN_VERTICAL_LAYER: Metal2
 PDN_HORIZONTAL_LAYER: Metal3
 PDN_VWIDTH: 2
 PDN_HWIDTH: 2
-PDN_VPITCH: 30
-PDN_HPITCH: 30
+PDN_VPITCH: 75
+PDN_HPITCH: 75
 
 MACROS:
   gf180mcu_ocd_ip_sram__sram1024x8m8wm1:
@@ -52,20 +64,24 @@ MACROS:
         - dir::../../libs/gf180mcu_ocd_ip_sram/cells/gf180mcu_ocd_ip_sram__sram1024x8m8wm1/gf180mcu_ocd_ip_sram__sram1024x8m8wm1__ff_n40C_3v60.lib
     instances:
       sram2048.u_bank0:
-        location: [15, 112]
+        location: [510, 10]
         orientation: N
       sram2048.u_bank1:
-        location: [330, 112]
+        location: [190, 10]
         orientation: N 
 
 PDN_MACRO_CONNECTIONS:
   - "sram2048.u_bank0 VDD VSS VDD VSS"
   - "sram2048.u_bank1 VDD VSS VDD VSS"
 
+
+
 PDN_CFG: dir::pdn_cfg.tcl
 
 
 # Don't error on DRC for the small block during development
 ERROR_ON_MAGIC_DRC: False
+
+
 
 
