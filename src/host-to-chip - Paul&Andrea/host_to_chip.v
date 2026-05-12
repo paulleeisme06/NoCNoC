@@ -1,19 +1,18 @@
 `default_nettype none
 
 // ============================================================================
-// host_spi_slave — Host ↔ Chip SPI gateway  (Mode 0: CPOL=0 CPHA=0)
+// host_to_chip — Host ↔ Chip SPI gateway  (Mode 0: CPOL=0 CPHA=0)
 // ============================================================================
 //
 // Command protocol (all MSB-first, one transaction per CS assertion):
 //
-//  CMD 0x00  WRITE_SRAM — write one byte to all 9 tile SRAMs simultaneously
+//  CMD 0x00  WRITE_SRAM — write one byte to the selected tile via mesh router
 //    Byte 0 : 0x00
 //    Byte 1 : addr[10:8]  (upper 3 bits of 11-bit SRAM address)
 //    Byte 2 : addr[7:0]   (lower 8 bits)
 //    Byte 3 : data[7:0]   (byte to write)
-//    → pulses sram_wen for one sys_clk, drives sram_waddr / sram_wdata
-//      All 9 tiles share the same boot_addr/boot_data/boot_wen bus so they
-//      all receive the same write simultaneously (matches boot_controller).
+//    → emits a one-cycle write flit on host_flit; the mesh router delivers it
+//      to the tile selected by CMD 0x04 and writes directly to its SRAM.
 //
 //  CMD 0x02  READ_RESULT — read one byte from one tile's SRAM
 //    Byte 0 : 0x02
@@ -27,9 +26,25 @@
 //    Byte 1 : 0xFF = assert reset (hold cores)
 //             0x00 = release reset (let cores run)
 //
+//  CMD 0x04  SET_TILE — select destination tile for subsequent writes
+//    Byte 0 : 0x04
+//    Byte 1 : row (0–2)
+//    Byte 2 : col (0–2)
+//    Sticky — persists until next CMD 0x04.  Default on reset: tile (0,0).
+//
+//  Flit format (36-bit, injected at tile(0,0) NW port):
+//    [35]    = valid
+//    [34:33] = 00 (pad)
+//    [32:31] = dest row
+//    [30:29] = dest col
+//    [28]    = 1 (write-flit flag; router writes SRAM directly on eject)
+//    [27:17] = sram_addr (11 bits)
+//    [16:9]  = sram_data (8 bits)
+//    [8:0]   = 0 (unused)
+//
 // ============================================================================
 
-module host_spi_slave (
+module host_to_chip (
     input  wire        sys_clk,
     input  wire        sys_rst,
 
@@ -39,10 +54,8 @@ module host_spi_slave (
     input  wire        spi_mosi,
     output reg         spi_miso,
 
-    // Broadcast SRAM write bus (connects to same bus as boot_controller)
-    output reg  [10:0] sram_waddr,    // 11-bit: matches 2048×8 SRAM; addr[10:8] from byte 1
-    output reg  [7:0]  sram_wdata,
-    output reg         sram_wen,      // active-high, one sys_clk pulse
+    // Write flit — one-cycle pulse injected at tile(0,0) NW port
+    output reg  [35:0] host_flit,
 
     // CPU reset override
     output reg         host_rst,      // 1 = hold cores in reset
@@ -137,14 +150,20 @@ module host_spi_slave (
     localparam ST_RD_SEND    = 4'd10;
     localparam ST_RST_ARG    = 4'd11;
     localparam ST_DONE       = 4'd12;
+    localparam ST_SEL_ROW    = 4'd13;
+    localparam ST_SEL_COL    = 4'd14;
 
-    reg [3:0] state;
-    reg [2:0] addr_hi_r;   // holds addr[10:8] (3 bits for 11-bit SRAM)
+    reg [3:0]  state;
+    reg [2:0]  addr_hi_r;
+    reg [10:0] sram_waddr;
+    reg [7:0]  sram_wdata;
+    reg [1:0]  sel_row_r;
+    reg [1:0]  sel_col_r;
 
     always @(posedge sys_clk) begin
-        sram_wen <= 1'b0;
-        rd_req   <= 1'b0;
-        tx_load  <= 1'b0;
+        host_flit <= 36'h0;
+        rd_req    <= 1'b0;
+        tx_load   <= 1'b0;
 
         if (sys_rst) begin
             state       <= ST_IDLE;
@@ -154,6 +173,8 @@ module host_spi_slave (
             sram_wdata  <= 8'h0;
             rd_tile     <= 4'h0;
             rd_addr     <= 11'h0;
+            sel_row_r   <= 2'h0;
+            sel_col_r   <= 2'h0;
         end else if (cs_deassert) begin
             state <= ST_IDLE;
         end else begin
@@ -168,6 +189,7 @@ module host_spi_slave (
                             8'h00:   state <= ST_WR_ADDRHI;
                             8'h02:   state <= ST_RD_TILE;
                             8'h03:   state <= ST_RST_ARG;
+                            8'h04:   state <= ST_SEL_ROW;
                             default: state <= ST_DONE;
                         endcase
                     end
@@ -175,13 +197,13 @@ module host_spi_slave (
                 // ---- WRITE_SRAM ----
                 ST_WR_ADDRHI:
                     if (rx_byte_rdy) begin
-                        addr_hi_r <= rx_shift[2:0];   // addr[10:8]
+                        addr_hi_r <= rx_shift[2:0];
                         state     <= ST_WR_ADDRLO;
                     end
 
                 ST_WR_ADDRLO:
                     if (rx_byte_rdy) begin
-                        sram_waddr <= {addr_hi_r, rx_shift};  // 11-bit addr
+                        sram_waddr <= {addr_hi_r, rx_shift};
                         state      <= ST_WR_DATA;
                     end
 
@@ -192,8 +214,15 @@ module host_spi_slave (
                     end
 
                 ST_WR_COMMIT: begin
-                    sram_wen <= 1'b1;   // one-cycle broadcast write
-                    state    <= ST_DONE;
+                    host_flit <= {1'b1,
+                                  2'b00,
+                                  sel_row_r,
+                                  sel_col_r,
+                                  1'b1,
+                                  sram_waddr,
+                                  sram_wdata,
+                                  9'b0};
+                    state <= ST_DONE;
                 end
 
                 // ---- READ_RESULT ----
@@ -205,26 +234,25 @@ module host_spi_slave (
 
                 ST_RD_ADDRHI:
                     if (rx_byte_rdy) begin
-                        addr_hi_r <= rx_shift[2:0];   // addr[10:8]
+                        addr_hi_r <= rx_shift[2:0];
                         state     <= ST_RD_ADDRLO;
                     end
 
                 ST_RD_ADDRLO:
                     if (rx_byte_rdy) begin
-                        rd_addr <= {addr_hi_r, rx_shift};  // 11-bit addr
+                        rd_addr <= {addr_hi_r, rx_shift};
                         rd_req  <= 1'b1;
                         state   <= ST_RD_WAIT;
                     end
 
                 ST_RD_WAIT: begin
-                    // One cycle SRAM read latency
                     tx_next <= rd_data;
                     tx_load <= 1'b1;
                     state   <= ST_RD_SEND;
                 end
 
                 ST_RD_SEND:
-                    state <= ST_DONE;   // shifting out; wait for CS deassert
+                    state <= ST_DONE;
 
                 // ---- SET_RESET ----
                 ST_RST_ARG:
@@ -234,7 +262,20 @@ module host_spi_slave (
                         state       <= ST_DONE;
                     end
 
-                ST_DONE: ; // wait for CS deassert
+                // ---- SET_TILE ----
+                ST_SEL_ROW:
+                    if (rx_byte_rdy) begin
+                        sel_row_r <= rx_shift[1:0];
+                        state     <= ST_SEL_COL;
+                    end
+
+                ST_SEL_COL:
+                    if (rx_byte_rdy) begin
+                        sel_col_r <= rx_shift[1:0];
+                        state     <= ST_DONE;
+                    end
+
+                ST_DONE: ;
 
                 default: state <= ST_IDLE;
             endcase
