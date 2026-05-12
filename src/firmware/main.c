@@ -1,300 +1,414 @@
 #include <stdint.h>
 
+// ============================================================================
+// Multi-pattern snake connectivity test
+//
+// Compile with -DPATTERN=0 .. -DPATTERN=3 to select the traversal.
+//
+// Pattern 0 — Horizontal boustrophedon (original H-snake)
+//   Even rows go →, odd rows go ←.  Uses E/W/S links.
+//
+// Pattern 1 — SE diagonal snake  (antidiagonal stripes, NW corner first)
+//   Walks tiles in antidiagonal order: (0,0), (1,0),(0,1), (2,0),(1,1),(0,2) …
+//   Within each antidiagonal the order is column-ascending.
+//   Each hop is either one step SOUTH or one step EAST depending on whether
+//   the sender and receiver are on the same row.
+//   The crucial sub-case: when two consecutive antidiagonal tiles are
+//   (r,c) → (r-1,c+1), the sender writes to its SE neighbour, exercising
+//   se_out → nw_in.
+//   NOTE: the XY router still forwards cardinally, but for single-step
+//   diagonal hops the direct tile is both south-east of sender.  To force
+//   the diagonal wire to carry the flit the sender must write dest = (r+1,c+1)
+//   and the flit will transit se_out of sender → nw_in of receiver in one cycle
+//   because those wires connect immediately-adjacent tiles.  The router *inside*
+//   the receiver sees the flit on nw_in and ejects it (dest == my_id).
+//   In the router code nw_in is checked as a transit input, so this works
+//   correctly with your existing mesh_router.v.
+//
+// Pattern 2 — SW diagonal snake  (antidiagonal stripes, NE corner first)
+//   Mirror of pattern 1.  Starts at (0, MESH_C-1), walks antidiagonals with
+//   column-descending order within each stripe.
+//   Each hop is either one step SOUTH or one step WEST.
+//   Diagonal sub-case: (r,c) → (r+1,c-1) exercises sw_out → ne_in.
+//
+// Pattern 3 — Vertical boustrophedon (column-first V-snake)
+//   Even columns go ↓, odd columns go ↑.  Uses N/S/E links.
+//   Provides a second pass over all N/S wires in a different sequence so
+//   ordering hazards are exposed.
+//
+// For patterns 1 and 2 a tile MUST know which wire its incoming token
+// arrived on.  Because the router ejects from all 9 inputs into a single
+// FIFO the firmware cannot distinguish NW from N from E at the FIFO level.
+// Instead the *logical* direction is inferred from the snake ordering:
+//   pattern 1: predecessor is either (r-1, c) [came from N] or (r, c-1) [came from W]
+//              when the hop is purely diagonal the predecessor is (r-1, c+1) →
+//              that means it came via NW (sender wrote to SE = our NW input).
+//   pattern 2: symmetric.
+//
+// ============================================================================
+
+#ifndef PATTERN
+#define PATTERN 0
+#endif
+
+// ============================================================================
+// Mesh configuration
+// ============================================================================
+#define MESH_R  5
+#define MESH_C  5
+
+// ============================================================================
+// NoC memory-mapped registers
+// ============================================================================
 #define NOC_INJECT_BASE  0x80000000u
 #define NOC_RECV_BASE    0x80000004u
 #define NOC_ID_BASE      0x80000008u
 
-#define SIG_BOOT_ALIVE   0xF0000001u
-#define SIG_SEED_LIVE    0xF0000002u
-#define SIG_MATH_DONE    0xF0000003u
-#define SIG_GEN_STABLE   0xF0000004u
+// TILE_ID encoding: row in [5:3], col in [2:0]
+#define TILE_ID(r, c)   ((((uint32_t)(r) & 0x7u) << 3) | ((uint32_t)(c) & 0x7u))
 
-#define SIZE 10
+#define FLIT_DEST_SHIFT  26u
+#define TOKEN_VALID_BIT  (1u << 10)
 
-#define PHYS_ROWS    5
-#define PHYS_COLS    5
+// ============================================================================
+// Debug memory map
+// ============================================================================
+#define DEBUG_BASE          0x0700u
+#define DEBUG_MY_ID         (DEBUG_BASE +  0)
+#define DEBUG_TOKEN_RECV    (DEBUG_BASE +  4)
+#define DEBUG_DIR_RECV      (DEBUG_BASE +  8)
+#define DEBUG_TOKEN_SENT    (DEBUG_BASE + 12)
+#define DEBUG_DEST_SENT     (DEBUG_BASE + 16)
+#define DEBUG_DONE          (DEBUG_BASE + 20)
+// Stores which PATTERN this tile ran (testbench can cross-check)
+#define DEBUG_PATTERN       (DEBUG_BASE + 24)
 
-/* Must match ACTIVE_R / ACTIVE_C in test_mesh.py */
-#define ACTIVE_ROWS  4
-#define ACTIVE_COLS  5
+// ---- Direction codes -------------------------------------------------------
+// Cardinal
+#define DIR_SELF   0u   // tile (0,0) or pattern start — no receive
+#define DIR_WEST   1u
+#define DIR_EAST   2u
+#define DIR_NORTH  3u
+#define DIR_SOUTH  4u
+// Diagonal
+#define DIR_NW     5u   // token arrived on the NW input (sent by SE neighbour)
+#define DIR_NE     6u   // token arrived on the NE input (sent by SW neighbour)
+#define DIR_SE     7u   // token arrived on the SE input  (unused — reserved)
+#define DIR_SW     8u   // token arrived on the SW input  (unused — reserved)
 
-#define GRID_BASE       0x0500u
-#define GHOST_BASE      0x0600u
-#define NEXT_GRID_BASE  0x0640u
+// ============================================================================
+// Typed SRAM pointers
+// ============================================================================
+#define dbg_my_id       ((volatile uint32_t *)DEBUG_MY_ID)
+#define dbg_token_recv  ((volatile uint32_t *)DEBUG_TOKEN_RECV)
+#define dbg_dir_recv    ((volatile uint32_t *)DEBUG_DIR_RECV)
+#define dbg_token_sent  ((volatile uint32_t *)DEBUG_TOKEN_SENT)
+#define dbg_dest_sent   ((volatile uint32_t *)DEBUG_DEST_SENT)
+#define dbg_done        ((volatile uint32_t *)DEBUG_DONE)
+#define dbg_pattern     ((volatile uint32_t *)DEBUG_PATTERN)
 
-#define DEBUG_BASE        0x0700u
-#define DEBUG_ITER_COUNT  (DEBUG_BASE + 28)
-#define DEBUG_MY_ID       (DEBUG_BASE + 44)
-
-#define DEBUG_PRE_CHECKERBOARD   0x0740u
-#define DEBUG_POST_CHECKERBOARD  0x0744u
-#define DEBUG_PHASE_MARKER       0x0748u
-
-/*
- * NOC inject status register (word before inject, or same peripheral).
- * Bit meanings are hardware-specific; mask 0xc = both "not-ready" bits.
- * We poll this before writing so we never block on a stalled WB ack.
- *
- * If your hardware provides a separate "tx-ready" flag, point
- * NOC_STATUS_BASE at it and adjust NOC_READY_MASK accordingly.
- */
-#define NOC_STATUS_BASE  0x80000000u   /* same word: read = status, write = inject */
-#define NOC_READY_MASK   0x0000000Cu   /* bits [3:2] clear => inject port is ready  */
-#define NOC_SIGNAL_TRIES 256u          /* give up after this many busy-polls        */
-
-static inline void noc_write(uint32_t word)
+// ============================================================================
+// NoC helpers
+// ============================================================================
+static inline void noc_send(uint32_t dest_id, uint32_t payload)
 {
-    volatile uint32_t *inject = (volatile uint32_t *)NOC_INJECT_BASE;
-    volatile uint32_t *status = (volatile uint32_t *)NOC_STATUS_BASE;
-    uint32_t tries;
+    *(volatile uint32_t *)NOC_INJECT_BASE =
+        (dest_id << FLIT_DEST_SHIFT) | TOKEN_VALID_BIT | (payload & 0x03FFFFFFu);
+}
 
-    /*
-     * Spin until the inject port is ready, but cap the loop so we never
-     * hang the CPU forever if the NOC is permanently backpressured.
-     * If the timeout fires we silently drop the packet and move on —
-     * signals are best-effort; the test can time-out rather than hang.
-     */
-    for (tries = 0; tries < NOC_SIGNAL_TRIES; tries++) {
-        if ((*status & NOC_READY_MASK) == 0u) {
-            break;
-        }
-        __asm__ volatile ("nop");
-    }
-
-    *inject = word;
+static inline uint32_t noc_recv_token(void)
+{
+    uint32_t p;
+    do { p = *(volatile uint32_t *)NOC_RECV_BASE; } while (!(p & TOKEN_VALID_BIT));
+    return p;
 }
 
 static inline uint32_t noc_read_my_id(void)
 {
-    return *(volatile uint32_t *)NOC_ID_BASE & 0x3Fu;  // was 0xFu - read all 6 bits (not just 4)
+    return *(volatile uint32_t *)NOC_ID_BASE & 0x3Fu;
 }
 
-static inline void noc_signal(uint32_t sig_word)
+// ============================================================================
+// Pattern 0: Horizontal boustrophedon
+//   Even rows left→right, odd rows right→left, step south at row end.
+// ============================================================================
+#if PATTERN == 0
+
+static int snake_next(int r, int c, int *nr, int *nc)
 {
-    noc_write(sig_word);
+    int even = ((r & 1) == 0);
+    if (even  && c < MESH_C - 1) { *nr = r;     *nc = c + 1; return 1; }
+    if (!even && c > 0)           { *nr = r;     *nc = c - 1; return 1; }
+    if (r < MESH_R - 1)           { *nr = r + 1; *nc = c;     return 1; }
+    return 0;
 }
 
+static int is_head(int r, int c) { return (r == 0 && c == 0); }
+
+// Direction from which the token arrived at (r,c).
+// Row-start tiles receive from the row above (north_in), all others from E or W.
+static uint32_t arrival_dir(int r, int c)
+{
+    int even = ((r & 1) == 0);
+    if (even && c > 0)            return DIR_WEST;
+    if (!even && c < MESH_C - 1) return DIR_EAST;
+    return DIR_NORTH;
+}
+
+#endif // PATTERN == 0
+
+// ============================================================================
+// Pattern 1: SE diagonal snake
+//   Antidiagonal d = r + c.  Within each antidiagonal, tiles are visited in
+//   order of increasing row (= decreasing col).
+//   Successor of tile (r,c):
+//     - if r > 0 on the same antidiagonal → (r-1, c+1)  [one step NE — but
+//       we are the SENDER, so we write to (r-1,c+1).  (r-1,c+1) is our NW
+//       neighbour only when r-1 = r-1 and c+1 = c+1… wait, let's be precise:
+//       (r-1,c+1) is NORTH-EAST of us.  From sender's perspective we output
+//       on ne_out; from receiver's perspective it arrives on sw_in.
+//       Actually no: let's re-check the direction convention in mesh_rxc.v:
+//         ne_i of (r,c) = grid_sw[r-1][c+1]   ← from tile above-right
+//       So (r,c)'s ne_in carries the sw_out of (r-1,c+1).
+//       Conversely, (r,c)'s ne_out feeds the sw_in of (r-1,c+1).
+//       If we want to send from (r,c) to (r-1,c+1) via diagonal wire:
+//         sender (r,c) ne_out → receiver (r-1,c+1) sw_in.
+//       That uses the NE output of sender = SW input of receiver.
+//     - At row-start of next antidiagonal → step SOUTH to (r+1, c)
+//       or EAST to (r, c+1) depending on boundary.
+//
+//   To keep things clean, within each antidiag we step DOWN the column
+//   (increasing r, decreasing c).  That means:
+//     - intra-antidiag hop: (r,c) → (r+1,c-1)  [one step south-west]
+//       sender uses sw_out, receiver sees it on ne_in.
+//     - antidiag transition: last tile of antidiag d to first tile of d+1.
+//       Last tile: largest r on antidiag d.  First tile: smallest r on d+1.
+//       This hop is either SOUTH (same col, row+1) or EAST (same row, col+1).
+//
+//   So pattern 1 actually exercises sw_out → ne_in for intra-antidiag hops.
+//   Rename to "SW-diagonal within antidiag" to avoid confusion.
+//   The pure diagonal link tested:  sw_out / ne_in.
+//
+// ============================================================================
+#if PATTERN == 1
+
+// Compute the position of tile with visit-order index idx in the
+// antidiagonal snake.  We scan antidiagonals 0..2*(N-1), and within each
+// antidiagonal we visit in order of increasing row.
+// Returns (r,c) for the given index.
+static void idx_to_rc(int idx, int *pr, int *pc)
+{
+    int count = 0;
+    int d;
+    for (d = 0; d < MESH_R + MESH_C - 1; d++) {
+        int r_start = (d < MESH_C) ? 0 : d - (MESH_C - 1);
+        int r_end   = (d < MESH_R) ? d : MESH_R - 1;
+        for (int r = r_start; r <= r_end; r++) {
+            if (count == idx) { *pr = r; *pc = d - r; return; }
+            count++;
+        }
+    }
+    *pr = -1; *pc = -1;
+}
+
+// Return the visit-order index of tile (r,c) in pattern 1.
+static int rc_to_idx(int r, int c)
+{
+    int d = r + c;
+    int r_start = (d < MESH_C) ? 0 : d - (MESH_C - 1);
+    int base = 0;
+    // Sum tiles in antidiagonals 0..d-1
+    for (int di = 0; di < d; di++) {
+        int rs = (di < MESH_C) ? 0 : di - (MESH_C - 1);
+        int re = (di < MESH_R) ? di : MESH_R - 1;
+        base += re - rs + 1;
+    }
+    return base + (r - r_start);
+}
+
+static int snake_next(int r, int c, int *nr, int *nc)
+{
+    int idx = rc_to_idx(r, c);
+    int total = MESH_R * MESH_C;
+    if (idx + 1 >= total) return 0;
+    idx_to_rc(idx + 1, nr, nc);
+    return 1;
+}
+
+static int is_head(int r, int c) { return (r == 0 && c == 0); }
+
+// Direction the token arrived at (r,c) from its predecessor.
+// Predecessor: tile with index rc_to_idx(r,c) - 1.
+static uint32_t arrival_dir(int r, int c)
+{
+    int idx = rc_to_idx(r, c);
+    if (idx == 0) return DIR_SELF;
+    int pr, pc;
+    idx_to_rc(idx - 1, &pr, &pc);
+    // Predecessor is at (pr,pc); we are at (r,c).
+    if (pr == r - 1 && pc == c + 1) return DIR_NE; // came via NE diagonal (sw_out of NE nbr)
+    if (pr == r - 1 && pc == c)     return DIR_NORTH;
+    if (pr == r && pc == c - 1)     return DIR_WEST;
+    return DIR_NORTH; // fallback
+}
+
+#endif // PATTERN == 1
+
+// ============================================================================
+// Pattern 2: SW diagonal snake  (NE corner first)
+//   Mirror of pattern 1.  Start at (0, MESH_C-1).
+//   Within each antidiagonal visit in order of decreasing row (increasing col).
+//   Intra-antidiag hop: (r,c) → (r-1,c+1)  = NE direction.
+//   sender: ne_out → receiver sw_in.
+//   Exercises ne_out / sw_in.
+// ============================================================================
+#if PATTERN == 2
+
+static void idx_to_rc(int idx, int *pr, int *pc)
+{
+    int count = 0;
+    for (int d = 0; d < MESH_R + MESH_C - 1; d++) {
+        int r_start = (d < MESH_C) ? 0 : d - (MESH_C - 1);
+        int r_end   = (d < MESH_R) ? d : MESH_R - 1;
+        // Visit in DECREASING row order (= increasing col)
+        for (int r = r_end; r >= r_start; r--) {
+            if (count == idx) { *pr = r; *pc = d - r; return; }
+            count++;
+        }
+    }
+    *pr = -1; *pc = -1;
+}
+
+static int rc_to_idx(int r, int c)
+{
+    int d = r + c;
+    int r_start = (d < MESH_C) ? 0 : d - (MESH_C - 1);
+    int r_end   = (d < MESH_R) ? d : MESH_R - 1;
+    int base = 0;
+    for (int di = 0; di < d; di++) {
+        int rs = (di < MESH_C) ? 0 : di - (MESH_C - 1);
+        int re = (di < MESH_R) ? di : MESH_R - 1;
+        base += re - rs + 1;
+    }
+    // Within antidiag d, our position is (r_end - r) in decreasing-r order
+    return base + (r_end - r);
+}
+
+static int snake_next(int r, int c, int *nr, int *nc)
+{
+    int idx = rc_to_idx(r, c);
+    if (idx + 1 >= MESH_R * MESH_C) return 0;
+    idx_to_rc(idx + 1, nr, nc);
+    return 1;
+}
+
+// Head is tile with visit-order 0
+static int is_head(int r, int c)
+{
+    int pr, pc;
+    idx_to_rc(0, &pr, &pc);
+    return (r == pr && c == pc);
+}
+
+static uint32_t arrival_dir(int r, int c)
+{
+    int idx = rc_to_idx(r, c);
+    if (idx == 0) return DIR_SELF;
+    int pr, pc;
+    idx_to_rc(idx - 1, &pr, &pc);
+    if (pr == r + 1 && pc == c - 1) return DIR_SW; // arrived via SW diagonal
+    if (pr == r + 1 && pc == c)     return DIR_SOUTH;
+    if (pr == r && pc == c + 1)     return DIR_EAST;
+    return DIR_SOUTH; // fallback
+}
+
+#endif // PATTERN == 2
+
+// ============================================================================
+// Pattern 3: Vertical boustrophedon
+//   Even cols top→bottom, odd cols bottom→top, step east at col end.
+// ============================================================================
+#if PATTERN == 3
+
+static int snake_next(int r, int c, int *nr, int *nc)
+{
+    int even = ((c & 1) == 0);
+    if (even  && r < MESH_R - 1) { *nr = r + 1; *nc = c;     return 1; }
+    if (!even && r > 0)           { *nr = r - 1; *nc = c;     return 1; }
+    if (c < MESH_C - 1)           { *nr = r;     *nc = c + 1; return 1; }
+    return 0;
+}
+
+static int is_head(int r, int c) { return (r == 0 && c == 0); }
+
+static uint32_t arrival_dir(int r, int c)
+{
+    int even = ((c & 1) == 0);
+    if (even && r > 0)            return DIR_NORTH;  // stepped down, came from above
+    if (!even && r < MESH_R - 1) return DIR_SOUTH;   // stepped up, came from below
+    return DIR_WEST;  // arrived from the column to our left
+}
+
+#endif // PATTERN == 3
+
+// ============================================================================
+// _start
+// ============================================================================
 __attribute__((section(".text.init"), naked))
 void _start(void)
 {
     __asm__ volatile (
-        "li   sp, 0x6f0\n"
-
-        /* zero ghost region: 0x0600..0x0627 */
-        "li   t0, 0x0600\n"
-        "li   t1, 0x0628\n"
+        "li   sp, 0x7fc\n"
+        "li   t0, 0x0700\n"
+        "li   t1, 0x0780\n"
         "1: bge  t0, t1, 2f\n"
         "   sb   zero, 0(t0)\n"
         "   addi t0, t0, 1\n"
         "   j    1b\n"
-
-        /* zero next_grid region: 0x0640..0x06a3 */
-        "2: li   t0, 0x0640\n"
-        "   li   t1, 0x06a4\n"
-        "3: bge  t0, t1, 4f\n"
-        "   sb   zero, 0(t0)\n"
-        "   addi t0, t0, 1\n"
-        "   j    3b\n"
-
-        /* zero debug region: 0x0700..0x077f */
-        "4: li   t0, 0x0700\n"
-        "   li   t1, 0x0780\n"
-        "5: bge  t0, t1, 6f\n"
-        "   sb   zero, 0(t0)\n"
-        "   addi t0, t0, 1\n"
-        "   j    5b\n"
-
-        "6: call main\n"
-        "7: j    7b\n"
+        "2: call main\n"
+        "3: j    3b\n"
     );
 }
 
-static void idle_tile_forever(void)
-{
-    while (1) {
-        __asm__ volatile ("nop");
-    }
-}
-
-/*
- * Delay so the cocotb seed check can see iteration 0 before firmware flips
- * to iteration 1.
- *
- * If iteration 1 never appears before timeout, reduce DELAY_OUTER.
- * If seed check sees iteration 1 too early, increase DELAY_OUTER.
- */
-__attribute__((noinline))
-static void delay_before_iter1(void)
-{
-    uint32_t outer;
-    uint32_t inner;
-
-    for (outer = 0; outer < 4u; outer++) {
-        for (inner = 0; inner < 255u; inner++) {
-            __asm__ volatile ("nop" ::: "memory");
-        }
-    }
-}
-
-/*
- * Direct assembly checkerboard writer.
- *
- * phase = 0:
- *   even (row + col) cells get fill_val
- *
- * phase = 1:
- *   odd (row + col) cells get fill_val
- */
-__attribute__((noinline))
-static void write_checkerboard_asm(uint8_t fill_val, uint32_t phase)
-{
-    __asm__ volatile (
-        /* t6 = fill_val */
-        "andi t6, %[fill], 0xff\n"
-
-        /* t5 = phase & 1 */
-        "andi t5, %[phase], 1\n"
-
-        /* t0 = current SRAM address = GRID_BASE */
-        "li   t0, 0x0500\n"
-
-        /* t1 = row = 0 */
-        "li   t1, 0\n"
-
-        "1:\n"
-        /* t2 = col = 0 */
-        "li   t2, 0\n"
-
-        "2:\n"
-        /* t3 = (row + col + phase) & 1 */
-        "add  t3, t1, t2\n"
-        "add  t3, t3, t5\n"
-        "andi t3, t3, 1\n"
-
-        /*
-         * Testbench expects fill when:
-         *   (row + col + iteration) % 2 == 0
-         *
-         * So if t3 != 0, write zero.
-         */
-        "bnez t3, 3f\n"
-
-        /* fill cell */
-        "sb   t6, 0(t0)\n"
-        "j    4f\n"
-
-        /* zero cell */
-        "3:\n"
-        "sb   zero, 0(t0)\n"
-
-        "4:\n"
-        /* addr++, col++ */
-        "addi t0, t0, 1\n"
-        "addi t2, t2, 1\n"
-
-        /* if col < 10, keep writing row */
-        "li   t4, 10\n"
-        "blt  t2, t4, 2b\n"
-
-        /* row++ */
-        "addi t1, t1, 1\n"
-
-        /* if row < 10, continue */
-        "li   t4, 10\n"
-        "blt  t1, t4, 1b\n"
-        :
-        : [fill] "r" ((uint32_t)fill_val),
-          [phase] "r" (phase)
-        : "t0", "t1", "t2", "t3", "t4", "t5", "t6", "memory"
-    );
-}
-
+// ============================================================================
+// main
+// ============================================================================
 int main(void)
 {
-    /*
-     * Magic check.
-     * If these pass, firmware executed and SRAM writes work.
-     */
-    *(volatile uint32_t *)0x0730u = 0xDEADBEEFu;
-    *(volatile uint32_t *)0x0734u = 0xCAFEBABEu;
+    uint32_t my_id  = noc_read_my_id();
+    int      my_row = (int)((my_id >> 3) & 0x7u);
+    int      my_col = (int)(my_id & 0x7u);
 
-    uint32_t my_id = noc_read_my_id();
+    *dbg_my_id   = my_id;
+    *dbg_pattern = (uint32_t)PATTERN;
 
-    // New — matches {row[2:0], col[2:0]} hardware encoding:
-    //will take of 8x8 and smaller
-    int phys_row = (int)((my_id >> 3) & 0x7u);
-    int phys_col = (int)(my_id & 0x7u);
+    int head = is_head(my_row, my_col);
 
-    *(volatile uint32_t *)DEBUG_MY_ID = my_id;
-
-    if (phys_row >= ACTIVE_ROWS || phys_col >= ACTIVE_COLS) {
-        idle_tile_forever();
+    uint32_t token_payload;
+    if (head) {
+        token_payload   = TOKEN_VALID_BIT | (my_id & 0xFFu);
+        *dbg_dir_recv   = DIR_SELF;
+        *dbg_token_recv = token_payload;
+    } else {
+        token_payload   = noc_recv_token();
+        *dbg_token_recv = token_payload;
+        *dbg_dir_recv   = arrival_dir(my_row, my_col);
     }
 
-    // 0,0 will show up as (.) 
-    // uint8_t fill_val = (uint8_t)my_id;
-
-    uint8_t fill_val = (uint8_t)(my_id + 1u);
-
-
-    noc_signal(SIG_BOOT_ALIVE);
-
-    /*
-     * ITERATION 0 / seed:
-     * expected parity is (row + col + 0) even.
-     */
-    *(volatile uint32_t *)DEBUG_PHASE_MARKER = 0x00000000u;
-    *(volatile uint32_t *)DEBUG_PRE_CHECKERBOARD = 0x11110000u;
-
-    write_checkerboard_asm(fill_val, 0u);
-
-    *(volatile uint32_t *)DEBUG_POST_CHECKERBOARD = 0x22220000u;
-    *(volatile uint32_t *)DEBUG_ITER_COUNT = 0u;
-
-    noc_signal(SIG_SEED_LIVE);
-
-    /*
-     * Hold seed long enough for test_iter0_seed_only / iter0 check.
-     */
-    delay_before_iter1();
-
-    /*
-     * ITERATION 1:
-     * expected parity is (row + col + 1) even.
-     * This flips the checkerboard from seed.
-     */
-    *(volatile uint32_t *)DEBUG_PHASE_MARKER = 0x00000001u;
-    *(volatile uint32_t *)DEBUG_PRE_CHECKERBOARD = 0x11110001u;
-
-    write_checkerboard_asm(fill_val, 1u);
-
-    *(volatile uint32_t *)DEBUG_POST_CHECKERBOARD = 0x22220001u;
-    *(volatile uint32_t *)DEBUG_ITER_COUNT = 1u;
-
-    noc_signal(SIG_MATH_DONE);
-    noc_signal(SIG_GEN_STABLE);
-
-    /*
-     * ITERATION 2:
-     * expected parity is (row + col + 2) even — same phase as iter 0.
-     */
-    *(volatile uint32_t *)DEBUG_PHASE_MARKER = 0x00000002u;
-    *(volatile uint32_t *)DEBUG_PRE_CHECKERBOARD = 0x11110002u;
-
-    write_checkerboard_asm(fill_val, 2u);
-
-    *(volatile uint32_t *)DEBUG_POST_CHECKERBOARD = 0x22220002u;
-    *(volatile uint32_t *)DEBUG_ITER_COUNT = 2u;
-
-    noc_signal(SIG_MATH_DONE);
-    noc_signal(SIG_GEN_STABLE);
-
-    /*
-     * Stop here so iteration 2 remains stable.
-     */
-    while (1) {
-        __asm__ volatile ("nop");
+    int next_r, next_c;
+    if (snake_next(my_row, my_col, &next_r, &next_c)) {
+        uint32_t dest    = TILE_ID(next_r, next_c);
+        uint32_t out_pay = TOKEN_VALID_BIT | (my_id & 0xFFu);
+        *dbg_token_sent = out_pay;
+        *dbg_dest_sent  = dest;
+        noc_send(dest, out_pay);
+    } else {
+        *dbg_token_sent = 0;
+        *dbg_dest_sent  = 0xFFu;
     }
 
+    *dbg_done = 0xDEADu;
+
+    while (1) {}
     return 0;
 }
