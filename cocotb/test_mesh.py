@@ -149,8 +149,17 @@ def read_debug_info(tile, label=""):
 #   hw_id = (row<<2)|col   (0,0)→0  (0,1)→1  (1,0)→4  (1,1)→5  etc.
 # Idle tiles (outside active region): SRAM stays all-zero (no writes)
 
+# tests when 0,0 is (.)
+# def hw_tile_id(r, c):
+#     return (r << 2) | c
+
 def hw_tile_id(r, c):
-    return (r << 2) | c
+    return ((r << 2) | c) + 1  # +1 so tile (0,0) = 1, not 0
+
+def fmt(v):
+    if v == 0:
+        return '.'
+    return f"{v:x}"[0]  # already non-zero, so this is fine
 
 def expected_checkerboard(r, c, iteration):
     """Return 10x10 expected grid for tile (r,c) at given iteration."""

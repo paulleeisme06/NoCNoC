@@ -229,7 +229,11 @@ int main(void)
         idle_tile_forever();
     }
 
-    uint8_t fill_val = (uint8_t)my_id;
+    // 0,0 will show up as (.) 
+    // uint8_t fill_val = (uint8_t)my_id;
+
+    uint8_t fill_val = (uint8_t)(my_id + 1u);
+
 
     noc_signal(SIG_BOOT_ALIVE);
 
