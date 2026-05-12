@@ -84,7 +84,7 @@ def tile_slice(frame, tr, tc):
 def print_grid(grid, label):
     print(f"\n  [{label}]")
     print(f"  +----------+")
-    for y, row in enumerate(grid):
+    for row in grid:
         print(f"  |{''.join('█' if v else '·' for v in row)}|")
     print(f"  +----------+")
     live = sum(grid[y][x] for y in range(TILE_SIZE) for x in range(TILE_SIZE))
@@ -164,7 +164,17 @@ async def host_write_sram(dut, addr, data):
     """CMD 0x00: broadcast write — same byte goes to all tiles at once."""
     await spi_transfer(dut, [
         0x00,
-        (addr >> 8) & 0x03,
+        (addr >> 8) & 0x07,   # 3 bits for 11-bit address space (0x000–0x7FF)
+        addr & 0xFF,
+        data & 0xFF,
+    ])
+
+async def host_write_sram_unicast(dut, tile_id, addr, data):
+    """CMD 0x01: unicast write — targets one specific tile by tile_id."""
+    await spi_transfer(dut, [
+        0x01,
+        (tile_id & 0x0F) << 4,  # tile_id in upper nibble, matches rd_tile encoding
+        (addr >> 8) & 0x07,
         addr & 0xFF,
         data & 0xFF,
     ])
@@ -209,30 +219,32 @@ async def test_host_seed_all_tiles(dut):
     await host_set_reset(dut, hold=True)
     await Timer(100, units="ns")
 
-    # All tiles get the same 10x10 seed (tile-0,0 slice of the 30x30 frame).
-    # CMD 0x00 is a broadcast: one write reaches every tile simultaneously.
-    seed = tile_slice(INPUT_FRAME, 0, 0)
-    print_grid(seed, "seed being written (tile 0,0 slice of input.pbm)")
+    # Each tile gets its own unique 10x10 slice from input.pbm via CMD 0x01 unicast.
+    expected_grids = {}
+    for tr in range(MESH_R):
+        for tc in range(MESH_C):
+            tile_id = (tr << 2) | tc
+            seed    = tile_slice(INPUT_FRAME, tr, tc)
+            expected_grids[(tr, tc)] = seed
+            print_grid(seed, f"seed for tile({tr},{tc})")
+            dut._log.info(f"[seed] Writing tile({tr},{tc}) id={tile_id:#x} unicast ...")
+            for y in range(TILE_SIZE):
+                for x in range(TILE_SIZE):
+                    addr = SRAM_GRID_BASE + y * TILE_SIZE + x
+                    await host_write_sram_unicast(dut, tile_id, addr, seed[y][x])
 
-    dut._log.info(
-        f"[seed] Writing {TILE_SIZE}x{TILE_SIZE} grid "
-        f"to 0x{SRAM_GRID_BASE:04x}–0x{SRAM_GRID_BASE + TILE_SIZE*TILE_SIZE - 1:04x} ..."
-    )
-    for y in range(TILE_SIZE):
-        for x in range(TILE_SIZE):
-            addr = SRAM_GRID_BASE + y * TILE_SIZE + x
-            await host_write_sram(dut, addr, seed[y][x])
-
-    dut._log.info("[seed] Write complete")
+    dut._log.info("[seed] All 9 tiles written")
     await Timer(1, units="us")
 
     # ── Stage 3: verify all 9 tiles via backdoor ports ───────────────────
     dut._log.info("[verify] Reading back all 9 tiles via backdoor ports ...")
-    errors = 0
+    errors     = 0
+    all_grids  = {}
 
     for tr in range(MESH_R):
         for tc in range(MESH_C):
             tile      = TileHandle(dut, tr, tc)
+            seed      = expected_grids[(tr, tc)]
             tile_errs = 0
             actual_grid = []
 
@@ -250,12 +262,28 @@ async def test_host_seed_all_tiles(dut):
                         tile_errs += 1
                 actual_grid.append(row)
 
+            all_grids[(tr, tc)] = actual_grid
+
             if tile_errs == 0:
                 dut._log.info(f"  tile({tr},{tc}): PASS")
             else:
                 print_grid(actual_grid, f"tile({tr},{tc}) ACTUAL (has {tile_errs} errors)")
                 errors += tile_errs
 
+    # ── Assembled 30×30 display ──────────────────────────────────────────
+    SEP = "+" + "+".join(["-" * TILE_SIZE] * MESH_C) + "+"
+    print(f"\n  [ASSEMBLED 30x30 — actual SRAM (all tiles same broadcast seed)]")
+    print(f"  {SEP}")
+    for tr in range(MESH_R):
+        for y in range(TILE_SIZE):
+            row_str = "  |"
+            for tc in range(MESH_C):
+                g = all_grids.get((tr, tc), [[0]*TILE_SIZE]*TILE_SIZE)
+                row_str += "".join("█" if g[y][x] else "·" for x in range(TILE_SIZE))
+                row_str += "|"
+            print(row_str)
+        print(f"  {SEP}")
+
     if errors == 0:
-        dut._log.info("ALL 9 TILES PASS — host SPI seed pipeline verified")
-    assert errors == 0, f"{errors} cell(s) failed host SPI seed check"
+        dut._log.info("ALL 9 TILES PASS — host SPI unicast seed pipeline verified")
+    assert errors == 0, f"{errors} cell(s) failed host SPI unicast seed check"
