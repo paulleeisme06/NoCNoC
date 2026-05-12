@@ -15,6 +15,15 @@
 //      All 9 tiles share the same boot_addr/boot_data/boot_wen bus so they
 //      all receive the same write simultaneously (matches boot_controller).
 //
+//  CMD 0x01  WRITE_SRAM_UNICAST — write one byte to one specific tile
+//    Byte 0 : 0x01
+//    Byte 1 : tile_id[3:0] in upper nibble  {tile_row[1:0], tile_col[1:0], 4'b0}
+//    Byte 2 : addr[10:8]  (upper 3 bits of 11-bit SRAM address)
+//    Byte 3 : addr[7:0]   (lower 8 bits)
+//    Byte 4 : data[7:0]   (byte to write)
+//    → pulses sram_wen, sets sram_wunicast=1 and sram_wtile to target tile
+//      mesh_3x3 gates boot_wen so only the selected tile's SRAM is written.
+//
 //  CMD 0x02  READ_RESULT — read one byte from one tile's SRAM
 //    Byte 0 : 0x02
 //    Byte 1 : tile_id = {tile_row[1:0], tile_col[1:0], 4'b0} (upper nibble)
@@ -39,10 +48,12 @@ module host_spi_slave (
     input  wire        spi_mosi,
     output reg         spi_miso,
 
-    // Broadcast SRAM write bus (connects to same bus as boot_controller)
-    output reg  [9:0]  sram_waddr,
+    // SRAM write bus (connects to same bus as boot_controller)
+    output reg  [10:0] sram_waddr,
     output reg  [7:0]  sram_wdata,
     output reg         sram_wen,      // active-high, one sys_clk pulse
+    output reg  [3:0]  sram_wtile,   // target tile for unicast write {row[1:0],col[1:0]}
+    output reg         sram_wunicast,// 1=unicast (one tile), 0=broadcast (all tiles)
 
     // CPU reset override
     output reg         host_rst,      // 1 = hold cores in reset
@@ -50,7 +61,7 @@ module host_spi_slave (
 
     // Readback interface (to rd_crossbar)
     output reg  [3:0]  rd_tile,       // {tile_row[1:0], tile_col[1:0]}
-    output reg  [9:0]  rd_addr,
+    output reg  [10:0] rd_addr,
     output reg         rd_req,        // one sys_clk pulse
     input  wire [7:0]  rd_data
 );
@@ -137,9 +148,11 @@ module host_spi_slave (
     localparam ST_RD_SEND    = 4'd10;
     localparam ST_RST_ARG    = 4'd11;
     localparam ST_DONE       = 4'd12;
+    localparam ST_UC_TILE    = 4'd13;  // unicast write: receive tile_id byte
 
     reg [3:0] state;
-    reg [1:0] addr_hi_r;
+    reg [2:0] addr_hi_r;
+    reg       unicast_r;   // latches 1 when current write is unicast
 
     always @(posedge sys_clk) begin
         sram_wen <= 1'b0;
@@ -147,13 +160,16 @@ module host_spi_slave (
         tx_load  <= 1'b0;
 
         if (sys_rst) begin
-            state       <= ST_IDLE;
-            host_rst    <= 1'b0;
-            host_rst_en <= 1'b0;
-            sram_waddr  <= 10'h0;
-            sram_wdata  <= 8'h0;
-            rd_tile     <= 4'h0;
-            rd_addr     <= 10'h0;
+            state        <= ST_IDLE;
+            host_rst     <= 1'b0;
+            host_rst_en  <= 1'b0;
+            sram_waddr   <= 11'h0;
+            sram_wdata   <= 8'h0;
+            sram_wtile   <= 4'h0;
+            sram_wunicast <= 1'b0;
+            unicast_r    <= 1'b0;
+            rd_tile      <= 4'h0;
+            rd_addr      <= 11'h0;
         end else if (cs_deassert) begin
             state <= ST_IDLE;
         end else begin
@@ -165,7 +181,8 @@ module host_spi_slave (
                 ST_CMD:
                     if (rx_byte_rdy) begin
                         case (rx_shift)
-                            8'h00:   state <= ST_WR_ADDRHI;
+                            8'h00:   begin unicast_r <= 1'b0; state <= ST_WR_ADDRHI; end
+                            8'h01:   state <= ST_UC_TILE;
                             8'h02:   state <= ST_RD_TILE;
                             8'h03:   state <= ST_RST_ARG;
                             default: state <= ST_DONE;
@@ -175,7 +192,7 @@ module host_spi_slave (
                 // ---- WRITE_SRAM ----
                 ST_WR_ADDRHI:
                     if (rx_byte_rdy) begin
-                        addr_hi_r <= rx_shift[1:0];
+                        addr_hi_r <= rx_shift[2:0];
                         state     <= ST_WR_ADDRLO;
                     end
 
@@ -192,9 +209,18 @@ module host_spi_slave (
                     end
 
                 ST_WR_COMMIT: begin
-                    sram_wen <= 1'b1;   // one-cycle broadcast write
-                    state    <= ST_DONE;
+                    sram_wen      <= 1'b1;
+                    sram_wunicast <= unicast_r;
+                    state         <= ST_DONE;
                 end
+
+                // ---- UNICAST_WRITE_SRAM ----
+                ST_UC_TILE:
+                    if (rx_byte_rdy) begin
+                        sram_wtile <= rx_shift[7:4];
+                        unicast_r  <= 1'b1;
+                        state      <= ST_WR_ADDRHI;
+                    end
 
                 // ---- READ_RESULT ----
                 ST_RD_TILE:
@@ -205,7 +231,7 @@ module host_spi_slave (
 
                 ST_RD_ADDRHI:
                     if (rx_byte_rdy) begin
-                        addr_hi_r <= rx_shift[1:0];
+                        addr_hi_r <= rx_shift[2:0];
                         state     <= ST_RD_ADDRLO;
                     end
 
