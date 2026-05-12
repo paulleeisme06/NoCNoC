@@ -12,10 +12,10 @@ module chip_core #(
     inout  wire VDD,
     inout  wire VSS,
     `endif
-
+    
     input  wire clk,       // clock
     input  wire rst_n,     // reset (active low)
-
+    
     input  wire [NUM_INPUT_PADS-1:0] input_in,   // Input value
     output wire [NUM_INPUT_PADS-1:0] input_pu,   // Pull-up
     output wire [NUM_INPUT_PADS-1:0] input_pd,   // Pull-down
@@ -32,117 +32,102 @@ module chip_core #(
     inout  wire [NUM_ANALOG_PADS-1:0] analog  // Analog
 );
 
-    // See: https://gf180mcu-pdk.readthedocs.io/en/latest/IPs/IO/gf180mcu_fd_io/digital.html
+    // See here for usage: https://gf180mcu-pdk.readthedocs.io/en/latest/IPs/IO/gf180mcu_fd_io/digital.html
+    
+    // Disable pull-up and pull-down for input
     assign input_pu = '0;
     assign input_pd = '0;
 
-    // bidir_out[0]   = host SPI MISO (driven by host_spi_slave below)
-    // bidir_out[3:1] = flash CS_N / CLK / MOSI (driven by mesh_3x3 outputs below)
-    assign bidir_oe = {{NUM_BIDIR_PADS-4{1'b0}}, 4'b1111};
+    // Set the bidir as output
+    assign bidir_out[0] = spi_miso;
+    assign bidir_oe = {{NUM_BIDIR_PADS-4{1'b0}}, 4'b1111};  // [3:1]=flash outputs, [0]=miso
     assign bidir_cs = '0;
     assign bidir_sl = '0;
     assign bidir_ie = ~bidir_oe;
     assign bidir_pu = '0;
     assign bidir_pd = '0;
-
+    
+    
     logic _unused;
-    assign _unused = &{bidir_in, input_in[3]};
+    assign _unused = &bidir_in;
 
-    // -----------------------------------------------------------------------
-    // Pad assignments
-    // input_in[0] = host SPI SCLK  (from host)
-    // input_in[1] = host SPI MOSI  (from host)
-    // input_in[2] = host SPI CSB   (from host, active-low)
-    // input_in[3] = spare
-    // input_in[4] = flash MISO     (from flash chip)
-    // bidir_out[0] = host SPI MISO (to host)
-    // bidir_out[1] = flash CS_N    (to flash chip)
-    // bidir_out[2] = flash CLK     (to flash chip)
-    // bidir_out[3] = flash MOSI    (to flash chip)
-    // -----------------------------------------------------------------------
-    wire spi_sclk = input_in[0];
+    // logic [NUM_BIDIR_PADS-1:0] count;
+
+    // always_ff @(posedge clk) begin
+    //     if (!rst_n) begin
+    //         count <= '0;
+    //     end else begin
+    //         if (&input_in) begin
+    //             count <= count + 1;
+    //         end
+    //     end
+    // end
+
+    // Ethan: SPI pad assignments and instantiation:
+
+    wire spi_clk  = input_in[0];
     wire spi_mosi = input_in[1];
-    wire spi_csb  = input_in[2];
-    wire spi_miso;   // driven by host_spi_slave, routed to bidir_out[0]
+    wire spi_cs_n = input_in[2];
+    wire dft_mode = input_in[3];
 
-    assign bidir_out[0] = spi_miso;
+    wire       dbg_req, dbg_we;
+    wire [3:0] dbg_tile_id;
+    wire [10:0] dbg_addr;
+    wire [7:0]  dbg_wdata;
+    wire [7:0]  dbg_rdata;
+    wire        dbg_ack;
+    wire        spi_miso;
 
-    // -----------------------------------------------------------------------
-    // host_spi_slave wires
-    // -----------------------------------------------------------------------
-    wire        host_rst, host_rst_en;
-    wire [10:0] sram_waddr;
-    wire  [7:0] sram_wdata;
-    wire        sram_wen;       // active-HIGH from host_spi_slave
-    wire  [3:0] sram_wtile;
-    wire        sram_wunicast;
-    wire  [3:0] rd_tile;
-    wire [10:0] rd_addr;
-    wire        rd_req;
-    wire  [7:0] rd_data;
-
-    // -----------------------------------------------------------------------
-    // Host SPI slave — receives commands from the external host over SPI.
-    // Provides broadcast/unicast SRAM writes, readback, and reset control.
-    // Uses flash_Sumi/host_spi_slave.v (11-bit addresses, CMD 0x00–0x03).
-    // -----------------------------------------------------------------------
-    host_spi_slave host_spi (
-        .sys_clk      (clk),
-        .sys_rst      (~rst_n),
-        .spi_csb      (spi_csb),
-        .spi_sclk     (spi_sclk),
-        .spi_mosi     (spi_mosi),
-        .spi_miso     (spi_miso),
-        .sram_waddr   (sram_waddr),
-        .sram_wdata   (sram_wdata),
-        .sram_wen     (sram_wen),
-        .sram_wtile   (sram_wtile),
-        .sram_wunicast(sram_wunicast),
-        .host_rst     (host_rst),
-        .host_rst_en  (host_rst_en),
-        .rd_tile      (rd_tile),
-        .rd_addr      (rd_addr),
-        .rd_req       (rd_req),
-        .rd_data      (rd_data)
+    spi_debug my_spi_debug (
+        .clk        (clk),
+        .rst        (~rst_n),
+        .spi_clk    (spi_clk),
+        .spi_cs_n   (spi_cs_n),
+        .spi_mosi   (spi_mosi),
+        .spi_miso   (spi_miso),
+        .dbg_req    (dbg_req),
+        .dbg_we     (dbg_we),
+        .dbg_tile_id(dbg_tile_id),
+        .dbg_addr   (dbg_addr),
+        .dbg_wdata  (dbg_wdata),
+        .dbg_rdata  (dbg_rdata),
+        .dbg_ack    (dbg_ack)
     );
 
-    // -----------------------------------------------------------------------
-    // 3×3 mesh — contains boot_controller (flash loader), 9 RISC-V tiles,
-    // and the host SRAM bus mux.  Flash pins go straight to pads.
-    //
-    // Polarity note: host_spi_slave.sram_wen is active-HIGH;
-    // mesh_3x3.host_sram_wen is active-LOW (matches boot_controller).
-    // -----------------------------------------------------------------------
+    reg dbg_ack_r;
+    always @(posedge clk) begin
+        if (!rst_n) begin
+            dbg_ack_r <= 1'b0;
+        end else begin
+            dbg_ack_r <= dbg_req & ~dbg_we;
+        end
+    end
+    assign dbg_ack = dbg_ack_r;
+
+    // Ethan: mesh 3x3 instantiation:
     mesh_3x3 u_mesh (
-        .clk                (clk),
-        .rst                (~rst_n),
-        .inject_00_nw       (34'b0),
-        .monitor_22_se      (),
+        .clk          (clk),
+        .rst          (~rst_n),
+        .inject_00_nw (34'b0),       // tie off unused NoC injection for now
+        .monitor_22_se(),
 
-        // Flash: MISO from input pad; CS_N/CLK/MOSI to bidir output pads
-        .flash_miso         (input_in[4]),
-        .flash_cs_n         (bidir_out[1]),
-        .flash_clk          (bidir_out[2]),
-        .flash_mosi         (bidir_out[3]),
+        // Flash boot pins — assign to remaining input/bidir pads
+        .flash_miso   (input_in[4]),
+        .flash_cs_n   (bidir_out[1]),
+        .flash_clk    (bidir_out[2]),
+        .flash_mosi   (bidir_out[3]),
 
-        // Host SRAM write bus (active-LOW wen)
-        .host_sram_addr     (sram_waddr),
-        .host_sram_data     (sram_wdata),
-        .host_sram_wen      (~sram_wen),
-        .host_sram_wtile    (sram_wtile),
-        .host_sram_wunicast (sram_wunicast),
-        .host_rst           (host_rst_en & host_rst),
-
-        // Host readback
-        .rd_tile            (rd_tile),
-        .rd_addr            (rd_addr),
-        .rd_req             (rd_req),
-        .rd_data            (rd_data)
+        // DFT
+        .dft_mode     (dft_mode),
+        .dft_tile_id  (dbg_tile_id),
+        .dft_we       (dbg_we & dbg_req),
+        .dft_addr     (dbg_addr),
+        .dft_wdata    (dbg_wdata),
+        .dft_rdata    (dbg_rdata)
     );
 
-    // Chip ID - do not remove, necessary for tapeout
-    (* keep *)
-    gf180mcu_ws_ip__id chip_id ();
+    
+
 
 endmodule
 
