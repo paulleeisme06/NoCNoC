@@ -101,17 +101,140 @@ module chip_core #(
     assign _unused = &{bidir_in, analog};
 
     // -------------------------------------------------------------------------
-    // mesh_3x3 — 3x3 grid of SERV RISC-V cores
+    // mesh_rxc — 5x5 grid of SERV RISC-V cores (contains the boot_controller)
+    // Its flash SPI signals are routed through spi_arbiter (below) so the
+    // housekeeping subsystem can be muxed onto the same flash bus.
     // -------------------------------------------------------------------------
+    wire mesh_flash_cs_n, mesh_flash_clk, mesh_flash_mosi;
+    wire boot_flash_miso;  // MISO going back to mesh's boot_controller
     mesh_rxc u_mesh (
         .clk          (clk),
         .rst          (~rst_n),
         .inject_00_nw (36'b0),
         .monitor_se(monitor_out),
-        .flash_miso   (flash_miso),
-        .flash_cs_n   (flash_cs_n),
-        .flash_clk    (flash_clk),
-        .flash_mosi   (flash_mosi_out)
+        .flash_miso   (boot_flash_miso),
+        .flash_cs_n   (mesh_flash_cs_n),
+        .flash_clk    (mesh_flash_clk),
+        .flash_mosi   (mesh_flash_mosi)
+    );
+
+    // -------------------------------------------------------------------------
+    // Flash housekeeping subsystem (flash_Sumi/)
+    //
+    //   shiftregister  -> housekeeping_fsm -> hk_boot_adapter (Wishbone path)
+    //                          |
+    //   flash_clk      -> SPI clock for HK side of spi_arbiter
+    //
+    // spi_arbiter muxes mesh_rxc.boot_controller's flash SPI with the
+    // housekeeping SPI to the physical flash pads. cpu_rst_n is tied 1'b0 so
+    // boot_controller always wins the bus (mesh_rxc doesn't expose its
+    // internal cpu_reset_n today); the HK chain is still synthesized.
+    // -------------------------------------------------------------------------
+    wire        hk_csb;
+    wire        hk_clk_spi;
+    wire        hk_mosi = 1'b0;       // HK is read-only; no MOSI payload
+    wire        hk_flash_miso;
+    wire        hk_fetch_o;
+    wire        hk_word_ready;
+    wire [31:0] hk_shifted_word;
+    wire        hk_fetch_en;
+    wire [31:0] hk_wbs_adr;
+    wire [31:0] hk_wbs_dat;
+    wire        hk_wbs_cyc;
+    wire        hk_wbs_stb;
+    wire        hk_wbs_we;
+    wire        hk_wbs_ack;
+    wire        hk_done_loading;
+    wire [9:0]  hk_boot_addr;
+    wire [7:0]  hk_boot_data;
+    wire        hk_boot_wen;
+
+    spi_arbiter u_spi_arb (
+        .boot_csb   (mesh_flash_cs_n),
+        .boot_clk   (mesh_flash_clk),
+        .boot_mosi  (mesh_flash_mosi),
+        .boot_miso  (boot_flash_miso),
+        .hk_csb     (hk_csb),
+        .hk_clk     (hk_clk_spi),
+        .hk_mosi    (hk_mosi),
+        .hk_miso    (hk_flash_miso),
+        .flash_csb  (flash_cs_n),
+        .flash_clk  (flash_clk),
+        .flash_mosi (flash_mosi_out),
+        .flash_miso (flash_miso),
+        .cpu_rst_n  (1'b0)
+    );
+
+    flash_clk u_flash_clk (
+        .clk      (clk),
+        .reset    (~rst_n),
+        .enable   (~hk_csb),
+        .flash_clk(hk_clk_spi)
+    );
+
+    shiftregister u_shiftreg (
+        .clk         (clk),
+        .reset       (~rst_n),
+        .serial_in   (hk_flash_miso),
+        .shift_en    (~hk_csb),
+        .fetch_o     (hk_fetch_o),
+        .shifted_word(hk_shifted_word),
+        .done_word   (hk_word_ready)
+    );
+
+    housekeeping_fsm u_hk_fsm (
+        .clk         (clk),
+        .reset       (~rst_n),
+        .bypass_en   (1'b0),
+        .word_ready  (hk_word_ready),
+        .shifted_word(hk_shifted_word),
+        .fetch_en    (hk_fetch_en),
+        .fetch_o     (hk_fetch_o),
+        .flash_csb   (hk_csb),
+        .wbs_adr     (hk_wbs_adr),
+        .wbs_dat     (hk_wbs_dat),
+        .wbs_cyc     (hk_wbs_cyc),
+        .wbs_stb     (hk_wbs_stb),
+        .wbs_we      (hk_wbs_we),
+        .wbs_ack     (hk_wbs_ack),
+        .done_loading(hk_done_loading)
+    );
+
+    hk_boot_adapter u_hk_boot_adapter (
+        .clk      (clk),
+        .rst      (~rst_n),
+        .wbs_adr  (hk_wbs_adr),
+        .wbs_dat  (hk_wbs_dat),
+        .wbs_cyc  (hk_wbs_cyc),
+        .wbs_stb  (hk_wbs_stb),
+        .wbs_we   (hk_wbs_we),
+        .wbs_ack  (hk_wbs_ack),
+        .boot_addr(hk_boot_addr),
+        .boot_data(hk_boot_data),
+        .boot_wen (hk_boot_wen)
+    );
+
+    // -------------------------------------------------------------------------
+    // rd_crossbar — readback crossbar (designed for a 3x3 mesh, 9 tiles).
+    // The current mesh is 5x5 and exposes no per-tile readback ports, so the
+    // 9 tile data inputs are tied to 0 and the crossbar's tile addr/req
+    // outputs dangle. Its rd_data drives dbg_rdata back into spi_debug.
+    // -------------------------------------------------------------------------
+    rd_crossbar u_rd_crossbar (
+        .clk            (clk),
+        .rd_tile        (dbg_tile_id),
+        .rd_addr        (dbg_addr[9:0]),
+        .rd_req         (dbg_req),
+        .rd_data        (dbg_rdata),
+        .tile_rd_addr_0 (), .tile_rd_addr_1 (), .tile_rd_addr_2 (),
+        .tile_rd_addr_3 (), .tile_rd_addr_4 (), .tile_rd_addr_5 (),
+        .tile_rd_addr_6 (), .tile_rd_addr_7 (), .tile_rd_addr_8 (),
+        .tile_rd_req_0  (), .tile_rd_req_1  (), .tile_rd_req_2  (),
+        .tile_rd_req_3  (), .tile_rd_req_4  (), .tile_rd_req_5  (),
+        .tile_rd_req_6  (), .tile_rd_req_7  (), .tile_rd_req_8  (),
+        .tile_rd_data_0 (8'b0), .tile_rd_data_1 (8'b0), .tile_rd_data_2 (8'b0),
+        .tile_rd_data_3 (8'b0), .tile_rd_data_4 (8'b0), .tile_rd_data_5 (8'b0),
+        .tile_rd_data_6 (8'b0), .tile_rd_data_7 (8'b0), .tile_rd_data_8 (8'b0)
     );
 
     // -------------------------------------------------------------------------
@@ -141,7 +264,6 @@ module chip_core #(
     // -------------------------------------------------------------------------
     // spi_debug — DFT interface (Ethan)
     // -------------------------------------------------------------------------
-    assign dbg_rdata = 8'b0; // mesh_rxc has no DFT readback yet
     spi_debug my_spi_debug (
         .clk        (clk),
         .rst        (~rst_n),

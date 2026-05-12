@@ -34,6 +34,12 @@ VERILOG_FILES:
 - dir::../src/mesh_psi_aan/mesh_router.v
 - dir::../src/mesh_psi_aan/boot_controller.v
 - dir::../src/host-to-chip - Paul&Andrea/host_to_chip.v
+- dir::../src/flash_Sumi/flash_clk.sv
+- dir::../src/flash_Sumi/hk_boot_adapter.v
+- dir::../src/flash_Sumi/housekeeping.sv
+- dir::../src/flash_Sumi/rd_crossbar.v
+- dir::../src/flash_Sumi/shiftregister.sv
+- dir::../src/flash_Sumi/spi_arbiter.v
 - dir::../src/subservient/rtl/subservient_core.v
 - dir::../src/subservient/rtl/subservient_rf_ram_if.v
 - dir::../src/subservient/rtl/subservient_ram.v

@@ -193,17 +193,13 @@ add_pdn_connect \
     -grid macro \
     -layers "$::env(PDN_VERTICAL_LAYER) $::env(PDN_HORIZONTAL_LAYER)"
 
-# SRAM macros (gf180mcu_ocd_ip_sram__sram1024x8m8wm1) expose VDD/VSS pins on
-# Metal1/Metal2/Metal3 only. PDN straps run on Metal4 (vertical) / Metal5
-# (horizontal), so we need a via stack down to Metal3 to reach the pins.
+# SRAM macros (gf180mcu_ocd_ip_sram__sram1024x8m8wm1) expose VDD/VSS pin
+# geometry on Metal3 (the topmost available pin layer). PDN straps run on
+# Metal4 (vertical), so add a Metal4↔Metal3 connect for the macro grid so
+# straps can step down to reach the pins.
+# Do NOT add Metal3↔Metal2 / Metal2↔Metal1 here: those layers contain the
+# macro's internal routing, and extra connect rules cause OpenROAD to lay
+# down overlapping via stacks that trigger via width/spacing DRC errors.
 add_pdn_connect \
     -grid macro \
     -layers "$::env(PDN_VERTICAL_LAYER) $::env(PDN_CORE_HORIZONTAL_LAYER)"
-
-add_pdn_connect \
-    -grid macro \
-    -layers "$::env(PDN_CORE_HORIZONTAL_LAYER) $::env(PDN_CORE_VERTICAL_LAYER)"
-
-add_pdn_connect \
-    -grid macro \
-    -layers "$::env(PDN_CORE_VERTICAL_LAYER) $::env(PDN_RAIL_LAYER)"
