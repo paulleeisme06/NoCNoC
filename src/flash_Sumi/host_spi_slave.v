@@ -6,14 +6,12 @@
 //
 // Command protocol (all MSB-first, one transaction per CS assertion):
 //
-//  CMD 0x00  WRITE_SRAM — write one byte to all 9 tile SRAMs simultaneously
+//  CMD 0x00  WRITE_SRAM — write one byte to selected tile SRAMs
 //    Byte 0 : 0x00
 //    Byte 1 : addr[10:8]  (upper 3 bits of 11-bit SRAM address)
 //    Byte 2 : addr[7:0]   (lower 8 bits)
 //    Byte 3 : data[7:0]   (byte to write)
-//    → pulses sram_wen for one sys_clk, drives sram_waddr / sram_wdata
-//      All 9 tiles share the same boot_addr/boot_data/boot_wen bus so they
-//      all receive the same write simultaneously (matches boot_controller).
+//    → pulses sram_wen for one sys_clk; tile_mask determines which tiles write
 //
 //  CMD 0x02  READ_RESULT — read one byte from one tile's SRAM
 //    Byte 0 : 0x02
@@ -27,6 +25,13 @@
 //    Byte 1 : 0xFF = assert reset (hold cores)
 //             0x00 = release reset (let cores run)
 //
+//  CMD 0x04  SET_TILE — set sticky tile-mask (persists until changed)
+//    Byte 0 : 0x04
+//    Byte 1 : row  (0–2; 0xFF = broadcast all tiles)
+//    Byte 2 : col  (0–2; ignored when row == 0xFF)
+//    Mask bit layout: bit (row*3+col) enables tile(row,col)
+//    Default on reset: 9'h1FF (all tiles = broadcast)
+//
 // ============================================================================
 
 module host_spi_slave (
@@ -39,10 +44,11 @@ module host_spi_slave (
     input  wire        spi_mosi,
     output reg         spi_miso,
 
-    // Broadcast SRAM write bus (connects to same bus as boot_controller)
+    // SRAM write bus (connects to same bus as boot_controller)
     output reg  [10:0] sram_waddr,    // 11-bit: matches 2048×8 SRAM; addr[10:8] from byte 1
     output reg  [7:0]  sram_wdata,
     output reg         sram_wen,      // active-high, one sys_clk pulse
+    output reg  [8:0]  tile_mask,     // sticky per-tile write enable (bit r*3+c); default all ones
 
     // CPU reset override
     output reg         host_rst,      // 1 = hold cores in reset
@@ -137,9 +143,12 @@ module host_spi_slave (
     localparam ST_RD_SEND    = 4'd10;
     localparam ST_RST_ARG    = 4'd11;
     localparam ST_DONE       = 4'd12;
+    localparam ST_SEL_ROW    = 4'd13;
+    localparam ST_SEL_COL    = 4'd14;
 
     reg [3:0] state;
     reg [2:0] addr_hi_r;   // holds addr[10:8] (3 bits for 11-bit SRAM)
+    reg [7:0] sel_row_r;   // holds row byte for CMD 0x04
 
     always @(posedge sys_clk) begin
         sram_wen <= 1'b0;
@@ -154,6 +163,7 @@ module host_spi_slave (
             sram_wdata  <= 8'h0;
             rd_tile     <= 4'h0;
             rd_addr     <= 11'h0;
+            tile_mask   <= 9'h1FF;
         end else if (cs_deassert) begin
             state <= ST_IDLE;
         end else begin
@@ -168,6 +178,7 @@ module host_spi_slave (
                             8'h00:   state <= ST_WR_ADDRHI;
                             8'h02:   state <= ST_RD_TILE;
                             8'h03:   state <= ST_RST_ARG;
+                            8'h04:   state <= ST_SEL_ROW;
                             default: state <= ST_DONE;
                         endcase
                     end
@@ -232,6 +243,34 @@ module host_spi_slave (
                         host_rst_en <= 1'b1;
                         host_rst    <= (rx_shift == 8'hFF);
                         state       <= ST_DONE;
+                    end
+
+                // ---- SET_TILE ----
+                ST_SEL_ROW:
+                    if (rx_byte_rdy) begin
+                        sel_row_r <= rx_shift;
+                        state     <= ST_SEL_COL;
+                    end
+
+                ST_SEL_COL:
+                    if (rx_byte_rdy) begin
+                        if (sel_row_r == 8'hFF) begin
+                            tile_mask <= 9'h1FF;  // broadcast
+                        end else begin
+                            case ({sel_row_r[1:0], rx_shift[1:0]})
+                                4'b0000: tile_mask <= 9'b0_0000_0001; // (0,0)
+                                4'b0001: tile_mask <= 9'b0_0000_0010; // (0,1)
+                                4'b0010: tile_mask <= 9'b0_0000_0100; // (0,2)
+                                4'b0100: tile_mask <= 9'b0_0000_1000; // (1,0)
+                                4'b0101: tile_mask <= 9'b0_0001_0000; // (1,1)
+                                4'b0110: tile_mask <= 9'b0_0010_0000; // (1,2)
+                                4'b1000: tile_mask <= 9'b0_0100_0000; // (2,0)
+                                4'b1001: tile_mask <= 9'b0_1000_0000; // (2,1)
+                                4'b1010: tile_mask <= 9'b1_0000_0000; // (2,2)
+                                default: tile_mask <= 9'h1FF;          // invalid → broadcast
+                            endcase
+                        end
+                        state <= ST_DONE;
                     end
 
                 ST_DONE: ; // wait for CS deassert
