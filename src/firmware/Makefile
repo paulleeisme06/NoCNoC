@@ -38,7 +38,7 @@ LDFLAGS = -T $(LINKER) -nostdlib
 ########################################
 TOPLEVEL_LANG = verilog
 TOPLEVEL      = mesh_rxc
-MODULE        = test_mesh
+MODULE        = test_snake
 SIM           = verilator
 
 export TOPLEVEL_LANG
@@ -73,6 +73,8 @@ COMPILE_ARGS = --timing \
 	-Wno-MINTYPMAXDLY \
 	--trace \
 	--trace-depth 6\
+	-GMESH_R=5 \
+	-GMESH_C=5 \
 	--no-trace-params
 
 SIM_ARGS = --trace --trace-file sim_build/dump.fst

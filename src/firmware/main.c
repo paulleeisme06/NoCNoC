@@ -28,8 +28,8 @@
 // ============================================================================
 // Mesh configuration — must match mesh_3x3.v
 // ============================================================================
-#define MESH_R  3
-#define MESH_C  3
+#define MESH_R  5
+#define MESH_C  5
 
 // ============================================================================
 // NoC memory-mapped registers
@@ -38,9 +38,8 @@
 #define NOC_RECV_BASE    0x80000004u
 #define NOC_ID_BASE      0x80000008u
 
-// TILE_ID encoding: row in [3:2], col in [1:0]  — matches mesh_router.v
-//   parameter [3:0] MY_ID,  wire [1:0] my_row = MY_ID[3:2],  my_col = MY_ID[1:0]
-#define TILE_ID(r, c)   ((((uint32_t)(r)) << 2) | ((uint32_t)(c)))
+// TILE_ID encoding: row in [5:3], col in [2:0]  — matches mesh_router.v
+#define TILE_ID(r, c)   ((((uint32_t)(r) & 0x7u) << 3) | ((uint32_t)(c) & 0x7u))
 
 // Flit layout (matches mesh_router.v inject path):
 //   CPU writes a 32-bit word to 0x80000000.
@@ -49,14 +48,13 @@
 //     [32:29] = word[31:28]  → dest TILE_ID (4 bits)
 //     [28:0]  = word[28:0]   → payload
 //
-//   Inject word layout:
-//     [31:28]  dest TILE_ID (4 bits) — consumed by router, NOT in payload
+//     [31:26]  dest TILE_ID (6 bits) — consumed by router, NOT in payload
 //     [28:0]   payload delivered to receiver FIFO ({3'b0, flit[28:0]})
 //
 // TOKEN_VALID_BIT must live inside payload[28:0] and must NOT overlap
-// bits [31:28] (the dest field).  Bit 16 is safe.
-#define FLIT_DEST_SHIFT  28u
-#define TOKEN_VALID_BIT  (1u << 16)   // sentinel: bit 16, safely inside payload
+// bits [31:26] (the dest field).  Bit 10 is safe.
+#define FLIT_DEST_SHIFT  26u
+#define TOKEN_VALID_BIT  (1u << 10)   // sentinel: bit 10, safely inside payload
 
 // ============================================================================
 // Debug memory map  (byte addresses inside the 2 KB SRAM)
@@ -90,10 +88,10 @@
 // ============================================================================
 static inline void noc_send(uint32_t dest_id, uint32_t payload)
 {
-    // dest_id is 4 bits, shifted to [31:28].
-    // payload must fit in [27:0] — TOKEN_VALID_BIT (bit 16) is safely below bit 28.
+    // dest_id is 6 bits, shifted to [31:26].
+    // payload must fit in [25:0] to avoid overlapping dest_id in [28:26].
     *(volatile uint32_t *)NOC_INJECT_BASE =
-        (dest_id << FLIT_DEST_SHIFT) | TOKEN_VALID_BIT | (payload & 0x0FFFFFFFu);
+        (dest_id << FLIT_DEST_SHIFT) | TOKEN_VALID_BIT | (payload & 0x03FFFFFFu);
 }
 
 // Block-poll until we receive a flit with TOKEN_VALID_BIT set.
@@ -109,7 +107,7 @@ static inline uint32_t noc_recv_token(void)
 
 static inline uint32_t noc_read_my_id(void)
 {
-    return *(volatile uint32_t *)NOC_ID_BASE & 0xFu;  // 4-bit TILE_ID
+    return *(volatile uint32_t *)NOC_ID_BASE & 0x3Fu;  // 6-bit TILE_ID
 }
 
 // ============================================================================
@@ -179,9 +177,9 @@ void _start(void)
 int main(void)
 {
     uint32_t my_id  = noc_read_my_id();
-    // 4-bit ID: row = MY_ID[3:2], col = MY_ID[1:0]
-    int      my_row = (int)((my_id >> 2) & 0x3u);
-    int      my_col = (int)(my_id & 0x3u);
+    // 6-bit ID: row = MY_ID[5:3], col = MY_ID[2:0]
+    int      my_row = (int)((my_id >> 3) & 0x7u);
+    int      my_col = (int)(my_id & 0x7u);
 
     *dbg_my_id = my_id;
 

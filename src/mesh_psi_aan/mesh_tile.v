@@ -140,7 +140,7 @@ module mesh_tile #(
     // Debug: SRAM write monitor — tile 1
     // -------------------------------------------------------------------------
     always @(posedge clk) begin
-        if (!boot_mode && sram_wen && final_d != 8'h00 && TILE_ID == 1) begin
+        if (!boot_mode && sram_wen && final_d != 8'h00 && TILE_ID == 0) begin
             $display("[SRAM t=%0t] MY_ID=%0d WRITE addr=0x%03x data=0x%02x",
                      $time, TILE_ID, final_a, final_d);
         end
@@ -152,7 +152,7 @@ module mesh_tile #(
     reg [10:0] prev_raddr_t1;
     reg        prev_rvalid_t1;
     always @(posedge clk) begin
-        if (!boot_mode && TILE_ID == 1) begin
+        if (!boot_mode && TILE_ID == 0) begin
             prev_raddr_t1  <= final_a;
             prev_rvalid_t1 <= !sram_wen;
         end else begin
