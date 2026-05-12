@@ -191,6 +191,50 @@ module mesh_router #(
     // -------------------------------------------------------------------------
     // Output registers + debug logging (simulation only)
     // -------------------------------------------------------------------------
+    // ── TILE(0,0) transit & misroute monitor ─────────────────────────────────
+    // Shows every flit that passes THROUGH tile (0,0) without being ejected,
+    // and flags any ghost flit that is being forwarded instead of ejected
+    // (which would indicate a destination ID mismatch / routing bug).
+    // Combinatorial — fires in the same always @(*) evaluation window.
+    always @(*) begin
+        if (MY_ID == 0) begin
+            // South-bound transit (heading to row 1 or 2)
+            if (next_s[33])
+                $display("[TRANSIT t=%0t] TILE(0,0) ->S  dest=%0d bmap=0x%03x bit10=%0b raw=0x%09x",
+                         $time, {next_s[32:29]}, next_s[9:0], next_s[10], next_s);
+            // East-bound transit (heading to col 1 or 2)
+            if (next_e[33])
+                $display("[TRANSIT t=%0t] TILE(0,0) ->E  dest=%0d bmap=0x%03x bit10=%0b raw=0x%09x",
+                         $time, {next_e[32:29]}, next_e[9:0], next_e[10], next_e);
+            // SE diagonal transit
+            if (next_se[33])
+                $display("[TRANSIT t=%0t] TILE(0,0) ->SE dest=%0d bmap=0x%03x bit10=%0b raw=0x%09x",
+                         $time, {next_se[32:29]}, next_se[9:0], next_se[10], next_se);
+            // Ghost flit being forwarded instead of ejected — this is a bug
+            if (next_s[33]  && next_s[10])
+                $display("[MISROUTE t=%0t] TILE(0,0) ghost going ->S  dest=%0d (expected dest=0) raw=0x%09x",
+                         $time, {next_s[32:29]}, next_s);
+            if (next_e[33]  && next_e[10])
+                $display("[MISROUTE t=%0t] TILE(0,0) ghost going ->E  dest=%0d (expected dest=0) raw=0x%09x",
+                         $time, {next_e[32:29]}, next_e);
+            if (next_se[33] && next_se[10])
+                $display("[MISROUTE t=%0t] TILE(0,0) ghost going ->SE dest=%0d (expected dest=0) raw=0x%09x",
+                         $time, {next_se[32:29]}, next_se);
+            if (MY_ID == 0 && cpu_read) begin
+                $display("[RD1 t=%0t] ID=0 reading FIFO head=0x%08x empty=%b",
+                        $time, fifo_head_comb[28:0], fifo_empty);
+            end
+            if (MY_ID == 1 && cpu_read) begin
+                $display("[RD1 t=%0t] ID=1 reading FIFO head=0x%08x empty=%b",
+                        $time, fifo_head_comb[28:0], fifo_empty);
+            end
+            if (MY_ID == 2 && cpu_read) begin
+                $display("[RD1 t=%0t] ID=2 reading FIFO head=0x%08x empty=%b",
+                        $time, fifo_head_comb[28:0], fifo_empty);
+            end
+        end
+    end
+
     always @(posedge clk) begin
         if (rst) begin
             {n_out, s_out, e_out, w_out,

@@ -72,7 +72,8 @@ COMPILE_ARGS = --timing \
 	-Wno-MODDUP \
 	-Wno-MINTYPMAXDLY \
 	--trace \
-	--trace-depth 6
+	--trace-depth 6\
+	--no-trace-params
 
 SIM_ARGS = --trace --trace-file sim_build/dump.fst
 

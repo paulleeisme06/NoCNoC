@@ -1,0 +1,9 @@
+{
+    "json_h": "/home/etcfranc/NoCNoC/librelane/noc_tile/runs/RUN_2026-05-08_18-38-35/05-yosys-jsonheader/mesh_tile.h.json",
+    "metrics": {
+        "design__lint_error__count": 0,
+        "design__lint_timing_construct__count": 0,
+        "design__lint_warning__count": 147,
+        "design__inferred_latch__count": 0
+    }
+}

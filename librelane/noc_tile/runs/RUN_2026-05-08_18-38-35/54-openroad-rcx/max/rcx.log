@@ -1,0 +1,337 @@
+Reading technology LEF file at '/home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_as_sc_mcu7t3v3/techlef/gf180mcu_as_sc_mcu7t3v3__max.tlef'…
+[INFO ODB-0388] unsupported LEF58_EOLENCLOSURE property for layer Via1 :"
+  	EOLENCLOSURE 0.34 0.06 ;"
+[INFO ODB-0388] unsupported LEF58_EOLENCLOSURE property for layer Via2 :" EOLENCLOSURE 0.34 0.06 ; "
+[INFO ODB-0388] unsupported LEF58_EOLENCLOSURE property for layer Via3 :" EOLENCLOSURE 0.34 0.06 ; "
+[INFO ODB-0388] unsupported LEF58_EOLENCLOSURE property for layer Via4 :" EOLENCLOSURE 0.34 0.06 ; "
+[INFO ODB-0227] LEF file: /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_as_sc_mcu7t3v3/techlef/gf180mcu_as_sc_mcu7t3v3__max.tlef, created 15 layers, 56 vias
+Making fake IO site GF_IO_Site…
+Making fake IO site GF_COR_Site…
+Reading cell LEF file at '/home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_as_sc_mcu7t3v3/lef/gf180mcu_as_sc_mcu7t3v3.lef'…
+[WARNING ODB-0220] WARNING (LEFPARS-2008): NOWIREEXTENSIONATPIN statement is obsolete in version 5.6 or later.
+The NOWIREEXTENSIONATPIN statement will be ignored. See file /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_as_sc_mcu7t3v3/lef/gf180mcu_as_sc_mcu7t3v3.lef at line 2.
+
+[WARNING ODB-0220] WARNING (LEFPARS-2008): NOWIREEXTENSIONATPIN statement is obsolete in version 5.6 or later.
+The NOWIREEXTENSIONATPIN statement will be ignored. See file /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_as_sc_mcu7t3v3/lef/gf180mcu_as_sc_mcu7t3v3.lef at line 92.
+
+[WARNING ODB-0220] WARNING (LEFPARS-2008): NOWIREEXTENSIONATPIN statement is obsolete in version 5.6 or later.
+The NOWIREEXTENSIONATPIN statement will be ignored. See file /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_as_sc_mcu7t3v3/lef/gf180mcu_as_sc_mcu7t3v3.lef at line 188.
+
+[WARNING ODB-0220] WARNING (LEFPARS-2008): NOWIREEXTENSIONATPIN statement is obsolete in version 5.6 or later.
+The NOWIREEXTENSIONATPIN statement will be ignored. See file /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_as_sc_mcu7t3v3/lef/gf180mcu_as_sc_mcu7t3v3.lef at line 303.
+
+[WARNING ODB-0220] WARNING (LEFPARS-2008): NOWIREEXTENSIONATPIN statement is obsolete in version 5.6 or later.
+The NOWIREEXTENSIONATPIN statement will be ignored. See file /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_as_sc_mcu7t3v3/lef/gf180mcu_as_sc_mcu7t3v3.lef at line 424.
+
+[WARNING ODB-0220] WARNING (LEFPARS-2008): NOWIREEXTENSIONATPIN statement is obsolete in version 5.6 or later.
+The NOWIREEXTENSIONATPIN statement will be ignored. See file /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_as_sc_mcu7t3v3/lef/gf180mcu_as_sc_mcu7t3v3.lef at line 528.
+
+[WARNING ODB-0220] WARNING (LEFPARS-2008): NOWIREEXTENSIONATPIN statement is obsolete in version 5.6 or later.
+The NOWIREEXTENSIONATPIN statement will be ignored. See file /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_as_sc_mcu7t3v3/lef/gf180mcu_as_sc_mcu7t3v3.lef at line 638.
+
+[WARNING ODB-0220] WARNING (LEFPARS-2008): NOWIREEXTENSIONATPIN statement is obsolete in version 5.6 or later.
+The NOWIREEXTENSIONATPIN statement will be ignored. See file /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_as_sc_mcu7t3v3/lef/gf180mcu_as_sc_mcu7t3v3.lef at line 754.
+
+[WARNING ODB-0220] WARNING (LEFPARS-2008): NOWIREEXTENSIONATPIN statement is obsolete in version 5.6 or later.
+The NOWIREEXTENSIONATPIN statement will be ignored. See file /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_as_sc_mcu7t3v3/lef/gf180mcu_as_sc_mcu7t3v3.lef at line 876.
+
+[WARNING ODB-0220] WARNING (LEFPARS-2008): NOWIREEXTENSIONATPIN statement is obsolete in version 5.6 or later.
+The NOWIREEXTENSIONATPIN statement will be ignored. See file /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_as_sc_mcu7t3v3/lef/gf180mcu_as_sc_mcu7t3v3.lef at line 987.
+
+[WARNING ODB-0220] WARNING (LEFPARS-2008): NOWIREEXTENSIONATPIN statement is obsolete in version 5.6 or later.
+The NOWIREEXTENSIONATPIN statement will be ignored. See file /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_as_sc_mcu7t3v3/lef/gf180mcu_as_sc_mcu7t3v3.lef at line 1104.
+
+[WARNING ODB-0220] WARNING (LEFPARS-2008): NOWIREEXTENSIONATPIN statement is obsolete in version 5.6 or later.
+The NOWIREEXTENSIONATPIN statement will be ignored. See file /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_as_sc_mcu7t3v3/lef/gf180mcu_as_sc_mcu7t3v3.lef at line 1216.
+
+[WARNING ODB-0220] WARNING (LEFPARS-2008): NOWIREEXTENSIONATPIN statement is obsolete in version 5.6 or later.
+The NOWIREEXTENSIONATPIN statement will be ignored. See file /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_as_sc_mcu7t3v3/lef/gf180mcu_as_sc_mcu7t3v3.lef at line 1334.
+
+[WARNING ODB-0220] WARNING (LEFPARS-2008): NOWIREEXTENSIONATPIN statement is obsolete in version 5.6 or later.
+The NOWIREEXTENSIONATPIN statement will be ignored. See file /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_as_sc_mcu7t3v3/lef/gf180mcu_as_sc_mcu7t3v3.lef at line 1451.
+
+[WARNING ODB-0220] WARNING (LEFPARS-2008): NOWIREEXTENSIONATPIN statement is obsolete in version 5.6 or later.
+The NOWIREEXTENSIONATPIN statement will be ignored. See file /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_as_sc_mcu7t3v3/lef/gf180mcu_as_sc_mcu7t3v3.lef at line 1588.
+
+[WARNING ODB-0220] WARNING (LEFPARS-2008): NOWIREEXTENSIONATPIN statement is obsolete in version 5.6 or later.
+The NOWIREEXTENSIONATPIN statement will be ignored. See file /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_as_sc_mcu7t3v3/lef/gf180mcu_as_sc_mcu7t3v3.lef at line 1691.
+
+[WARNING ODB-0220] WARNING (LEFPARS-2008): NOWIREEXTENSIONATPIN statement is obsolete in version 5.6 or later.
+The NOWIREEXTENSIONATPIN statement will be ignored. See file /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_as_sc_mcu7t3v3/lef/gf180mcu_as_sc_mcu7t3v3.lef at line 1802.
+
+[WARNING ODB-0220] WARNING (LEFPARS-2008): NOWIREEXTENSIONATPIN statement is obsolete in version 5.6 or later.
+The NOWIREEXTENSIONATPIN statement will be ignored. See file /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_as_sc_mcu7t3v3/lef/gf180mcu_as_sc_mcu7t3v3.lef at line 1912.
+
+[WARNING ODB-0220] WARNING (LEFPARS-2008): NOWIREEXTENSIONATPIN statement is obsolete in version 5.6 or later.
+The NOWIREEXTENSIONATPIN statement will be ignored. See file /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_as_sc_mcu7t3v3/lef/gf180mcu_as_sc_mcu7t3v3.lef at line 2030.
+
+[WARNING ODB-0220] WARNING (LEFPARS-2008): NOWIREEXTENSIONATPIN statement is obsolete in version 5.6 or later.
+The NOWIREEXTENSIONATPIN statement will be ignored. See file /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_as_sc_mcu7t3v3/lef/gf180mcu_as_sc_mcu7t3v3.lef at line 2147.
+
+[WARNING ODB-0220] WARNING (LEFPARS-2008): NOWIREEXTENSIONATPIN statement is obsolete in version 5.6 or later.
+The NOWIREEXTENSIONATPIN statement will be ignored. See file /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_as_sc_mcu7t3v3/lef/gf180mcu_as_sc_mcu7t3v3.lef at line 2269.
+
+[WARNING ODB-0220] WARNING (LEFPARS-2008): NOWIREEXTENSIONATPIN statement is obsolete in version 5.6 or later.
+The NOWIREEXTENSIONATPIN statement will be ignored. See file /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_as_sc_mcu7t3v3/lef/gf180mcu_as_sc_mcu7t3v3.lef at line 2393.
+
+[WARNING ODB-0220] WARNING (LEFPARS-2008): NOWIREEXTENSIONATPIN statement is obsolete in version 5.6 or later.
+The NOWIREEXTENSIONATPIN statement will be ignored. See file /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_as_sc_mcu7t3v3/lef/gf180mcu_as_sc_mcu7t3v3.lef at line 2521.
+
+[WARNING ODB-0220] WARNING (LEFPARS-2008): NOWIREEXTENSIONATPIN statement is obsolete in version 5.6 or later.
+The NOWIREEXTENSIONATPIN statement will be ignored. See file /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_as_sc_mcu7t3v3/lef/gf180mcu_as_sc_mcu7t3v3.lef at line 2633.
+
+[WARNING ODB-0220] WARNING (LEFPARS-2008): NOWIREEXTENSIONATPIN statement is obsolete in version 5.6 or later.
+The NOWIREEXTENSIONATPIN statement will be ignored. See file /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_as_sc_mcu7t3v3/lef/gf180mcu_as_sc_mcu7t3v3.lef at line 2713.
+
+[WARNING ODB-0220] WARNING (LEFPARS-2008): NOWIREEXTENSIONATPIN statement is obsolete in version 5.6 or later.
+The NOWIREEXTENSIONATPIN statement will be ignored. See file /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_as_sc_mcu7t3v3/lef/gf180mcu_as_sc_mcu7t3v3.lef at line 2799.
+
+[WARNING ODB-0220] WARNING (LEFPARS-2008): NOWIREEXTENSIONATPIN statement is obsolete in version 5.6 or later.
+The NOWIREEXTENSIONATPIN statement will be ignored. See file /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_as_sc_mcu7t3v3/lef/gf180mcu_as_sc_mcu7t3v3.lef at line 2899.
+
+[WARNING ODB-0220] WARNING (LEFPARS-2008): NOWIREEXTENSIONATPIN statement is obsolete in version 5.6 or later.
+The NOWIREEXTENSIONATPIN statement will be ignored. See file /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_as_sc_mcu7t3v3/lef/gf180mcu_as_sc_mcu7t3v3.lef at line 3011.
+
+[WARNING ODB-0220] WARNING (LEFPARS-2008): NOWIREEXTENSIONATPIN statement is obsolete in version 5.6 or later.
+The NOWIREEXTENSIONATPIN statement will be ignored. See file /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_as_sc_mcu7t3v3/lef/gf180mcu_as_sc_mcu7t3v3.lef at line 3097.
+
+[WARNING ODB-0220] WARNING (LEFPARS-2008): NOWIREEXTENSIONATPIN statement is obsolete in version 5.6 or later.
+The NOWIREEXTENSIONATPIN statement will be ignored. See file /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_as_sc_mcu7t3v3/lef/gf180mcu_as_sc_mcu7t3v3.lef at line 3197.
+
+[WARNING ODB-0220] WARNING (LEFPARS-2008): NOWIREEXTENSIONATPIN statement is obsolete in version 5.6 or later.
+The NOWIREEXTENSIONATPIN statement will be ignored. See file /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_as_sc_mcu7t3v3/lef/gf180mcu_as_sc_mcu7t3v3.lef at line 3403.
+
+[WARNING ODB-0220] WARNING (LEFPARS-2008): NOWIREEXTENSIONATPIN statement is obsolete in version 5.6 or later.
+The NOWIREEXTENSIONATPIN statement will be ignored. See file /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_as_sc_mcu7t3v3/lef/gf180mcu_as_sc_mcu7t3v3.lef at line 3551.
+
+[WARNING ODB-0220] WARNING (LEFPARS-2008): NOWIREEXTENSIONATPIN statement is obsolete in version 5.6 or later.
+The NOWIREEXTENSIONATPIN statement will be ignored. See file /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_as_sc_mcu7t3v3/lef/gf180mcu_as_sc_mcu7t3v3.lef at line 3697.
+
+[WARNING ODB-0220] WARNING (LEFPARS-2008): NOWIREEXTENSIONATPIN statement is obsolete in version 5.6 or later.
+The NOWIREEXTENSIONATPIN statement will be ignored. See file /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_as_sc_mcu7t3v3/lef/gf180mcu_as_sc_mcu7t3v3.lef at line 3754.
+
+[WARNING ODB-0220] WARNING (LEFPARS-2008): NOWIREEXTENSIONATPIN statement is obsolete in version 5.6 or later.
+The NOWIREEXTENSIONATPIN statement will be ignored. See file /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_as_sc_mcu7t3v3/lef/gf180mcu_as_sc_mcu7t3v3.lef at line 3802.
+
+[WARNING ODB-0220] WARNING (LEFPARS-2008): NOWIREEXTENSIONATPIN statement is obsolete in version 5.6 or later.
+The NOWIREEXTENSIONATPIN statement will be ignored. See file /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_as_sc_mcu7t3v3/lef/gf180mcu_as_sc_mcu7t3v3.lef at line 3850.
+
+[WARNING ODB-0220] WARNING (LEFPARS-2008): NOWIREEXTENSIONATPIN statement is obsolete in version 5.6 or later.
+The NOWIREEXTENSIONATPIN statement will be ignored. See file /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_as_sc_mcu7t3v3/lef/gf180mcu_as_sc_mcu7t3v3.lef at line 3898.
+
+[WARNING ODB-0220] WARNING (LEFPARS-2008): NOWIREEXTENSIONATPIN statement is obsolete in version 5.6 or later.
+The NOWIREEXTENSIONATPIN statement will be ignored. See file /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_as_sc_mcu7t3v3/lef/gf180mcu_as_sc_mcu7t3v3.lef at line 3946.
+
+[WARNING ODB-0220] WARNING (LEFPARS-2008): NOWIREEXTENSIONATPIN statement is obsolete in version 5.6 or later.
+The NOWIREEXTENSIONATPIN statement will be ignored. See file /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_as_sc_mcu7t3v3/lef/gf180mcu_as_sc_mcu7t3v3.lef at line 4004.
+
+[WARNING ODB-0220] WARNING (LEFPARS-2008): NOWIREEXTENSIONATPIN statement is obsolete in version 5.6 or later.
+The NOWIREEXTENSIONATPIN statement will be ignored. See file /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_as_sc_mcu7t3v3/lef/gf180mcu_as_sc_mcu7t3v3.lef at line 4062.
+
+[WARNING ODB-0220] WARNING (LEFPARS-2008): NOWIREEXTENSIONATPIN statement is obsolete in version 5.6 or later.
+The NOWIREEXTENSIONATPIN statement will be ignored. See file /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_as_sc_mcu7t3v3/lef/gf180mcu_as_sc_mcu7t3v3.lef at line 4120.
+
+[WARNING ODB-0220] WARNING (LEFPARS-2008): NOWIREEXTENSIONATPIN statement is obsolete in version 5.6 or later.
+The NOWIREEXTENSIONATPIN statement will be ignored. See file /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_as_sc_mcu7t3v3/lef/gf180mcu_as_sc_mcu7t3v3.lef at line 4192.
+
+[WARNING ODB-0220] WARNING (LEFPARS-2008): NOWIREEXTENSIONATPIN statement is obsolete in version 5.6 or later.
+The NOWIREEXTENSIONATPIN statement will be ignored. See file /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_as_sc_mcu7t3v3/lef/gf180mcu_as_sc_mcu7t3v3.lef at line 4270.
+
+[WARNING ODB-0220] WARNING (LEFPARS-2008): NOWIREEXTENSIONATPIN statement is obsolete in version 5.6 or later.
+The NOWIREEXTENSIONATPIN statement will be ignored. See file /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_as_sc_mcu7t3v3/lef/gf180mcu_as_sc_mcu7t3v3.lef at line 4352.
+
+[WARNING ODB-0220] WARNING (LEFPARS-2008): NOWIREEXTENSIONATPIN statement is obsolete in version 5.6 or later.
+The NOWIREEXTENSIONATPIN statement will be ignored. See file /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_as_sc_mcu7t3v3/lef/gf180mcu_as_sc_mcu7t3v3.lef at line 4477.
+
+[WARNING ODB-0220] WARNING (LEFPARS-2008): NOWIREEXTENSIONATPIN statement is obsolete in version 5.6 or later.
+The NOWIREEXTENSIONATPIN statement will be ignored. See file /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_as_sc_mcu7t3v3/lef/gf180mcu_as_sc_mcu7t3v3.lef at line 4580.
+
+[WARNING ODB-0220] WARNING (LEFPARS-2008): NOWIREEXTENSIONATPIN statement is obsolete in version 5.6 or later.
+The NOWIREEXTENSIONATPIN statement will be ignored. See file /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_as_sc_mcu7t3v3/lef/gf180mcu_as_sc_mcu7t3v3.lef at line 4689.
+
+[WARNING ODB-0220] WARNING (LEFPARS-2008): NOWIREEXTENSIONATPIN statement is obsolete in version 5.6 or later.
+The NOWIREEXTENSIONATPIN statement will be ignored. See file /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_as_sc_mcu7t3v3/lef/gf180mcu_as_sc_mcu7t3v3.lef at line 4800.
+
+[WARNING ODB-0220] WARNING (LEFPARS-2008): NOWIREEXTENSIONATPIN statement is obsolete in version 5.6 or later.
+The NOWIREEXTENSIONATPIN statement will be ignored. See file /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_as_sc_mcu7t3v3/lef/gf180mcu_as_sc_mcu7t3v3.lef at line 4917.
+
+[WARNING ODB-0220] WARNING (LEFPARS-2008): NOWIREEXTENSIONATPIN statement is obsolete in version 5.6 or later.
+The NOWIREEXTENSIONATPIN statement will be ignored. See file /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_as_sc_mcu7t3v3/lef/gf180mcu_as_sc_mcu7t3v3.lef at line 5009.
+
+[WARNING ODB-0220] WARNING (LEFPARS-2008): NOWIREEXTENSIONATPIN statement is obsolete in version 5.6 or later.
+The NOWIREEXTENSIONATPIN statement will be ignored. See file /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_as_sc_mcu7t3v3/lef/gf180mcu_as_sc_mcu7t3v3.lef at line 5106.
+
+[WARNING ODB-0220] WARNING (LEFPARS-2008): NOWIREEXTENSIONATPIN statement is obsolete in version 5.6 or later.
+The NOWIREEXTENSIONATPIN statement will be ignored. See file /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_as_sc_mcu7t3v3/lef/gf180mcu_as_sc_mcu7t3v3.lef at line 5205.
+
+[WARNING ODB-0220] WARNING (LEFPARS-2008): NOWIREEXTENSIONATPIN statement is obsolete in version 5.6 or later.
+The NOWIREEXTENSIONATPIN statement will be ignored. See file /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_as_sc_mcu7t3v3/lef/gf180mcu_as_sc_mcu7t3v3.lef at line 5309.
+
+[WARNING ODB-0220] WARNING (LEFPARS-2008): NOWIREEXTENSIONATPIN statement is obsolete in version 5.6 or later.
+The NOWIREEXTENSIONATPIN statement will be ignored. See file /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_as_sc_mcu7t3v3/lef/gf180mcu_as_sc_mcu7t3v3.lef at line 5417.
+
+[WARNING ODB-0220] WARNING (LEFPARS-2008): NOWIREEXTENSIONATPIN statement is obsolete in version 5.6 or later.
+The NOWIREEXTENSIONATPIN statement will be ignored. See file /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_as_sc_mcu7t3v3/lef/gf180mcu_as_sc_mcu7t3v3.lef at line 5534.
+
+[WARNING ODB-0220] WARNING (LEFPARS-2008): NOWIREEXTENSIONATPIN statement is obsolete in version 5.6 or later.
+The NOWIREEXTENSIONATPIN statement will be ignored. See file /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_as_sc_mcu7t3v3/lef/gf180mcu_as_sc_mcu7t3v3.lef at line 5627.
+
+[WARNING ODB-0220] WARNING (LEFPARS-2008): NOWIREEXTENSIONATPIN statement is obsolete in version 5.6 or later.
+The NOWIREEXTENSIONATPIN statement will be ignored. See file /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_as_sc_mcu7t3v3/lef/gf180mcu_as_sc_mcu7t3v3.lef at line 5720.
+
+[WARNING ODB-0220] WARNING (LEFPARS-2008): NOWIREEXTENSIONATPIN statement is obsolete in version 5.6 or later.
+The NOWIREEXTENSIONATPIN statement will be ignored. See file /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_as_sc_mcu7t3v3/lef/gf180mcu_as_sc_mcu7t3v3.lef at line 5818.
+
+[WARNING ODB-0220] WARNING (LEFPARS-2008): NOWIREEXTENSIONATPIN statement is obsolete in version 5.6 or later.
+The NOWIREEXTENSIONATPIN statement will be ignored. See file /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_as_sc_mcu7t3v3/lef/gf180mcu_as_sc_mcu7t3v3.lef at line 5919.
+
+[WARNING ODB-0220] WARNING (LEFPARS-2008): NOWIREEXTENSIONATPIN statement is obsolete in version 5.6 or later.
+The NOWIREEXTENSIONATPIN statement will be ignored. See file /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_as_sc_mcu7t3v3/lef/gf180mcu_as_sc_mcu7t3v3.lef at line 6024.
+
+[WARNING ODB-0220] WARNING (LEFPARS-2008): NOWIREEXTENSIONATPIN statement is obsolete in version 5.6 or later.
+The NOWIREEXTENSIONATPIN statement will be ignored. See file /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_as_sc_mcu7t3v3/lef/gf180mcu_as_sc_mcu7t3v3.lef at line 6140.
+
+[WARNING ODB-0220] WARNING (LEFPARS-2008): NOWIREEXTENSIONATPIN statement is obsolete in version 5.6 or later.
+The NOWIREEXTENSIONATPIN statement will be ignored. See file /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_as_sc_mcu7t3v3/lef/gf180mcu_as_sc_mcu7t3v3.lef at line 6229.
+
+[WARNING ODB-0220] WARNING (LEFPARS-2008): NOWIREEXTENSIONATPIN statement is obsolete in version 5.6 or later.
+The NOWIREEXTENSIONATPIN statement will be ignored. See file /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_as_sc_mcu7t3v3/lef/gf180mcu_as_sc_mcu7t3v3.lef at line 6324.
+
+[WARNING ODB-0220] WARNING (LEFPARS-2008): NOWIREEXTENSIONATPIN statement is obsolete in version 5.6 or later.
+The NOWIREEXTENSIONATPIN statement will be ignored. See file /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_as_sc_mcu7t3v3/lef/gf180mcu_as_sc_mcu7t3v3.lef at line 6362.
+
+[WARNING ODB-0220] WARNING (LEFPARS-2008): NOWIREEXTENSIONATPIN statement is obsolete in version 5.6 or later.
+The NOWIREEXTENSIONATPIN statement will be ignored. See file /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_as_sc_mcu7t3v3/lef/gf180mcu_as_sc_mcu7t3v3.lef at line 6426.
+
+[WARNING ODB-0220] WARNING (LEFPARS-2008): NOWIREEXTENSIONATPIN statement is obsolete in version 5.6 or later.
+The NOWIREEXTENSIONATPIN statement will be ignored. See file /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_as_sc_mcu7t3v3/lef/gf180mcu_as_sc_mcu7t3v3.lef at line 6490.
+
+[WARNING ODB-0220] WARNING (LEFPARS-2008): NOWIREEXTENSIONATPIN statement is obsolete in version 5.6 or later.
+The NOWIREEXTENSIONATPIN statement will be ignored. See file /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_as_sc_mcu7t3v3/lef/gf180mcu_as_sc_mcu7t3v3.lef at line 6623.
+
+[INFO ODB-0227] LEF file: /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_as_sc_mcu7t3v3/lef/gf180mcu_as_sc_mcu7t3v3.lef, created 67 library cells
+Reading macro LEF file at '/home/etcfranc/NoCNoC/libs/gf180mcu_ocd_ip_sram/cells/gf180mcu_ocd_ip_sram__sram1024x8m8wm1/gf180mcu_ocd_ip_sram__sram1024x8m8wm1.lef'…
+[WARNING ODB-0220] WARNING (LEFPARS-2008): NOWIREEXTENSIONATPIN statement is obsolete in version 5.6 or later.
+The NOWIREEXTENSIONATPIN statement will be ignored. See file /home/etcfranc/NoCNoC/libs/gf180mcu_ocd_ip_sram/cells/gf180mcu_ocd_ip_sram__sram1024x8m8wm1/gf180mcu_ocd_ip_sram__sram1024x8m8wm1.lef at line 2.
+
+[INFO ODB-0227] LEF file: /home/etcfranc/NoCNoC/libs/gf180mcu_ocd_ip_sram/cells/gf180mcu_ocd_ip_sram__sram1024x8m8wm1/gf180mcu_ocd_ip_sram__sram1024x8m8wm1.lef, created 1 library cells
+Reading gpio pad LEF file at '/home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_fd_io/lef/gf180mcu_fd_io__dvdd.lef'…
+[WARNING ODB-0220] WARNING (LEFPARS-2008): NOWIREEXTENSIONATPIN statement is obsolete in version 5.6 or later.
+The NOWIREEXTENSIONATPIN statement will be ignored. See file /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_fd_io/lef/gf180mcu_fd_io__dvdd.lef at line 2.
+
+[INFO ODB-0227] LEF file: /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_fd_io/lef/gf180mcu_fd_io__dvdd.lef, created 1 library cells
+Reading gpio pad LEF file at '/home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_fd_io/lef/gf180mcu_fd_io__cor.lef'…
+[WARNING ODB-0220] WARNING (LEFPARS-2008): NOWIREEXTENSIONATPIN statement is obsolete in version 5.6 or later.
+The NOWIREEXTENSIONATPIN statement will be ignored. See file /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_fd_io/lef/gf180mcu_fd_io__cor.lef at line 2.
+
+[INFO ODB-0227] LEF file: /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_fd_io/lef/gf180mcu_fd_io__cor.lef, created 1 library cells
+Reading gpio pad LEF file at '/home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_fd_io/lef/gf180mcu_fd_io__bi_24t.lef'…
+[WARNING ODB-0220] WARNING (LEFPARS-2008): NOWIREEXTENSIONATPIN statement is obsolete in version 5.6 or later.
+The NOWIREEXTENSIONATPIN statement will be ignored. See file /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_fd_io/lef/gf180mcu_fd_io__bi_24t.lef at line 2.
+
+[INFO ODB-0227] LEF file: /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_fd_io/lef/gf180mcu_fd_io__bi_24t.lef, created 1 library cells
+Reading gpio pad LEF file at '/home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_fd_io/lef/gf180mcu_fd_io__bi_t.lef'…
+[WARNING ODB-0220] WARNING (LEFPARS-2008): NOWIREEXTENSIONATPIN statement is obsolete in version 5.6 or later.
+The NOWIREEXTENSIONATPIN statement will be ignored. See file /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_fd_io/lef/gf180mcu_fd_io__bi_t.lef at line 2.
+
+[INFO ODB-0227] LEF file: /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_fd_io/lef/gf180mcu_fd_io__bi_t.lef, created 1 library cells
+Reading gpio pad LEF file at '/home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_fd_io/lef/gf180mcu_fd_io__dvss.lef'…
+[WARNING ODB-0220] WARNING (LEFPARS-2008): NOWIREEXTENSIONATPIN statement is obsolete in version 5.6 or later.
+The NOWIREEXTENSIONATPIN statement will be ignored. See file /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_fd_io/lef/gf180mcu_fd_io__dvss.lef at line 2.
+
+[INFO ODB-0227] LEF file: /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_fd_io/lef/gf180mcu_fd_io__dvss.lef, created 1 library cells
+Reading gpio pad LEF file at '/home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_fd_io/lef/gf180mcu_fd_io__asig_5p0.lef'…
+[WARNING ODB-0220] WARNING (LEFPARS-2008): NOWIREEXTENSIONATPIN statement is obsolete in version 5.6 or later.
+The NOWIREEXTENSIONATPIN statement will be ignored. See file /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_fd_io/lef/gf180mcu_fd_io__asig_5p0.lef at line 2.
+
+[INFO ODB-0227] LEF file: /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_fd_io/lef/gf180mcu_fd_io__asig_5p0.lef, created 1 library cells
+Reading gpio pad LEF file at '/home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_fd_io/lef/gf180mcu_fd_io__in_c.lef'…
+[WARNING ODB-0220] WARNING (LEFPARS-2008): NOWIREEXTENSIONATPIN statement is obsolete in version 5.6 or later.
+The NOWIREEXTENSIONATPIN statement will be ignored. See file /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_fd_io/lef/gf180mcu_fd_io__in_c.lef at line 2.
+
+[INFO ODB-0227] LEF file: /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_fd_io/lef/gf180mcu_fd_io__in_c.lef, created 1 library cells
+Reading gpio pad LEF file at '/home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_fd_io/lef/gf180mcu_fd_io__fill5.lef'…
+[WARNING ODB-0220] WARNING (LEFPARS-2008): NOWIREEXTENSIONATPIN statement is obsolete in version 5.6 or later.
+The NOWIREEXTENSIONATPIN statement will be ignored. See file /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_fd_io/lef/gf180mcu_fd_io__fill5.lef at line 2.
+
+[INFO ODB-0227] LEF file: /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_fd_io/lef/gf180mcu_fd_io__fill5.lef, created 1 library cells
+Reading gpio pad LEF file at '/home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_fd_io/lef/gf180mcu_fd_io__brk5.lef'…
+[WARNING ODB-0220] WARNING (LEFPARS-2008): NOWIREEXTENSIONATPIN statement is obsolete in version 5.6 or later.
+The NOWIREEXTENSIONATPIN statement will be ignored. See file /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_fd_io/lef/gf180mcu_fd_io__brk5.lef at line 2.
+
+[INFO ODB-0227] LEF file: /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_fd_io/lef/gf180mcu_fd_io__brk5.lef, created 1 library cells
+Reading gpio pad LEF file at '/home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_fd_io/lef/gf180mcu_fd_io__fill1.lef'…
+[WARNING ODB-0220] WARNING (LEFPARS-2008): NOWIREEXTENSIONATPIN statement is obsolete in version 5.6 or later.
+The NOWIREEXTENSIONATPIN statement will be ignored. See file /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_fd_io/lef/gf180mcu_fd_io__fill1.lef at line 2.
+
+[INFO ODB-0227] LEF file: /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_fd_io/lef/gf180mcu_fd_io__fill1.lef, created 1 library cells
+Reading gpio pad LEF file at '/home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_fd_io/lef/gf180mcu_fd_io__brk2.lef'…
+[WARNING ODB-0220] WARNING (LEFPARS-2008): NOWIREEXTENSIONATPIN statement is obsolete in version 5.6 or later.
+The NOWIREEXTENSIONATPIN statement will be ignored. See file /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_fd_io/lef/gf180mcu_fd_io__brk2.lef at line 2.
+
+[INFO ODB-0227] LEF file: /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_fd_io/lef/gf180mcu_fd_io__brk2.lef, created 1 library cells
+Reading gpio pad LEF file at '/home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_fd_io/lef/gf180mcu_fd_io__fillnc.lef'…
+[WARNING ODB-0220] WARNING (LEFPARS-2008): NOWIREEXTENSIONATPIN statement is obsolete in version 5.6 or later.
+The NOWIREEXTENSIONATPIN statement will be ignored. See file /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_fd_io/lef/gf180mcu_fd_io__fillnc.lef at line 2.
+
+[INFO ODB-0227] LEF file: /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_fd_io/lef/gf180mcu_fd_io__fillnc.lef, created 1 library cells
+Reading gpio pad LEF file at '/home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_fd_io/lef/gf180mcu_ws_io__dvdd.lef'…
+[WARNING ODB-0220] WARNING (LEFPARS-2008): NOWIREEXTENSIONATPIN statement is obsolete in version 5.6 or later.
+The NOWIREEXTENSIONATPIN statement will be ignored. See file /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_fd_io/lef/gf180mcu_ws_io__dvdd.lef at line 2.
+
+[INFO ODB-0227] LEF file: /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_fd_io/lef/gf180mcu_ws_io__dvdd.lef, created 1 library cells
+Reading gpio pad LEF file at '/home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_fd_io/lef/gf180mcu_fd_io__in_s.lef'…
+[WARNING ODB-0220] WARNING (LEFPARS-2008): NOWIREEXTENSIONATPIN statement is obsolete in version 5.6 or later.
+The NOWIREEXTENSIONATPIN statement will be ignored. See file /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_fd_io/lef/gf180mcu_fd_io__in_s.lef at line 2.
+
+[INFO ODB-0227] LEF file: /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_fd_io/lef/gf180mcu_fd_io__in_s.lef, created 1 library cells
+Reading gpio pad LEF file at '/home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_fd_io/lef/gf180mcu_fd_io__fill10.lef'…
+[WARNING ODB-0220] WARNING (LEFPARS-2008): NOWIREEXTENSIONATPIN statement is obsolete in version 5.6 or later.
+The NOWIREEXTENSIONATPIN statement will be ignored. See file /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_fd_io/lef/gf180mcu_fd_io__fill10.lef at line 2.
+
+[INFO ODB-0227] LEF file: /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_fd_io/lef/gf180mcu_fd_io__fill10.lef, created 1 library cells
+Reading gpio pad LEF file at '/home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_fd_io/lef/gf180mcu_ef_io__bi_t.lef'…
+[WARNING ODB-0220] WARNING (LEFPARS-2008): NOWIREEXTENSIONATPIN statement is obsolete in version 5.6 or later.
+The NOWIREEXTENSIONATPIN statement will be ignored. See file /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_fd_io/lef/gf180mcu_ef_io__bi_t.lef at line 2.
+
+[INFO ODB-0227] LEF file: /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_fd_io/lef/gf180mcu_ef_io__bi_t.lef, created 1 library cells
+Reading gpio pad LEF file at '/home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_fd_io/lef/gf180mcu_ws_io__dvss.lef'…
+[WARNING ODB-0220] WARNING (LEFPARS-2008): NOWIREEXTENSIONATPIN statement is obsolete in version 5.6 or later.
+The NOWIREEXTENSIONATPIN statement will be ignored. See file /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_fd_io/lef/gf180mcu_ws_io__dvss.lef at line 2.
+
+[INFO ODB-0227] LEF file: /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.ref/gf180mcu_fd_io/lef/gf180mcu_ws_io__dvss.lef, created 1 library cells
+[INFO ODB-0127] Reading DEF file: /home/etcfranc/NoCNoC/librelane/noc_tile/runs/RUN_2026-05-08_18-38-35/53-odb-cellfrequencytables/mesh_tile.def
+[INFO ODB-0128] Design: mesh_tile
+[INFO ODB-0130]     Created 599 pins.
+[INFO ODB-0131]     Created 18130 components and 80721 component-terminals.
+[INFO ODB-0132]     Created 2 special nets and 67416 connections.
+[INFO ODB-0133]     Created 4350 nets and 13274 connections.
+[INFO ODB-0134] Finished DEF file: /home/etcfranc/NoCNoC/librelane/noc_tile/runs/RUN_2026-05-08_18-38-35/53-odb-cellfrequencytables/mesh_tile.def
+Using RCX ruleset '/home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.tech/librelane/rules.openrcx.gf180mcuD.max'…
+[INFO RCX-0431] Defined process_corner CURRENT_CORNER with ext_model_index 0
+[INFO RCX-0029] Defined extraction corner CURRENT_CORNER
++ extract_parasitics  -ext_model_file /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.tech/librelane/rules.openrcx.gf180mcuD.max -lef_res
+[INFO RCX-0435] Reading extraction model file /home/etcfranc/NoCNoC/gf180mcu/gf180mcuD/libs.tech/librelane/rules.openrcx.gf180mcuD.max ...
+[INFO RCX-0436] RC segment generation mesh_tile (max_merge_res 50.0) ...
+[INFO RCX-0040] Final 15695 rc segments
+[INFO RCX-0439] Coupling Cap extraction mesh_tile ...
+[INFO RCX-0440] Coupling threshhold is 0.1000 fF, coupling capacitance less than 0.1000 fF will be grounded.
+[INFO RCX-0442] 45% of 36981 wires extracted
+[INFO RCX-0442] 100% of 36981 wires extracted
+[INFO RCX-0045] Extract 4350 nets, 20045 rsegs, 20045 caps, 49853 ccs
+Setting global connections for newly added cells…
+[INFO] Setting global connections...
+sram2048.u_bank0 matched with sram2048.u_bank0
+sram2048.u_bank1 matched with sram2048.u_bank1
+[INFO ODB-0403] 0 connections made, 0 conflicts skipped.
+Updating metrics…
+Cell type report:                       Count       Area
+  Macro                                     2  310827.11
+  Fill cell                             11524  189371.12
+  Tap cell                               2550   11195.52
+  Antenna cell                              6      26.34
+  Tie cell                                192    1685.91
+  Standard cell                          3856   98619.36
+  Total                                 18130  611725.37
+Writing extracted parasitics to '/home/etcfranc/NoCNoC/librelane/noc_tile/runs/RUN_2026-05-08_18-38-35/54-openroad-rcx/max/mesh_tile.max.spef'…
+[INFO RCX-0443] 4350 nets finished

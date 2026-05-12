@@ -1,0 +1,5 @@
+[PSM-0069] Check connectivity failed on VDD.
+[PSM-0069] Check connectivity failed on VSS.
+1291120 power grid violations (as reported by OpenROAD PSM- you may ignore these if LVS passes) found. - deferred
+102 Routing DRC errors found. - deferred
+29486 KLayout DRC errors found. - deferred
