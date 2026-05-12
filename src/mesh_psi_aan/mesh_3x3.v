@@ -102,7 +102,7 @@ module mesh_3x3 (
                 wire [35:0] nw_i = (r == 0 && c == 0) ? inject_00_nw :
                                    (r > 0  && c > 0)   ? grid_se[r-1][c-1] : 36'b0;
 
-                mesh_tile #(.TILE_ID({2'(r), 2'(c)})) tile_inst (
+                mesh_tile #(.TILE_ID({3'(r), 3'(c)})) tile_inst (
                     .clk(clk), .rst(!cpu_rst_n), .boot_mode(boot_mode),
                     .boot_addr(boot_addr), .boot_data(boot_data), .boot_wen(boot_wen),
                     .north_in(n_i),   .south_in(s_i),   .east_in(e_i),   .west_in(w_i),
