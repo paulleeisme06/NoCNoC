@@ -48,7 +48,7 @@ VERILOG_SOURCES := \
     $(MESH)/mesh_3x3.v \
     $(MESH)/mesh_tile.v \
     $(MESH)/mesh_router.v \
-    $(FLASH)/host_spi_slave.v \
+    $(SRC)/host-to-chip\ -\ Paul\&Andrea/host_to_chip.v \
     $(FLASH)/rd_crossbar.v \
     $(FLASH)/spi_arbiter.v \
     $(FLASH)/hk_boot_adapter.v \
@@ -113,6 +113,7 @@ sim-flash: ## Run flash->housekeeping->mesh SRAM test
 .PHONY: sim-flash
 
 sim-host: ## Run host-to-chip SPI write test: boot flash then write input.pbm to all tile SRAMs
+	rm -f results.xml
 	$(MAKE) results.xml \
 		MODULE=test_host_write \
 		SIM_BUILD=sim_build/host \
@@ -120,7 +121,9 @@ sim-host: ## Run host-to-chip SPI write test: boot flash then write input.pbm to
 		VERILOG_SOURCES="$(VERILOG_SOURCES)"
 .PHONY: sim-host
 
-
+clean:: ## Remove simulation build artifacts and results
+	rm -rf sim_build results.xml
+.PHONY: clean
 
 clone-pdk: ## Clone the GF180MCU PDK repository
 	rm -rf $(MAKEFILE_DIR)/gf180mcu

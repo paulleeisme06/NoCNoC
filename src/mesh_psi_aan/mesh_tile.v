@@ -97,16 +97,28 @@ module mesh_tile #(
     wire cpu_sram_init_pulse = boot_mode_q & ~boot_mode;
 
     // -------------------------------------------------------------------------
-    // Address / Data MUX
+    // Router direct-write path (write flits delivered by mesh_router)
     // -------------------------------------------------------------------------
-    wire [10:0] final_a = boot_mode ? boot_addr  : (sram_wen ? sram_waddr : sram_raddr);
-    wire [7:0]  final_d = boot_mode ? boot_data  : sram_wdata;
+    wire [10:0] router_sram_waddr;
+    wire [7:0]  router_sram_wdata;
+    wire        router_sram_wen;
+
+    // -------------------------------------------------------------------------
+    // Address / Data MUX — router writes have highest priority
+    // -------------------------------------------------------------------------
+    wire [10:0] final_a = router_sram_wen ? router_sram_waddr :
+                          boot_mode        ? boot_addr :
+                          sram_wen         ? sram_waddr : sram_raddr;
+    wire [7:0]  final_d = router_sram_wen ? router_sram_wdata :
+                          boot_mode        ? boot_data : sram_wdata;
 
     // -------------------------------------------------------------------------
     // SRAM control signals
     // -------------------------------------------------------------------------
-    wire sram_active = boot_mode ? ~boot_wen            : ~cpu_sram_init_pulse;
-    wire sram_write  = boot_mode ? ~boot_wen            : sram_wen;
+    wire sram_active = router_sram_wen ? 1'b1 :
+                       boot_mode       ? ~boot_wen : ~cpu_sram_init_pulse;
+    wire sram_write  = router_sram_wen ? 1'b1 :
+                       boot_mode       ? ~boot_wen : sram_wen;
 
     // -------------------------------------------------------------------------
     // Subservient RISC-V core (bit-serial SERV)
@@ -231,7 +243,10 @@ module mesh_tile #(
         .n_in (north_in),  .s_in (south_in),  .e_in (east_in),  .w_in (west_in),
         .n_out(north_out), .s_out(south_out), .e_out(east_out), .w_out(west_out),
         .ne_in(ne_in),  .nw_in(nw_in),  .se_in(se_in),  .sw_in(sw_in),
-        .ne_out(ne_out),.nw_out(nw_out),.se_out(se_out),.sw_out(sw_out)
+        .ne_out(ne_out),.nw_out(nw_out),.se_out(se_out),.sw_out(sw_out),
+        .router_sram_waddr(router_sram_waddr),
+        .router_sram_wdata(router_sram_wdata),
+        .router_sram_wen  (router_sram_wen)
     );
 
 endmodule

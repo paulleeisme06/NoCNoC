@@ -41,7 +41,12 @@ module mesh_router #(
 
     // Diagonal outputs/inputs
     output reg  [35:0] ne_out, nw_out, se_out, sw_out,
-    input  wire [35:0] ne_in,  nw_in,  se_in,  sw_in
+    input  wire [35:0] ne_in,  nw_in,  se_in,  sw_in,
+
+    // Direct SRAM write — fires one cycle after a write flit is ejected
+    output reg  [10:0] router_sram_waddr,
+    output reg  [7:0]  router_sram_wdata,
+    output reg         router_sram_wen
 );
 
     // Decode this tile's position from MY_ID.
@@ -102,7 +107,9 @@ module mesh_router #(
                     (local_wb_adr == 32'h80000004);
 
     wire [35:0] eject_flit_next;
-    wire fifo_push = eject_flit_next[35] && !fifo_full;
+    // Write flits (payload[28]=1) are handled in hardware; don't push to CPU FIFO
+    wire is_write_flit = eject_flit_next[35] && eject_flit_next[28];
+    wire fifo_push = eject_flit_next[35] && !eject_flit_next[28] && !fifo_full;
 
     reg cpu_read_q;
     always @(posedge clk) begin
@@ -241,7 +248,16 @@ module mesh_router #(
         if (rst) begin
             {n_out, s_out, e_out, w_out,
              ne_out, nw_out, se_out, sw_out} <= 0;
+            router_sram_wen   <= 1'b0;
+            router_sram_waddr <= 11'h0;
+            router_sram_wdata <= 8'h0;
         end else begin
+            router_sram_wen <= 1'b0;   // one-cycle pulse; cleared every cycle
+            if (is_write_flit) begin
+                router_sram_waddr <= eject_flit_next[27:17];
+                router_sram_wdata <= eject_flit_next[16:9];
+                router_sram_wen   <= 1'b1;
+            end
             n_out  <= next_n;  s_out  <= next_s;
             e_out  <= next_e;  w_out  <= next_w;
             ne_out <= next_ne; nw_out <= next_nw;

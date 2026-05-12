@@ -15,16 +15,12 @@ module top (
     output wire host_miso
 );
 
-    wire [35:0] inject_00_nw = 36'h0;
     wire [35:0] monitor_22_se;
 
-    // host_spi_slave outputs
+    // host_to_chip outputs
     wire        host_rst;
     wire        host_rst_en;
-    wire [10:0] host_sram_waddr;
-    wire [7:0]  host_sram_wdata;
-    wire        host_sram_wen;
-    wire [8:0]  host_tile_mask;
+    wire [35:0] host_flit;
     wire [3:0]  rd_tile;
     wire [10:0] rd_addr;
     wire        rd_req;
@@ -36,35 +32,28 @@ module top (
     mesh_3x3 mesh_inst (
         .clk           (clk),
         .rst           (rst),
-        .inject_00_nw  (inject_00_nw),
+        .inject_00_nw  (host_flit),
         .monitor_22_se (monitor_22_se),
         .flash_miso    (flash_miso),
         .flash_cs_n    (flash_csb),
         .flash_clk     (flash_clk),
         .flash_mosi    (flash_mosi),
-        // Host write bus — connects after boot so host can overwrite tile SRAMs
-        .host_waddr      (host_sram_waddr),
-        .host_wdata      (host_sram_wdata),
-        .host_wen        (host_sram_wen),
-        .host_tile_mask  (host_tile_mask),
+        // Host reset control (write flits enter via inject_00_nw)
         .host_rst_in     (host_rst),
         .host_rst_en     (host_rst_en)
     );
 
     // -----------------------------------------------------------------------
-    // host_spi_slave — SPI gateway for host SRAM writes and CPU reset control
+    // host_to_chip — SPI gateway for host SRAM writes and CPU reset control
     // -----------------------------------------------------------------------
-    host_spi_slave host_spi (
+    host_to_chip host_spi (
         .sys_clk     (clk),
         .sys_rst     (rst),
         .spi_csb     (host_csb),
         .spi_sclk    (host_sclk),
         .spi_mosi    (host_mosi),
         .spi_miso    (host_miso),
-        .sram_waddr  (host_sram_waddr),
-        .sram_wdata  (host_sram_wdata),
-        .sram_wen    (host_sram_wen),
-        .tile_mask   (host_tile_mask),
+        .host_flit   (host_flit),
         .host_rst    (host_rst),
         .host_rst_en (host_rst_en),
         .rd_tile     (rd_tile),

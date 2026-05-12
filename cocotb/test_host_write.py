@@ -6,10 +6,9 @@ Test sequence:
   2. Wait for boot_controller to assert cpu_rst_n (boot done).
   3. Verify SRAM[0:3] = first firmware bytes (sanity check).
   4. Host sends CMD 0x03 0xFF  →  assert reset, put tiles in write mode.
-  5. Host sends CMD 0x00 for every pixel in input.pbm, writing
-     1 byte-per-pixel starting at SRAM address 0x000 (broadcast to all 9 tiles).
-     This deliberately overwrites the firmware to prove the host write path works.
-  6. Verify all 9 tiles have the correct PBM bytes in SRAM.
+  5. For each tile(r,c): CMD 0x04 selects it, then CMD 0x00 writes its unique
+     10×10 sub-image (image rows r*10..r*10+9, cols c*10..c*10+9) to SRAM[0..99].
+  6. Verify each tile holds its correct 10×10 patch.
 
 SPI timing: SPI half-cycle = SPI_HALF_NS = 500 ns  (sys_clk period = 10 ns).
 The double-register synchroniser in host_spi_slave needs >= 2 sys_clk cycles
@@ -130,6 +129,11 @@ async def host_set_reset(dut, assert_rst):
     await spi_transaction(dut, [0x03, 0xFF if assert_rst else 0x00])
 
 
+async def host_set_tile(dut, row, col):
+    """CMD 0x04: select tile(row,col) for subsequent writes. row=0xFF = broadcast."""
+    await spi_transaction(dut, [0x04, row & 0xFF, col & 0xFF])
+
+
 async def host_write_sram(dut, addr, data):
     """CMD 0x00: broadcast-write one byte to all 9 tile SRAMs at addr."""
     await spi_transaction(dut, [
@@ -151,6 +155,23 @@ def sram_read(dut, row, col, addr):
     if not val.is_resolvable:
         return None
     return int(val) & 0xFF
+
+
+def sram_image(dut, patch, log):
+    """Reconstruct and print the full image assembled from all 9 tiles' SRAM patches."""
+    log.info("=== Reconstructed image (# = 1, . = 0) ===")
+    full_w = 3 * patch
+    for img_row in range(3 * patch):
+        tr = img_row // patch   # tile row
+        pr = img_row % patch    # pixel row within tile
+        line = ""
+        for tc in range(3):     # tile col
+            for pc in range(patch):
+                addr = pr * patch + pc
+                v = sram_read(dut, tr, tc, addr)
+                line += "#" if (v is not None and v != 0) else "."
+        log.info(f"  {line}")
+    log.info(f"  {'=' * full_w}")
 
 
 def sram_dump(dut, row, col, length, log, bytes_per_line=16):
@@ -233,12 +254,21 @@ async def host_write_input_pbm(dut):
     for _ in range(10):
         await RisingEdge(dut.clk)
 
-    # ----- Phase 2: broadcast-write all PBM pixels to SRAM addr 0 .. N-1 -----
-    dut._log.info("Writing input.pbm to all tile SRAMs ...")
-    for addr, val in enumerate(pixels):
-        await host_write_sram(dut, addr, val)
-        if addr % 100 == 0:
-            dut._log.info(f"  wrote {addr}/{len(pixels)} bytes ...")
+    # ----- Phase 2: per-tile write — each tile gets its 10×10 patch -----
+    # tile(r,c) receives the 10×10 sub-image at image rows [r*10..r*10+9],
+    # image cols [c*10..c*10+9], stored linearly at SRAM addr 0..99.
+    PATCH = 10
+    dut._log.info("Writing per-tile 10×10 patches from input.pbm ...")
+    for r in range(3):
+        for c in range(3):
+            await host_set_tile(dut, r, c)
+            written = 0
+            for i in range(PATCH):
+                for j in range(PATCH):
+                    src = (r * PATCH + i) * w + (c * PATCH + j)
+                    await host_write_sram(dut, i * PATCH + j, pixels[src])
+                    written += 1
+            dut._log.info(f"  tile({r},{c}): wrote {written} bytes")
 
     dut._log.info("Write complete.")
 
@@ -246,37 +276,42 @@ async def host_write_input_pbm(dut):
     for _ in range(20):
         await RisingEdge(dut.clk)
 
-    # ----- Phase 3: verify SRAM contents in all 9 tiles -----
-    check_len = min(len(pixels), 32)   # spot-check first 32 bytes
-    dut._log.info(f"Verifying first {check_len} bytes in all 9 tiles ...")
+    # ----- Phase 3: verify each tile has its correct 10×10 patch -----
+    dut._log.info("Verifying per-tile SRAM contents ...")
     total_errors = 0
 
     for r in range(3):
         for c in range(3):
             tile_errors = 0
-            for addr in range(check_len):
-                exp = pixels[addr]
-                got = sram_read(dut, r, c, addr)
-                if got is None:
-                    dut._log.error(f"tile({r},{c}) SRAM[{addr}]: unresolvable (X/Z)")
-                    tile_errors += 1
-                elif got != exp:
-                    dut._log.error(
-                        f"tile({r},{c}) SRAM[{addr:3d}]: got 0x{got:02x}, "
-                        f"expected 0x{exp:02x}"
-                    )
-                    tile_errors += 1
+            for i in range(PATCH):
+                for j in range(PATCH):
+                    sram_addr = i * PATCH + j
+                    src = (r * PATCH + i) * w + (c * PATCH + j)
+                    exp = pixels[src]
+                    got = sram_read(dut, r, c, sram_addr)
+                    if got is None:
+                        dut._log.error(
+                            f"tile({r},{c}) SRAM[{sram_addr}]: unresolvable (X/Z)"
+                        )
+                        tile_errors += 1
+                    elif got != exp:
+                        dut._log.error(
+                            f"tile({r},{c}) SRAM[{sram_addr:3d}]: "
+                            f"got 0x{got:02x}, expected 0x{exp:02x}"
+                        )
+                        tile_errors += 1
             if tile_errors == 0:
-                dut._log.info(f"tile({r},{c}): PASS (first {check_len} bytes match)")
+                dut._log.info(f"tile({r},{c}): PASS (10×10 patch correct)")
             total_errors += tile_errors
         await RisingEdge(dut.clk)
 
-    # ----- Phase 4: SRAM dump for all 9 tiles -----
-    dump_len = min(len(pixels), 64)
-    dut._log.info(f"=== SRAM contents (first {dump_len} bytes per tile) ===")
+    # ----- Phase 4: SRAM dump for all 9 tiles (full 10×10 patch = 100 bytes) -----
+    dut._log.info("=== SRAM contents (100-byte 10×10 patch per tile) ===")
     for r in range(3):
         for c in range(3):
-            sram_dump(dut, r, c, dump_len, dut._log)
+            sram_dump(dut, r, c, PATCH * PATCH, dut._log)
+
+    sram_image(dut, PATCH, dut._log)
 
     if total_errors == 0:
         dut._log.info("ALL 9 TILES PASS — host-to-chip write verified.")
