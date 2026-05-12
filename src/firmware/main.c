@@ -33,10 +33,14 @@
 #define DEBUG_LIVE_COUNT     (DEBUG_BASE + 36)
 #define DEBUG_COL0_BM        (DEBUG_BASE + 40)
 #define DEBUG_MY_ID          (DEBUG_BASE + 44)
-#define DEBUG_SEND_BM        (DEBUG_BASE + 48)
-#define DEBUG_ROW_TRACE_BASE (DEBUG_BASE + 52)   /* 0x0734: 10 words, rows 0-9 */
-#define DEBUG_ROW8_AT_CALL   (DEBUG_BASE + 52)   /* 0x0734 */
-#define DEBUG_ROW9_AT_CALL   (DEBUG_BASE + 56)   /* 0x0738 */
+#define DEBUG_ROW_TRACE_BASE (DEBUG_BASE + 52)   /* 0x0734 */
+#define DEBUG_ROW8_AT_CALL   (DEBUG_BASE + 52)   /* 0x0734: row-8 contribution shifted into bit 8 */
+#define DEBUG_ROW9_AT_CALL   (DEBUG_BASE + 56)   /* 0x0738: row-9 contribution shifted into bit 9 */
+#define DEBUG_PRE_OR_S8      (DEBUG_BASE + 60)   /* 0x073C: shifted8 right before OR */
+#define DEBUG_PRE_OR_S9      (DEBUG_BASE + 64)   /* 0x0740: shifted9 right before OR */
+#define DEBUG_CELL9_RAW      (DEBUG_BASE + 68)   /* 0x0744: raw grid[9*SIZE+col] byte */
+#define DEBUG_BIT9_VAL       (DEBUG_BASE + 72)   /* 0x0748: bit9 after & 1 */
+#define DEBUG_SEND_BM        (DEBUG_BASE + 80)   /* 0x0750: final bm sent west (matches test) */
 
 #define grid      ((volatile uint8_t *)GRID_BASE)
 #define ghost_N   ((volatile uint8_t *)(GHOST_BASE +  0))
@@ -108,15 +112,6 @@ static uint32_t col_bitmap_lo(int col)
     return bm;
 }
 
-__attribute__((noinline))
-static uint32_t col_bitmap_hi(int col)
-{
-    uint32_t bm = 0;
-    if (grid[8 * SIZE + col] & 1u) bm |= 1u;   /* row 8 → bit 0 */
-    if (grid[9 * SIZE + col] & 1u) bm |= 2u;   /* row 9 → bit 1 */
-    return bm;
-}
-
 
 __attribute__((noinline))
 static int neighbour_count(int row, int col)
@@ -151,6 +146,39 @@ static int neighbour_count(int row, int col)
     }
     return n;
 }
+
+static const uint32_t PATTERN[30] = {
+    0x155FFE01u,  /* row  0: tile(0,0)=X  tile(0,1)=Ring  tile(0,2)=VStripes */
+    0x15580502u,  /* row  1 */
+    0x15580484u,  /* row  2 */
+    0x15580448u,  /* row  3 */
+    0x15580430u,  /* row  4 */
+    0x15580430u,  /* row  5 */
+    0x15580448u,  /* row  6 */
+    0x15580484u,  /* row  7 */
+    0x15580502u,  /* row  8 */
+    0x155FFE01u,  /* row  9 */
+    0x155043FFu,  /* row 10: tile(1,0)=HStripes  tile(1,1)=Diamond  tile(1,2)=Checker */
+    0x2AA0A000u,  /* row 11 */
+    0x155113FFu,  /* row 12 */
+    0x2AA20800u,  /* row 13 */
+    0x155407FFu,  /* row 14 */
+    0x2AA20800u,  /* row 15 */
+    0x155113FFu,  /* row 16 */
+    0x2AA0A000u,  /* row 17 */
+    0x155043FFu,  /* row 18 */
+    0x2AA00000u,  /* row 19 */
+    0x00000800u,  /* row 20: tile(2,0)=Block  tile(2,1)=Glider  tile(2,2)=Blinker */
+    0x00001000u,  /* row 21 */
+    0x00001C00u,  /* row 22 */
+    0x00000000u,  /* row 23 */
+    0x00000030u,  /* row 24 */
+    0x03800030u,  /* row 25 */
+    0x00000000u,  /* row 26 */
+    0x00000000u,  /* row 27 */
+    0x00000000u,  /* row 28 */
+    0x00000000u,  /* row 29 */
+};
 
 __attribute__((section(".text.init"), naked))
 void _start(void)
@@ -196,71 +224,60 @@ int main(void)
 
     noc_signal(SIG_BOOT_ALIVE);
 
-    for (int i = 0; i < SIZE * SIZE; i++) grid[i] = 0u;
-    grid[4 * SIZE + 5] = 1; grid[5 * SIZE + 5] = 1; grid[6 * SIZE + 5] = 1;
-    grid[8 * SIZE + 0] = 1; grid[9 * SIZE + 0] = 1;
-    grid[8 * SIZE + 9] = 1; grid[9 * SIZE + 9] = 1;
+    {
+        int y_off = my_row * SIZE;
+        int x_off = my_col * SIZE;
+        for (int row = 0; row < SIZE; row++) {
+            uint32_t bits = PATTERN[y_off + row] >> x_off;
+            for (int col = 0; col < SIZE; col++)
+                grid[row * SIZE + col] = (uint8_t)((bits >> col) & 1u);
+        }
+    }
 
     noc_signal(SIG_SEED_LIVE);
 
     uint32_t iter = 0;
     while (1) {
-        *debug_iter_count = iter;
+        __sync_synchronize();
 
-        __sync_synchronize();  
-
-        if (my_col > 0) {
-            uint32_t dest = TILE_ID(my_row, my_col - 1);
-            //uint32_t bm0  = col_bitmap(0);
-            //uint32_t bm0  = 0x300;
-            uint32_t bm0_lo = col_bitmap_lo(0);
-            uint32_t bm0_hi = col_bitmap_hi(0);
-            /* shift hi into bits 8-9 using 8 safe shifts of 1 */
-            bm0_hi = bm0_hi << 1; bm0_hi = bm0_hi << 1; bm0_hi = bm0_hi << 1; bm0_hi = bm0_hi << 1;
-            bm0_hi = bm0_hi << 1; bm0_hi = bm0_hi << 1; bm0_hi = bm0_hi << 1; bm0_hi = bm0_hi << 1;
-            uint32_t bm0 = bm0_lo | bm0_hi;
-            noc_write((dest << FLIT_DEST_SHIFT) | FLIT_VALID_BIT | (bm0 & FLIT_BMAP_MASK));
-            *debug_ghost_flags |= 0x8;
-        }
-
+        /* Phase A: send col9 east, then recv col9 from west → ghost_W. */
         if (my_col < MESH_COLS - 1) {
-            uint32_t dest = TILE_ID(my_row, my_col + 1);
-            //uint32_t bm9  = col_bitmap(SIZE - 1);
-            //uint32_t bm9  = 0x300;
+            uint32_t dest   = TILE_ID(my_row, my_col + 1);
             uint32_t bm9_lo = col_bitmap_lo(SIZE - 1);
-            uint32_t bm9_hi = col_bitmap_hi(SIZE - 1);
-            /* shift hi into bits 8-9 using 8 safe shifts of 1 */
-            bm9_hi = bm9_hi << 1; bm9_hi = bm9_hi << 1; bm9_hi = bm9_hi << 1; bm9_hi = bm9_hi << 1;
-            bm9_hi = bm9_hi << 1; bm9_hi = bm9_hi << 1; bm9_hi = bm9_hi << 1; bm9_hi = bm9_hi << 1;
-            uint32_t bm9 = bm9_lo | bm9_hi;
+            uint32_t s8     = (uint32_t)(grid[8 * SIZE + (SIZE - 1)] & 1u) << 8;
+            uint32_t s9     = (uint32_t)(grid[9 * SIZE + (SIZE - 1)] & 1u) << 9;
+            uint32_t bm9    = bm9_lo | s8 | s9;
             noc_write((dest << FLIT_DEST_SHIFT) | FLIT_VALID_BIT | (bm9 & FLIT_BMAP_MASK));
-            *debug_ghost_flags |= 0x4;
         }
-
         if (my_col > 0) {
-            uint32_t bmr0 = recv_ghost();
-            *debug_last_recv_w = bmr0;
-            for (int i = 0; i < SIZE; i++) ghost_W[i] = (bmr0 >> i) & 1u;
+            uint32_t bmr = recv_ghost();
+            *debug_last_recv_w = bmr;
+            for (int i = 0; i < SIZE; i++) ghost_W[i] = (bmr >> i) & 1u;
         }
 
+        /* Phase B: send col0 west, then recv col0 from east → ghost_E. */
+        if (my_col > 0) {
+            uint32_t dest   = TILE_ID(my_row, my_col - 1);
+            uint32_t bm0_lo = col_bitmap_lo(0);
+            uint32_t s8     = (uint32_t)(grid[8 * SIZE + 0] & 1u) << 8;
+            uint32_t s9     = (uint32_t)(grid[9 * SIZE + 0] & 1u) << 9;
+            uint32_t bm0    = bm0_lo | s8 | s9;
+            noc_write((dest << FLIT_DEST_SHIFT) | FLIT_VALID_BIT | (bm0 & FLIT_BMAP_MASK));
+        }
         if (my_col < MESH_COLS - 1) {
-            uint32_t bmr9 = recv_ghost();
-            *debug_last_recv_e = bmr9;
-            for (int i = 0; i < SIZE; i++) ghost_E[i] = (bmr9 >> i) & 1u;
+            uint32_t bmr = recv_ghost();
+            *debug_last_recv_e = bmr;
+            for (int i = 0; i < SIZE; i++) ghost_E[i] = (bmr >> i) & 1u;
         }
 
-        uint8_t neighbor_counts[9] = {0};
         for (int row = 0; row < SIZE; row++) {
             for (int col = 0; col < SIZE; col++) {
                 int alive = grid[row * SIZE + col] & 1;
                 int n     = neighbour_count(row, col);
                 next_grid[row * SIZE + col] =
                     (uint8_t)(alive ? (n == 2 || n == 3) : (n == 3));
-                if (n <= 8) neighbor_counts[n]++;
             }
         }
-        for (int i = 0; i <= 8; i++)
-            debug_neighbor_hist[i] = neighbor_counts[i];
 
         noc_signal(SIG_MATH_DONE);
 
