@@ -24,6 +24,7 @@ module top (
     wire [10:0] host_sram_waddr;
     wire [7:0]  host_sram_wdata;
     wire        host_sram_wen;
+    wire [8:0]  host_tile_mask;
     wire [3:0]  rd_tile;
     wire [10:0] rd_addr;
     wire        rd_req;
@@ -42,11 +43,12 @@ module top (
         .flash_clk     (flash_clk),
         .flash_mosi    (flash_mosi),
         // Host write bus — connects after boot so host can overwrite tile SRAMs
-        .host_waddr    (host_sram_waddr),
-        .host_wdata    (host_sram_wdata),
-        .host_wen      (host_sram_wen),
-        .host_rst_in   (host_rst),
-        .host_rst_en   (host_rst_en)
+        .host_waddr      (host_sram_waddr),
+        .host_wdata      (host_sram_wdata),
+        .host_wen        (host_sram_wen),
+        .host_tile_mask  (host_tile_mask),
+        .host_rst_in     (host_rst),
+        .host_rst_en     (host_rst_en)
     );
 
     // -----------------------------------------------------------------------
@@ -62,6 +64,7 @@ module top (
         .sram_waddr  (host_sram_waddr),
         .sram_wdata  (host_sram_wdata),
         .sram_wen    (host_sram_wen),
+        .tile_mask   (host_tile_mask),
         .host_rst    (host_rst),
         .host_rst_en (host_rst_en),
         .rd_tile     (rd_tile),
