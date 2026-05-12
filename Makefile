@@ -71,7 +71,8 @@ COMPILE_ARGS += \
     -Wno-PINMISSING \
     -Wno-MODDUP \
     -Wno-MINTYPMAXDLY \
-    -Wno-MULTIDRIVEN
+    -Wno-MULTIDRIVEN \
+    -Wno-SPECIFYIGN
 #-------------------------------------
 #Help
 #-------------------------------------
