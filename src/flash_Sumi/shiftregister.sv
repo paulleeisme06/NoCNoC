@@ -37,4 +37,3 @@ module shiftregister (
         end
     end
 endmodule
-
