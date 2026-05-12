@@ -32,8 +32,8 @@ TOPLEVEL      = top
 
 SRC   := $(MAKEFILE_DIR)/src
 FLASH := $(SRC)/flash_Sumi
-MESH  := $(SRC)/mesh
-DFT   := $(SRC)/dft
+MESH  := $(SRC)/mesh_psi_aan
+DFT   := $(SRC)/dft_ethan
 
 VERILOG_EXTRA_DIRS = \
     $(MAKEFILE_DIR)/src/serv/rtl \
@@ -44,9 +44,11 @@ VERILOG_EXTRA = $(wildcard $(addsuffix /*.v,$(VERILOG_EXTRA_DIRS)))
 
 VERILOG_SOURCES := \
     $(SRC)/top.v \
+	$(SRC)/flash_Sumi/top_tb.v \
+    model/s25fl128l.sv \
 	$(MESH)/boot_controller.v \
     $(MESH)/mesh_3x3.v \
-    $(MESH)/mesh_tile.v \
+	$(FLASH)/mesh_tile_dft_shim.v \
     $(MESH)/mesh_router.v \
     $(FLASH)/host_spi_slave.v \
     $(FLASH)/rd_crossbar.v \
@@ -63,7 +65,6 @@ export VERILOG_SOURCES
 SIM = verilator
 
 COMPILE_ARGS += \
-    --timing \
     -I$(SRC) \
     -I$(FLASH) \
     -I$(MESH) \
@@ -71,7 +72,10 @@ COMPILE_ARGS += \
     -Wno-PINMISSING \
     -Wno-MODDUP \
     -Wno-MINTYPMAXDLY \
-    -Wno-MULTIDRIVEN
+    -Wno-MULTIDRIVEN \
+	-Wno-STMTDLY \
+    -Wno-TIMESCALEMOD \
+	-Wno-PINNOTFOUND
 #-------------------------------------
 #Help
 #-------------------------------------
@@ -102,6 +106,29 @@ help: ## Show this help message
 
 all: librelane ## Build the project (runs LibreLane)
 .PHONY: all
+
+sim-clean: ## Clean simulation build artifacts
+	rm -rf sim_build results.xml __pycache__ cocotb/__pycache__
+.PHONY: sim-clean
+
+COCOTB_MK := $(shell cocotb-config --makefiles)/Makefile.sim
+
+sim-flash-tb: ## Run flash test with real S25FL128L model via top_tb
+	$(MAKE) results.xml \
+		TOPLEVEL=top_tb \
+		MODULE=test_flash_mesh \
+		SIM_BUILD=sim_build/flash_tb \
+		PYTHONPATH=$(MAKEFILE_DIR)/cocotb:$(PYTHONPATH)
+.PHONY: sim-flash-tb
+
+sim-flash-tb-iv: ## Run flash test with real S25FL128L model via iverilog
+	$(MAKE) results.xml \
+		TOPLEVEL=top_tb \
+		MODULE=test_flash_mesh \
+		SIM=icarus \
+		SIM_BUILD=sim_build/flash_tb_iv \
+		PYTHONPATH=$(MAKEFILE_DIR)/cocotb:$(PYTHONPATH)
+.PHONY: sim-flash-tb-iv
 
 sim-flash: ## Run flash->housekeeping->mesh SRAM test
 	$(MAKE) results.xml \

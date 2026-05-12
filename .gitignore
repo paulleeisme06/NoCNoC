@@ -12,3 +12,4 @@ img/
 sim_build/
 src/firmware/firmware.bin
 src/firmware/test.txt
+model/

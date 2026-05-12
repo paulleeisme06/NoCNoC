@@ -104,6 +104,14 @@ module chip_core #(
     end
     assign dbg_ack = dbg_ack_r;
 
+    wire flash_cs_n_int;
+    wire flash_clk_int;
+    wire flash_mosi_int;
+
+    assign bidir_out[1] = flash_cs_n_int;
+    assign bidir_out[2] = flash_clk_int;
+    assign bidir_out[3] = flash_mosi_int;
+
     // Ethan: mesh 3x3 instantiation:
     mesh_3x3 u_mesh (
         .clk          (clk),
@@ -113,9 +121,9 @@ module chip_core #(
 
         // Flash boot pins — assign to remaining input/bidir pads
         .flash_miso   (input_in[4]),
-        .flash_cs_n   (bidir_out[1]),
-        .flash_clk    (bidir_out[2]),
-        .flash_mosi   (bidir_out[3]),
+        .flash_cs_n   (flash_cs_n_int),
+        .flash_clk    (flash_clk_int),
+        .flash_mosi   (flash_mosi_int),
 
         // DFT
         .dft_mode     (dft_mode),
