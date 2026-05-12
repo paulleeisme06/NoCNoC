@@ -18,9 +18,10 @@ module mesh_3x3 (
     // host_wen is active-high; internally inverted to match boot bus polarity.
     input  wire [10:0] host_waddr,
     input  wire [7:0]  host_wdata,
-    input  wire        host_wen,     // active-high
-    input  wire        host_rst_in,  // 1 = hold tiles in reset (enables host writes)
-    input  wire        host_rst_en,  // 1 = host owns reset/bus
+    input  wire        host_wen,       // active-high
+    input  wire [8:0]  host_tile_mask, // bit (r*3+c) = 1 enables tile(r,c); default all ones
+    input  wire        host_rst_in,   // 1 = hold tiles in reset (enables host writes)
+    input  wire        host_rst_en,   // 1 = host owns reset/bus
 
     // DFT debug ports (Ethan)
     input  wire        dft_mode,
@@ -75,12 +76,11 @@ module mesh_3x3 (
     //     to safely write, then release to start the CPUs)
     // When host_rst_en=0 the boot_controller owns everything (normal boot).
     // -------------------------------------------------------------------------
-    wire [10:0] boot_addr = host_rst_en ? host_waddr         : bc_addr;
-    wire [7:0]  boot_data = host_rst_en ? host_wdata         : bc_data;
-    // boot_wen is active-low; host_wen is active-high so invert it
-    wire        boot_wen  = host_rst_en ? ~host_wen          : bc_wen;
-    wire        cpu_rst_n = host_rst_en ? ~host_rst_in       : bc_cpu_rst_n;
+    wire [10:0] boot_addr = host_rst_en ? host_waddr   : bc_addr;
+    wire [7:0]  boot_data = host_rst_en ? host_wdata   : bc_data;
+    wire        cpu_rst_n = host_rst_en ? ~host_rst_in : bc_cpu_rst_n;
     wire        boot_mode = !cpu_rst_n;
+    // boot_wen is computed per-tile inside the generate loop so host_tile_mask is applied
 
     // -------------------------------------------------------------------------
     // Mesh interconnect wires (36-bit flits)
@@ -102,9 +102,14 @@ module mesh_3x3 (
                 wire [35:0] nw_i = (r == 0 && c == 0) ? inject_00_nw :
                                    (r > 0  && c > 0)   ? grid_se[r-1][c-1] : 36'b0;
 
+                // boot_wen is active-low; host_wen active-high, masked per tile
+                wire tile_boot_wen = host_rst_en
+                    ? (~host_wen | ~host_tile_mask[r*3+c])
+                    : bc_wen;
+
                 mesh_tile #(.TILE_ID({3'(r), 3'(c)})) tile_inst (
                     .clk(clk), .rst(!cpu_rst_n), .boot_mode(boot_mode),
-                    .boot_addr(boot_addr), .boot_data(boot_data), .boot_wen(boot_wen),
+                    .boot_addr(boot_addr), .boot_data(boot_data), .boot_wen(tile_boot_wen),
                     .north_in(n_i),   .south_in(s_i),   .east_in(e_i),   .west_in(w_i),
                     .north_out(grid_n[r][c]), .south_out(grid_s[r][c]),
                     .east_out(grid_e[r][c]),  .west_out(grid_w[r][c]),
