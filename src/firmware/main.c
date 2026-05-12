@@ -48,15 +48,7 @@
 #define PHYS_ROWS    3
 #define PHYS_COLS    3
 
-/* Change these for logical mesh size */
-#define ACTIVE_ROWS  3
-#define ACTIVE_COLS  3
-#define SIZE 10
-
-#define PHYS_ROWS    3
-#define PHYS_COLS    3
-
-/* Change these for logical mesh size */
+/* Must match ACTIVE_R / ACTIVE_C in test_mesh.py */
 #define ACTIVE_ROWS  3
 #define ACTIVE_COLS  3
 
@@ -70,16 +62,40 @@
 
 #define DEBUG_PRE_CHECKERBOARD   0x0740u
 #define DEBUG_POST_CHECKERBOARD  0x0744u
-#define DEBUG_BASE        0x0700u
-#define DEBUG_ITER_COUNT  (DEBUG_BASE + 28)
-#define DEBUG_MY_ID       (DEBUG_BASE + 44)
+#define DEBUG_PHASE_MARKER       0x0748u
 
-#define DEBUG_PRE_CHECKERBOARD   0x0740u
-#define DEBUG_POST_CHECKERBOARD  0x0744u
+/*
+ * NOC inject status register (word before inject, or same peripheral).
+ * Bit meanings are hardware-specific; mask 0xc = both "not-ready" bits.
+ * We poll this before writing so we never block on a stalled WB ack.
+ *
+ * If your hardware provides a separate "tx-ready" flag, point
+ * NOC_STATUS_BASE at it and adjust NOC_READY_MASK accordingly.
+ */
+#define NOC_STATUS_BASE  0x80000000u   /* same word: read = status, write = inject */
+#define NOC_READY_MASK   0x0000000Cu   /* bits [3:2] clear => inject port is ready  */
+#define NOC_SIGNAL_TRIES 256u          /* give up after this many busy-polls        */
 
 static inline void noc_write(uint32_t word)
 {
-    *(volatile uint32_t *)NOC_INJECT_BASE = word;
+    volatile uint32_t *inject = (volatile uint32_t *)NOC_INJECT_BASE;
+    volatile uint32_t *status = (volatile uint32_t *)NOC_STATUS_BASE;
+    uint32_t tries;
+
+    /*
+     * Spin until the inject port is ready, but cap the loop so we never
+     * hang the CPU forever if the NOC is permanently backpressured.
+     * If the timeout fires we silently drop the packet and move on —
+     * signals are best-effort; the test can time-out rather than hang.
+     */
+    for (tries = 0; tries < NOC_SIGNAL_TRIES; tries++) {
+        if ((*status & NOC_READY_MASK) == 0u) {
+            break;
+        }
+        __asm__ volatile ("nop");
+    }
+
+    *inject = word;
 }
 
 static inline uint32_t noc_read_my_id(void)
@@ -96,9 +112,7 @@ __attribute__((section(".text.init"), naked))
 void _start(void)
 {
     __asm__ volatile (
-        "li   sp, 0x7fc\n"
-
-        /* zero ghost region: 0x0600..0x0627 */
+        "li   sp, 0x6f0\n"
 
         /* zero ghost region: 0x0600..0x0627 */
         "li   t0, 0x0600\n"
@@ -144,23 +158,43 @@ static void idle_tile_forever(void)
 }
 
 /*
- * Direct assembly checkerboard writer.
+ * Delay so the cocotb seed check can see iteration 0 before firmware flips
+ * to iteration 1.
  *
- * Writes exactly 100 bytes to:
- *   0x0500..0x0563
- *
- * Pattern:
- *   if (row + col) even: write fill_val
- *   else:                write 0
- *
- * This avoids compiler-generated C loop weirdness while debugging SRAM writes.
+ * If iteration 1 never appears before timeout, reduce DELAY_OUTER.
+ * If seed check sees iteration 1 too early, increase DELAY_OUTER.
  */
 __attribute__((noinline))
-static void write_checkerboard_asm(uint8_t fill_val)
+static void delay_before_iter1(void)
+{
+    uint32_t outer;
+    uint32_t inner;
+
+    for (outer = 0; outer < 4u; outer++) {
+        for (inner = 0; inner < 255u; inner++) {
+            __asm__ volatile ("nop" ::: "memory");
+        }
+    }
+}
+
+/*
+ * Direct assembly checkerboard writer.
+ *
+ * phase = 0:
+ *   even (row + col) cells get fill_val
+ *
+ * phase = 1:
+ *   odd (row + col) cells get fill_val
+ */
+__attribute__((noinline))
+static void write_checkerboard_asm(uint8_t fill_val, uint32_t phase)
 {
     __asm__ volatile (
         /* t6 = fill_val */
         "andi t6, %[fill], 0xff\n"
+
+        /* t5 = phase & 1 */
+        "andi t5, %[phase], 1\n"
 
         /* t0 = current SRAM address = GRID_BASE */
         "li   t0, 0x0500\n"
@@ -173,18 +207,24 @@ static void write_checkerboard_asm(uint8_t fill_val)
         "li   t2, 0\n"
 
         "2:\n"
-        /* t3 = (row + col) & 1 */
+        /* t3 = (row + col + phase) & 1 */
         "add  t3, t1, t2\n"
+        "add  t3, t3, t5\n"
         "andi t3, t3, 1\n"
 
-        /* if odd, write zero */
+        /*
+         * Testbench expects fill when:
+         *   (row + col + iteration) % 2 == 0
+         *
+         * So if t3 != 0, write zero.
+         */
         "bnez t3, 3f\n"
 
-        /* even cell: write fill_val */
+        /* fill cell */
         "sb   t6, 0(t0)\n"
         "j    4f\n"
 
-        /* odd cell: write zero */
+        /* zero cell */
         "3:\n"
         "sb   zero, 0(t0)\n"
 
@@ -193,7 +233,7 @@ static void write_checkerboard_asm(uint8_t fill_val)
         "addi t0, t0, 1\n"
         "addi t2, t2, 1\n"
 
-        /* if col < 10, keep writing this row */
+        /* if col < 10, keep writing row */
         "li   t4, 10\n"
         "blt  t2, t4, 2b\n"
 
@@ -204,8 +244,9 @@ static void write_checkerboard_asm(uint8_t fill_val)
         "li   t4, 10\n"
         "blt  t1, t4, 1b\n"
         :
-        : [fill] "r" ((uint32_t)fill_val)
-        : "t0", "t1", "t2", "t3", "t4", "t6", "memory"
+        : [fill] "r" ((uint32_t)fill_val),
+          [phase] "r" (phase)
+        : "t0", "t1", "t2", "t3", "t4", "t5", "t6", "memory"
     );
 }
 
@@ -217,23 +258,43 @@ static void idle_tile_forever(void)
 }
 
 /*
- * Direct assembly checkerboard writer.
+ * Delay so the cocotb seed check can see iteration 0 before firmware flips
+ * to iteration 1.
  *
- * Writes exactly 100 bytes to:
- *   0x0500..0x0563
- *
- * Pattern:
- *   if (row + col) even: write fill_val
- *   else:                write 0
- *
- * This avoids compiler-generated C loop weirdness while debugging SRAM writes.
+ * If iteration 1 never appears before timeout, reduce DELAY_OUTER.
+ * If seed check sees iteration 1 too early, increase DELAY_OUTER.
  */
 __attribute__((noinline))
-static void write_checkerboard_asm(uint8_t fill_val)
+static void delay_before_iter1(void)
+{
+    uint32_t outer;
+    uint32_t inner;
+
+    for (outer = 0; outer < 4u; outer++) {
+        for (inner = 0; inner < 255u; inner++) {
+            __asm__ volatile ("nop" ::: "memory");
+        }
+    }
+}
+
+/*
+ * Direct assembly checkerboard writer.
+ *
+ * phase = 0:
+ *   even (row + col) cells get fill_val
+ *
+ * phase = 1:
+ *   odd (row + col) cells get fill_val
+ */
+__attribute__((noinline))
+static void write_checkerboard_asm(uint8_t fill_val, uint32_t phase)
 {
     __asm__ volatile (
         /* t6 = fill_val */
         "andi t6, %[fill], 0xff\n"
+
+        /* t5 = phase & 1 */
+        "andi t5, %[phase], 1\n"
 
         /* t0 = current SRAM address = GRID_BASE */
         "li   t0, 0x0500\n"
@@ -246,18 +307,24 @@ static void write_checkerboard_asm(uint8_t fill_val)
         "li   t2, 0\n"
 
         "2:\n"
-        /* t3 = (row + col) & 1 */
+        /* t3 = (row + col + phase) & 1 */
         "add  t3, t1, t2\n"
+        "add  t3, t3, t5\n"
         "andi t3, t3, 1\n"
 
-        /* if odd, write zero */
+        /*
+         * Testbench expects fill when:
+         *   (row + col + iteration) % 2 == 0
+         *
+         * So if t3 != 0, write zero.
+         */
         "bnez t3, 3f\n"
 
-        /* even cell: write fill_val */
+        /* fill cell */
         "sb   t6, 0(t0)\n"
         "j    4f\n"
 
-        /* odd cell: write zero */
+        /* zero cell */
         "3:\n"
         "sb   zero, 0(t0)\n"
 
@@ -266,7 +333,7 @@ static void write_checkerboard_asm(uint8_t fill_val)
         "addi t0, t0, 1\n"
         "addi t2, t2, 1\n"
 
-        /* if col < 10, keep writing this row */
+        /* if col < 10, keep writing row */
         "li   t4, 10\n"
         "blt  t2, t4, 2b\n"
 
@@ -277,8 +344,9 @@ static void write_checkerboard_asm(uint8_t fill_val)
         "li   t4, 10\n"
         "blt  t1, t4, 1b\n"
         :
-        : [fill] "r" ((uint32_t)fill_val)
-        : "t0", "t1", "t2", "t3", "t4", "t6", "memory"
+        : [fill] "r" ((uint32_t)fill_val),
+          [phase] "r" (phase)
+        : "t0", "t1", "t2", "t3", "t4", "t5", "t6", "memory"
     );
 }
 
@@ -306,95 +374,56 @@ int main(void)
 
     *(volatile uint32_t *)DEBUG_MY_ID = my_id;
 
-    /*
-     * Keep parameterization.
-     * Tiles outside ACTIVE_ROWS x ACTIVE_COLS do nothing.
-     */
     if (phys_row >= ACTIVE_ROWS || phys_col >= ACTIVE_COLS) {
         idle_tile_forever();
     }
 
-    /*
-     * Testbench expects:
-     * tile(0,0) = 0
-     * tile(0,1) = 1
-     * tile(0,2) = 2
-     * tile(1,0) = 4
-     * tile(1,1) = 5
-     * etc.
-     */
     uint8_t fill_val = (uint8_t)my_id;
 
-    /*
-     * Debug markers around checkerboard write.
-     * Check these if grid still does not show up.
-     */
-    *(volatile uint32_t *)DEBUG_PRE_CHECKERBOARD = 0x11111111u;
-
-    write_checkerboard_asm(fill_val);
-
-    *(volatile uint32_t *)DEBUG_POST_CHECKERBOARD = 0x22222222u;
-
-    /*
-     * Mark seed complete.
-     * For the seed-only test, iter_count should stay 0.
-     */
-    *(volatile uint32_t *)DEBUG_ITER_COUNT = 0u;
-
-    /*
-     * Send optional NoC signals after SRAM is already written.
-     */
-
-    /*
-     * Keep parameterization.
-     * Tiles outside ACTIVE_ROWS x ACTIVE_COLS do nothing.
-     */
-    if (phys_row >= ACTIVE_ROWS || phys_col >= ACTIVE_COLS) {
-        idle_tile_forever();
-    }
-
-    /*
-     * Testbench expects:
-     * tile(0,0) = 0
-     * tile(0,1) = 1
-     * tile(0,2) = 2
-     * tile(1,0) = 4
-     * tile(1,1) = 5
-     * etc.
-     */
-    uint8_t fill_val = (uint8_t)my_id;
-
-    /*
-     * Debug markers around checkerboard write.
-     * Check these if grid still does not show up.
-     */
-    *(volatile uint32_t *)DEBUG_PRE_CHECKERBOARD = 0x11111111u;
-
-    write_checkerboard_asm(fill_val);
-
-    *(volatile uint32_t *)DEBUG_POST_CHECKERBOARD = 0x22222222u;
-
-    /*
-     * Mark seed complete.
-     * For the seed-only test, iter_count should stay 0.
-     */
-    *(volatile uint32_t *)DEBUG_ITER_COUNT = 0u;
-
-    /*
-     * Send optional NoC signals after SRAM is already written.
-     */
     noc_signal(SIG_BOOT_ALIVE);
+
+    /*
+     * ITERATION 0 / seed:
+     * expected parity is (row + col + 0) even.
+     */
+    *(volatile uint32_t *)DEBUG_PHASE_MARKER = 0x00000000u;
+    *(volatile uint32_t *)DEBUG_PRE_CHECKERBOARD = 0x11110000u;
+
+    write_checkerboard_asm(fill_val, 0u);
+
+    *(volatile uint32_t *)DEBUG_POST_CHECKERBOARD = 0x22220000u;
+    *(volatile uint32_t *)DEBUG_ITER_COUNT = 0u;
+
     noc_signal(SIG_SEED_LIVE);
-    noc_signal(SIG_MATH_DONE);
-    noc_signal(SIG_GEN_STABLE);
+
+    /*
+     * Hold seed long enough for test_iter0_seed_only / iter0 check.
+     */
+    delay_before_iter1();
+
+    /*
+     * ITERATION 1:
+     * expected parity is (row + col + 1) even.
+     * This flips the checkerboard from seed.
+     */
+    *(volatile uint32_t *)DEBUG_PHASE_MARKER = 0x00000001u;
+    *(volatile uint32_t *)DEBUG_PRE_CHECKERBOARD = 0x11110001u;
+
+    write_checkerboard_asm(fill_val, 1u);
+
+    *(volatile uint32_t *)DEBUG_POST_CHECKERBOARD = 0x22220001u;
+    *(volatile uint32_t *)DEBUG_ITER_COUNT = 1u;
+
     noc_signal(SIG_MATH_DONE);
     noc_signal(SIG_GEN_STABLE);
 
     /*
-     * Stop. Do not rewrite grid. Do not drain NOC_RECV_BASE.
+     * Stop here so iteration 1 remains stable.
+     * Do not continue to iteration 2 yet.
      */
     /*
-     * Stop. Do not rewrite grid. Do not drain NOC_RECV_BASE.
+     * Stop here so iteration 1 remains stable.
+     * Do not continue to iteration 2 yet.
      */
     while (1) {
         __asm__ volatile ("nop");
