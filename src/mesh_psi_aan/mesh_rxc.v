@@ -27,6 +27,7 @@ module mesh_rxc #(
     output wire        flash_mosi
 );
 
+
     // -------------------------------------------------------------------------
     // Boot controller — shared across all tiles (broadcast bus)
     // -------------------------------------------------------------------------
@@ -71,13 +72,22 @@ module mesh_rxc #(
                 // TILE_ID encoding: row in [5:3], col in [2:0]
                 localparam [5:0] THIS_TILE_ID = {r[2:0], c[2:0]};
 
+                // ----------------------------------------------------------
+                // Neighbour inputs — XY convention:
+                //   north_in  = south_out of the tile ABOVE  (r-1)
+                //   south_in  = north_out of the tile BELOW  (r+1)
+                //   east_in   = west_out  of the tile RIGHT  (c+1)
+                //   west_in   = east_out  of the tile LEFT   (c-1)
+                // Border tiles receive 36'b0 on missing neighbours.
+                // ----------------------------------------------------------
                 wire [35:0] n_i  = (r > 0)                          ? grid_s [r-1][c  ] : 36'b0;
-                wire [35:0] s_i  = (r < MESH_R-1)                   ? grid_n [r+1][c  ] : 36'b0;
-                wire [35:0] e_i  = (c < MESH_C-1)                   ? grid_w [r  ][c+1] : 36'b0;
+                wire [35:0] s_i  = (r < MESH_R-1)                ? grid_n [r+1][c  ] : 36'b0;
+                wire [35:0] e_i  = (c < MESH_C-1)                ? grid_w [r  ][c+1] : 36'b0;
                 wire [35:0] w_i  = (c > 0)                          ? grid_e [r  ][c-1] : 36'b0;
-                wire [35:0] ne_i = (r > 0 && c < MESH_C-1)         ? grid_sw[r-1][c+1] : 36'b0;
-                wire [35:0] se_i = (r < MESH_R-1 && c < MESH_C-1)  ? grid_nw[r+1][c+1] : 36'b0;
-                wire [35:0] sw_i = (r < MESH_R-1 && c > 0)         ? grid_ne[r+1][c-1] : 36'b0;
+                wire [35:0] ne_i = (r > 0 && c < MESH_C-1)       ? grid_sw[r-1][c+1] : 36'b0;
+                wire [35:0] se_i = (r < MESH_R-1 && c < MESH_C-1) ? grid_nw[r+1][c+1] : 36'b0;
+                wire [35:0] sw_i = (r < MESH_R-1 && c > 0)       ? grid_ne[r+1][c-1] : 36'b0;
+                // NW of (0,0) is the external injection port
                 wire [35:0] nw_i = (r == 0 && c == 0) ? inject_00_nw
                                  : (r > 0  && c > 0 ) ? grid_se[r-1][c-1]
                                  :                       36'b0;
@@ -113,14 +123,14 @@ module mesh_rxc #(
     // SE output of the bottom-right tile — useful for testbench probing
     assign monitor_se = grid_se[MESH_R-1][MESH_C-1];
 
-`ifndef SYNTHESIS
     // =========================================================================
-    // INTER-TILE WIRE MONITOR (simulation only)
+    // INTER-TILE WIRE MONITOR (compile-time guarded — only when MESH_COLS >= 2)
     // =========================================================================
     generate
         if (MESH_C >= 2) begin : wire_monitor
             always @(posedge clk) begin
 
+                // ── (0,0) east output ─────────────────────────────────────────
                 if (rows[0].cols[0].tile_inst.router_inst.e_out[33]) begin
                     $display("[WIRE t=%0t] (0,0).east_out   VALID  dest=%0d  payload=0x%08x",
                              $time,
@@ -128,6 +138,7 @@ module mesh_rxc #(
                              rows[0].cols[0].tile_inst.router_inst.e_out[28:0]);
                 end
 
+                // ── (0,1) west input ──────────────────────────────────────────
                 if (rows[0].cols[1].tile_inst.router_inst.w_in[33]) begin
                     $display("[WIRE t=%0t] (0,1).west_in     VALID  dest=%0d  payload=0x%08x",
                              $time,
@@ -135,6 +146,7 @@ module mesh_rxc #(
                              rows[0].cols[1].tile_inst.router_inst.w_in[28:0]);
                 end
 
+                // ── (0,1) ejection decision ───────────────────────────────────
                 if (rows[0].cols[1].tile_inst.router_inst.next_eject[33]) begin
                     $display("[WIRE t=%0t] (0,1).next_eject  VALID  payload=0x%08x  fifo_full=%0b  fifo_count=%0d",
                              $time,
@@ -143,12 +155,14 @@ module mesh_rxc #(
                              rows[0].cols[1].tile_inst.router_inst.fifo_count);
                 end
 
+                // ── (0,1) FIFO push confirmation ──────────────────────────────
                 if (rows[0].cols[1].tile_inst.router_inst.fifo_push) begin
                     $display("[WIRE t=%0t] (0,1).fifo_push   count_after=%0d",
                              $time,
                              rows[0].cols[1].tile_inst.router_inst.fifo_count + 1);
                 end
 
+                // ── (0,0) inject flit ─────────────────────────────────────────
                 if (rows[0].cols[0].tile_inst.router_inst.inject_flit[33]) begin
                     $display("[WIRE t=%0t] (0,0).inject_flit VALID  dest=%0d  payload=0x%08x",
                              $time,
@@ -160,6 +174,5 @@ module mesh_rxc #(
             end
         end
     endgenerate
-`endif
 
 endmodule

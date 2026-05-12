@@ -121,7 +121,7 @@ def chip_top_runner():
         proj_path / "../src/dft_ethan/spi_debug.v",
         proj_path / "../src/dft_ethan/gf180mcu_fd_ip_sram__sram2048x8m8wm1.v",
         proj_path / "../src/mesh_psi_aan/mesh_3x3.v",
-        proj_path / "../src/mesh_psi_aan/mesh_tile.v",
+        proj_path / "../src/mesh_psi_aann/mesh_tile.v",
         proj_path / "../src/mesh_psi_aan/mesh_router.v",
         proj_path / "../src/mesh_psi_aan/boot_controller.v",
         # Add all .v files from subservient and serv submodules:

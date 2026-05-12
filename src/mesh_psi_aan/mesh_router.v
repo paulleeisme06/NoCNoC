@@ -188,9 +188,6 @@ module mesh_router #(
 
     assign eject_flit_next = next_eject;
 
-    // -------------------------------------------------------------------------
-    // Output registers + debug logging (simulation only)
-    // -------------------------------------------------------------------------
     // ── TILE(0,0) transit & misroute monitor ─────────────────────────────────
     // Shows every flit that passes THROUGH tile (0,0) without being ejected,
     // and flags any ghost flit that is being forwarded instead of ejected
@@ -245,7 +242,6 @@ module mesh_router #(
             ne_out <= next_ne; nw_out <= next_nw;
             se_out <= next_se; sw_out <= next_sw;
 
-`ifndef SYNTHESIS
             // ── Wishbone write cycle monitor ─────────────────────────────────
             if (local_wb_stb && local_wb_we && local_wb_adr == 32'h80000000) begin
                 $display("[WB_CYCLE t=%0t] TILE=%0d stb=%b we=%b ack=%b dat_o=0x%08x",
@@ -286,10 +282,7 @@ module mesh_router #(
                          $time, MY_ID, next_s[34:32], next_s[31:29], next_s[28:0]);
 
             $fflush();
-`endif
         end
     end
 
 endmodule
-
-`default_nettype wire
