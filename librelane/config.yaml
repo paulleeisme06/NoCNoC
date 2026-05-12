@@ -26,20 +26,40 @@ meta:
 
 DESIGN_NAME: chip_top
 VERILOG_FILES:
+# Top-level and core
 - dir::../src/chip_top.sv
 - dir::../src/chip_core.sv
-- dir::../src/dft - Ethan/spi_debug.v
-- dir::../src/mesh - Psi&Aan/mesh_3x3.v
-- dir::../src/mesh - Psi&Aan/mesh_tile.v
-- dir::../src/mesh - Psi&Aan/mesh_router.v
-- dir::../src/mesh - Psi&Aan/boot_loader.v
-- dir::../src/host-to-chip - Paul&Andrea/host_to_chip.v
-- dir::../src/flash - Sumi/flash_clk.sv
-- dir::../src/flash - Sumi/hk_boot_adapter.v
-- dir::../src/flash - Sumi/housekeeping.sv
-- dir::../src/flash - Sumi/shiftregister.sv
-- dir::../src/serv/*.v 
-- dir::../src/subservient/*.v
+# Host SPI slave (11-bit addr, unicast+broadcast write, readback, reset control)
+- dir::../src/flash_Sumi/host_spi_slave.v
+# Integration mesh (boot_controller + 9 tiles + host bus + readback mux)
+- dir::../src/integration/mesh_3x3.v
+- dir::../src/integration/mesh_tile.v
+- dir::../src/integration/mesh_router.v
+- dir::../src/integration/boot_controller.v
+# Subservient RISC-V core (used inside each mesh_tile)
+- dir::../src/subservient/ethan/subservient_core.v
+- dir::../src/subservient/ethan/subservient_rf_ram_if.v
+# SERV bit-serial RISC-V RTL (dependency of subservient_core)
+- dir::../src/serv/rtl/serv_alu.v
+- dir::../src/serv/rtl/serv_bufreg.v
+- dir::../src/serv/rtl/serv_bufreg2.v
+- dir::../src/serv/rtl/serv_compdec.v
+- dir::../src/serv/rtl/serv_csr.v
+- dir::../src/serv/rtl/serv_ctrl.v
+- dir::../src/serv/rtl/serv_decode.v
+- dir::../src/serv/rtl/serv_immdec.v
+- dir::../src/serv/rtl/serv_mem_if.v
+- dir::../src/serv/rtl/serv_rf_if.v
+- dir::../src/serv/rtl/serv_rf_ram_if.v
+- dir::../src/serv/rtl/serv_rf_ram.v
+- dir::../src/serv/rtl/serv_rf_top.v
+- dir::../src/serv/rtl/serv_state.v
+- dir::../src/serv/rtl/serv_top.v
+- dir::../src/serv/rtl/serv_aligner.v
+- dir::../src/serv/servile/servile_arbiter.v
+- dir::../src/serv/servile/servile_mux.v
+- dir::../src/serv/servile/servile_rf_mem_if.v
+- dir::../src/serv/servile/servile.v
 - dir::../src/serv/servile/*.v
 
 
@@ -189,26 +209,53 @@ MACROS:
         location: ["expr::$DIE_AREA[2] + -169.25", "expr::$DIE_AREA[3] + -169.25"]
         orientation: N
 
-  gf180mcu_ocd_ip_sram__sram512x8m8wm1:
+  # Each mesh_tile instantiates gf180mcu_fd_ip_sram__sram2048x8m8wm1.
+  # There are 9 tiles (rows 0-2, cols 0-2); instance paths follow the generate
+  # block naming: i_chip_core.u_mesh.rows[R].cols[C].tile_inst.sram_inst
+  # GDS/LEF/LIB paths below assume the standard GF180MCU PDK layout.
+  # Run `make clone-pdk` and verify these paths before tapeout.
+  gf180mcu_fd_ip_sram__sram2048x8m8wm1:
     gds:
-      - dir::../libs/gf180mcu_ocd_ip_sram/cells/gf180mcu_ocd_ip_sram__sram512x8m8wm1/gf180mcu_ocd_ip_sram__sram512x8m8wm1.gds
+      - dir::../gf180mcu/gf180mcuD/libs.ref/gf180mcu_fd_ip_sram/gds/gf180mcu_fd_ip_sram__sram2048x8m8wm1.gds
     lef:
-      - dir::../libs/gf180mcu_ocd_ip_sram/cells/gf180mcu_ocd_ip_sram__sram512x8m8wm1/gf180mcu_ocd_ip_sram__sram512x8m8wm1.lef
+      - dir::../gf180mcu/gf180mcuD/libs.ref/gf180mcu_fd_ip_sram/lef/gf180mcu_fd_ip_sram__sram2048x8m8wm1.lef
     vh:
-      - dir::../libs/gf180mcu_ocd_ip_sram/cells/gf180mcu_ocd_ip_sram__sram512x8m8wm1/gf180mcu_ocd_ip_sram__sram512x8m8wm1.blackbox.v
+      - dir::../src/subservient/ethan/gf180mcu_fd_ip_sram__sram2048x8m8wm1.v
     lib:
       "*_tt_025C_3v30":
-        - dir::../libs/gf180mcu_ocd_ip_sram/cells/gf180mcu_ocd_ip_sram__sram512x8m8wm1/gf180mcu_ocd_ip_sram__sram512x8m8wm1__tt_025C_3v30.lib
+        - dir::../gf180mcu/gf180mcuD/libs.ref/gf180mcu_fd_ip_sram/lib/gf180mcu_fd_ip_sram__sram2048x8m8wm1__tt_025C_3v30.lib
       "*_ff_n40C_3v60":
-        - dir::../libs/gf180mcu_ocd_ip_sram/cells/gf180mcu_ocd_ip_sram__sram512x8m8wm1/gf180mcu_ocd_ip_sram__sram512x8m8wm1__ff_n40C_3v60.lib
+        - dir::../gf180mcu/gf180mcuD/libs.ref/gf180mcu_fd_ip_sram/lib/gf180mcu_fd_ip_sram__sram2048x8m8wm1__ff_n40C_3v60.lib
     instances:
-      # Make sure to specify the SRAMs in pdn_cfg.tcl
-      i_chip_core.sram_0:
-        location: [490, 500]
+      # TODO: determine final floorplan locations for all 9 tile SRAMs.
+      # Placeholder locations below — update before running LibreLane.
+      i_chip_core.u_mesh.rows[0].cols[0].tile_inst.sram_inst:
+        location: [200, 200]
         orientation: N
-      i_chip_core.sram_1:
-        location: [970, 500]
-        orientation: E
+      i_chip_core.u_mesh.rows[0].cols[1].tile_inst.sram_inst:
+        location: [500, 200]
+        orientation: N
+      i_chip_core.u_mesh.rows[0].cols[2].tile_inst.sram_inst:
+        location: [800, 200]
+        orientation: N
+      i_chip_core.u_mesh.rows[1].cols[0].tile_inst.sram_inst:
+        location: [200, 500]
+        orientation: N
+      i_chip_core.u_mesh.rows[1].cols[1].tile_inst.sram_inst:
+        location: [500, 500]
+        orientation: N
+      i_chip_core.u_mesh.rows[1].cols[2].tile_inst.sram_inst:
+        location: [800, 500]
+        orientation: N
+      i_chip_core.u_mesh.rows[2].cols[0].tile_inst.sram_inst:
+        location: [200, 800]
+        orientation: N
+      i_chip_core.u_mesh.rows[2].cols[1].tile_inst.sram_inst:
+        location: [500, 800]
+        orientation: N
+      i_chip_core.u_mesh.rows[2].cols[2].tile_inst.sram_inst:
+        location: [800, 800]
+        orientation: N
 
 # This is an alternative method compared to
 # specifying the power connections in the RTL
