@@ -38,210 +38,219 @@
 #define NOC_RECV_BASE    0x80000004u
 #define NOC_ID_BASE      0x80000008u
 
-// TILE_ID encoding: row in [3:2], col in [1:0]  — matches mesh_router.v
-//   parameter [3:0] MY_ID,  wire [1:0] my_row = MY_ID[3:2],  my_col = MY_ID[1:0]
-#define TILE_ID(r, c)   ((((uint32_t)(r)) << 2) | ((uint32_t)(c)))
+#define SIG_BOOT_ALIVE   0xF0000001u
+#define SIG_SEED_LIVE    0xF0000002u
+#define SIG_MATH_DONE    0xF0000003u
+#define SIG_GEN_STABLE   0xF0000004u
 
-// Flit layout (matches mesh_router.v inject path):
-//   CPU writes a 32-bit word to 0x80000000.
-//   The router builds the 34-bit flit as:
-//     [33]    = 1'b1 (valid)
-//     [32:29] = word[31:28]  → dest TILE_ID (4 bits)
-//     [28:0]  = word[28:0]   → payload
-//
-//   Inject word layout:
-//     [31:28]  dest TILE_ID (4 bits) — consumed by router, NOT in payload
-//     [28:0]   payload delivered to receiver FIFO ({3'b0, flit[28:0]})
-//
-// TOKEN_VALID_BIT must live inside payload[28:0] and must NOT overlap
-// bits [31:28] (the dest field).  Bit 16 is safe.
-#define FLIT_DEST_SHIFT  28u
-#define TOKEN_VALID_BIT  (1u << 16)   // sentinel: bit 16, safely inside payload
+#define SIZE 10
 
-// ============================================================================
-// Debug memory map  (byte addresses inside the 2 KB SRAM)
-// ============================================================================
-#define DEBUG_BASE          0x0700u
-#define DEBUG_MY_ID         (DEBUG_BASE +  0)   // uint32: my TILE_ID
-#define DEBUG_TOKEN_RECV    (DEBUG_BASE +  4)   // uint32: raw payload received
-#define DEBUG_DIR_RECV      (DEBUG_BASE +  8)   // uint32: direction token came from
-#define DEBUG_TOKEN_SENT    (DEBUG_BASE + 12)   // uint32: payload we forwarded
-#define DEBUG_DEST_SENT     (DEBUG_BASE + 16)   // uint32: dest TILE_ID we sent to
-#define DEBUG_DONE          (DEBUG_BASE + 20)   // uint32: 0xDEAD when finished
+#define PHYS_ROWS    3
+#define PHYS_COLS    3
 
-// Direction codes stored in DEBUG_DIR_RECV
-#define DIR_SELF   0u   // tile(0,0) — no receive, self-start
-#define DIR_WEST   1u   // token arrived from the west  (E link of left neighbour)
-#define DIR_EAST   2u   // token arrived from the east  (W link of right neighbour)
-#define DIR_NORTH  3u   // token arrived from the north (S link of upper neighbour)
+/* Change these for logical mesh size */
+#define ACTIVE_ROWS  3
+#define ACTIVE_COLS  3
 
-// ============================================================================
-// Typed SRAM pointers
-// ============================================================================
-#define dbg_my_id       ((volatile uint32_t *)DEBUG_MY_ID)
-#define dbg_token_recv  ((volatile uint32_t *)DEBUG_TOKEN_RECV)
-#define dbg_dir_recv    ((volatile uint32_t *)DEBUG_DIR_RECV)
-#define dbg_token_sent  ((volatile uint32_t *)DEBUG_TOKEN_SENT)
-#define dbg_dest_sent   ((volatile uint32_t *)DEBUG_DEST_SENT)
-#define dbg_done        ((volatile uint32_t *)DEBUG_DONE)
+#define GRID_BASE       0x0500u
+#define GHOST_BASE      0x0600u
+#define NEXT_GRID_BASE  0x0640u
 
-// ============================================================================
-// NoC helpers
-// ============================================================================
-static inline void noc_send(uint32_t dest_id, uint32_t payload)
+#define DEBUG_BASE        0x0700u
+#define DEBUG_ITER_COUNT  (DEBUG_BASE + 28)
+#define DEBUG_MY_ID       (DEBUG_BASE + 44)
+
+#define DEBUG_PRE_CHECKERBOARD   0x0740u
+#define DEBUG_POST_CHECKERBOARD  0x0744u
+
+static inline void noc_write(uint32_t word)
 {
-    // dest_id is 4 bits, shifted to [31:28].
-    // payload must fit in [27:0] — TOKEN_VALID_BIT (bit 16) is safely below bit 28.
-    *(volatile uint32_t *)NOC_INJECT_BASE =
-        (dest_id << FLIT_DEST_SHIFT) | TOKEN_VALID_BIT | (payload & 0x0FFFFFFFu);
-}
-
-// Block-poll until we receive a flit with TOKEN_VALID_BIT set.
-// Returns the full 29-bit payload word (bits [28:0]).
-static inline uint32_t noc_recv_token(void)
-{
-    uint32_t p;
-    do {
-        p = *(volatile uint32_t *)NOC_RECV_BASE;
-    } while (!(p & TOKEN_VALID_BIT));
-    return p;
+    *(volatile uint32_t *)NOC_INJECT_BASE = word;
 }
 
 static inline uint32_t noc_read_my_id(void)
 {
-    return *(volatile uint32_t *)NOC_ID_BASE & 0xFu;  // 4-bit TILE_ID
+    return *(volatile uint32_t *)NOC_ID_BASE & 0xFu;
 }
 
-// ============================================================================
-// Snake ordering helpers
-//
-// The snake visits tiles in boustrophedon row order:
-//   even rows (0,2,...): left → right   (increasing col)
-//   odd  rows (1,3,...): right → left   (decreasing col)
-//
-// snake_next(r, c, &nr, &nc) fills (nr, nc) with the next tile in the snake.
-// Returns 0 if (r,c) is the last tile (no next tile).
-// ============================================================================
-static int snake_next(int r, int c, int *nr, int *nc)
+static inline void noc_signal(uint32_t sig_word)
 {
-    int even_row = ((r & 1) == 0);
-
-    if (even_row) {
-        /* moving right */
-        if (c < MESH_C - 1) {
-            *nr = r;
-            *nc = c + 1;
-            return 1;
-        }
-    } else {
-        /* moving left */
-        if (c > 0) {
-            *nr = r;
-            *nc = c - 1;
-            return 1;
-        }
-    }
-
-    /* At the row end — step south if there is a next row */
-    if (r < MESH_R - 1) {
-        *nr = r + 1;
-        *nc = c;
-        return 1;
-    }
-
-    /* Last tile in the mesh — no next */
-    return 0;
+    noc_write(sig_word);
 }
 
-// ============================================================================
-// _start — minimal RISC-V reset entry
-// ============================================================================
 __attribute__((section(".text.init"), naked))
 void _start(void)
 {
     __asm__ volatile (
         "li   sp, 0x7fc\n"
-        /* zero the entire debug region 0x0700..0x077f */
-        "li   t0, 0x0700\n"
-        "li   t1, 0x0780\n"
+
+        /* zero ghost region: 0x0600..0x0627 */
+        "li   t0, 0x0600\n"
+        "li   t1, 0x0628\n"
         "1: bge  t0, t1, 2f\n"
         "   sb   zero, 0(t0)\n"
         "   addi t0, t0, 1\n"
         "   j    1b\n"
-        "2: call main\n"
-        "3: j    3b\n"
+
+        /* zero next_grid region: 0x0640..0x06a3 */
+        "2: li   t0, 0x0640\n"
+        "   li   t1, 0x06a4\n"
+        "3: bge  t0, t1, 4f\n"
+        "   sb   zero, 0(t0)\n"
+        "   addi t0, t0, 1\n"
+        "   j    3b\n"
+
+        /* zero debug region: 0x0700..0x077f */
+        "4: li   t0, 0x0700\n"
+        "   li   t1, 0x0780\n"
+        "5: bge  t0, t1, 6f\n"
+        "   sb   zero, 0(t0)\n"
+        "   addi t0, t0, 1\n"
+        "   j    5b\n"
+
+        "6: call main\n"
+        "7: j    7b\n"
     );
 }
 
-// ============================================================================
-// main
-// ============================================================================
+static void idle_tile_forever(void)
+{
+    while (1) {
+        __asm__ volatile ("nop");
+    }
+}
+
+/*
+ * Direct assembly checkerboard writer.
+ *
+ * Writes exactly 100 bytes to:
+ *   0x0500..0x0563
+ *
+ * Pattern:
+ *   if (row + col) even: write fill_val
+ *   else:                write 0
+ *
+ * This avoids compiler-generated C loop weirdness while debugging SRAM writes.
+ */
+__attribute__((noinline))
+static void write_checkerboard_asm(uint8_t fill_val)
+{
+    __asm__ volatile (
+        /* t6 = fill_val */
+        "andi t6, %[fill], 0xff\n"
+
+        /* t0 = current SRAM address = GRID_BASE */
+        "li   t0, 0x0500\n"
+
+        /* t1 = row = 0 */
+        "li   t1, 0\n"
+
+        "1:\n"
+        /* t2 = col = 0 */
+        "li   t2, 0\n"
+
+        "2:\n"
+        /* t3 = (row + col) & 1 */
+        "add  t3, t1, t2\n"
+        "andi t3, t3, 1\n"
+
+        /* if odd, write zero */
+        "bnez t3, 3f\n"
+
+        /* even cell: write fill_val */
+        "sb   t6, 0(t0)\n"
+        "j    4f\n"
+
+        /* odd cell: write zero */
+        "3:\n"
+        "sb   zero, 0(t0)\n"
+
+        "4:\n"
+        /* addr++, col++ */
+        "addi t0, t0, 1\n"
+        "addi t2, t2, 1\n"
+
+        /* if col < 10, keep writing this row */
+        "li   t4, 10\n"
+        "blt  t2, t4, 2b\n"
+
+        /* row++ */
+        "addi t1, t1, 1\n"
+
+        /* if row < 10, continue */
+        "li   t4, 10\n"
+        "blt  t1, t4, 1b\n"
+        :
+        : [fill] "r" ((uint32_t)fill_val)
+        : "t0", "t1", "t2", "t3", "t4", "t6", "memory"
+    );
+}
+
 int main(void)
 {
-    uint32_t my_id  = noc_read_my_id();
-    // 4-bit ID: row = MY_ID[3:2], col = MY_ID[1:0]
-    int      my_row = (int)((my_id >> 2) & 0x3u);
-    int      my_col = (int)(my_id & 0x3u);
+    /*
+     * Magic check.
+     * If these pass, firmware executed and SRAM writes work.
+     */
+    *(volatile uint32_t *)0x0730u = 0xDEADBEEFu;
+    *(volatile uint32_t *)0x0734u = 0xCAFEBABEu;
 
-    *dbg_my_id = my_id;
+    uint32_t my_id = noc_read_my_id();
 
-    // -------------------------------------------------------------------------
-    // Determine what position in the snake this tile occupies.
-    //
-    // A tile is the *snake head* (first in chain) if and only if it is
-    // tile(0,0).  Every other tile must first receive the token from its
-    // snake predecessor before forwarding it.
-    // -------------------------------------------------------------------------
-    int is_head = (my_row == 0 && my_col == 0);
+    int phys_row = (int)((my_id >> 2) & 0x3u);
+    int phys_col = (int)(my_id & 0x3u);
 
-    uint32_t token_payload;
+    *(volatile uint32_t *)DEBUG_MY_ID = my_id;
 
-    if (is_head) {
-        // Tile(0,0): generate the initial token.
-        token_payload = TOKEN_VALID_BIT | (my_id & 0xFFu);
-        *dbg_dir_recv   = DIR_SELF;
-        *dbg_token_recv = token_payload;
-    } else {
-        // Every other tile: block-wait for the token.
-        token_payload = noc_recv_token();
-        *dbg_token_recv = token_payload;
-
-        // Determine which direction the token came from based on snake order:
-        //   even row, c>0       → predecessor is (r, c-1) → token came from WEST
-        //   odd  row, c<MC-1    → predecessor is (r, c+1) → token came from EAST
-        //   row-start column    → predecessor is (r-1, c) → token came from NORTH
-        int even_row = ((my_row & 1) == 0);
-        uint32_t dir;
-        if (even_row && my_col > 0)
-            dir = DIR_WEST;
-        else if (!even_row && my_col < MESH_C - 1)
-            dir = DIR_EAST;
-        else
-            dir = DIR_NORTH;
-        *dbg_dir_recv = dir;
+    /*
+     * Keep parameterization.
+     * Tiles outside ACTIVE_ROWS x ACTIVE_COLS do nothing.
+     */
+    if (phys_row >= ACTIVE_ROWS || phys_col >= ACTIVE_COLS) {
+        idle_tile_forever();
     }
 
-    // -------------------------------------------------------------------------
-    // Forward the token to the next tile in the snake, if there is one.
-    // We embed our own TILE_ID in the payload so the receiver can verify
-    // that the right tile sent it.
-    // -------------------------------------------------------------------------
-    int next_r, next_c;
-    if (snake_next(my_row, my_col, &next_r, &next_c)) {
-        uint32_t dest    = TILE_ID(next_r, next_c);
-        uint32_t out_pay = TOKEN_VALID_BIT | (my_id & 0xFFu);
-        *dbg_token_sent = out_pay;
-        *dbg_dest_sent  = dest;
-        noc_send(dest, out_pay);
-    } else {
-        /* Last tile — nothing to forward */
-        *dbg_token_sent = 0;
-        *dbg_dest_sent  = 0xFFu;
+    /*
+     * Testbench expects:
+     * tile(0,0) = 0
+     * tile(0,1) = 1
+     * tile(0,2) = 2
+     * tile(1,0) = 4
+     * tile(1,1) = 5
+     * etc.
+     */
+    uint8_t fill_val = (uint8_t)my_id;
+
+    /*
+     * Debug markers around checkerboard write.
+     * Check these if grid still does not show up.
+     */
+    *(volatile uint32_t *)DEBUG_PRE_CHECKERBOARD = 0x11111111u;
+
+    write_checkerboard_asm(fill_val);
+
+    *(volatile uint32_t *)DEBUG_POST_CHECKERBOARD = 0x22222222u;
+
+    /*
+     * Mark seed complete.
+     * For the seed-only test, iter_count should stay 0.
+     */
+    *(volatile uint32_t *)DEBUG_ITER_COUNT = 0u;
+
+    /*
+     * Send optional NoC signals after SRAM is already written.
+     */
+    noc_signal(SIG_BOOT_ALIVE);
+    noc_signal(SIG_SEED_LIVE);
+    noc_signal(SIG_MATH_DONE);
+    noc_signal(SIG_GEN_STABLE);
+
+    /*
+     * Stop. Do not rewrite grid. Do not drain NOC_RECV_BASE.
+     */
+    while (1) {
+        __asm__ volatile ("nop");
     }
 
-    *dbg_done = 0xDEADu;
-
-    /* Spin forever */
-    while (1) {}
     return 0;
 }

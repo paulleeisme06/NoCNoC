@@ -1,0 +1,12 @@
+<testsuites name="results">
+  <testsuite name="all" package="all">
+    <property name="random_seed" value="1778483020" />
+    <testcase name="test_magic_check" classname="test_mesh" file="/home/psi19/NoCNoC/cocotb/test_mesh.py" lineno="224" time="0" sim_time_ns="0" ratio_time="0">
+      <skipped />
+    </testcase>
+    <testcase name="test_iter0_seed_only" classname="test_mesh" file="/home/psi19/NoCNoC/cocotb/test_mesh.py" lineno="260" time="179.43737530708313" sim_time_ns="4700000.0" ratio_time="26192.9823257645" />
+    <testcase name="test_checkerboard_iter1_iter2" classname="test_mesh" file="/home/psi19/NoCNoC/cocotb/test_mesh.py" lineno="286" time="0" sim_time_ns="0" ratio_time="0">
+      <skipped />
+    </testcase>
+  </testsuite>
+</testsuites>
