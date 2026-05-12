@@ -32,10 +32,11 @@ MAKEFILE_DIR := $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
   TOPLEVEL_LANG = verilog
   TOPLEVEL      = top
 
-  SRC   := $(MAKEFILE_DIR)/src
-  FLASH := $(SRC)/flash_Sumi
-  MESH  := $(SRC)/integration
-  DFT   := $(SRC)/subservient/ethan
+  SRC          := $(MAKEFILE_DIR)/src
+  FLASH        := $(SRC)/flash_Sumi
+  MESH         := $(SRC)/integration
+  DFT          := $(SRC)/subservient/ethan
+  HOST_TO_CHIP := $(SRC)/host-to-chip
 
   VERILOG_EXTRA_DIRS = \
       $(MAKEFILE_DIR)/src/serv/rtl \
@@ -50,7 +51,7 @@ MAKEFILE_DIR := $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
       $(MESH)/mesh_3x3.v \
       $(MESH)/mesh_tile.v \
       $(MESH)/mesh_router.v \
-      $(FLASH)/host_spi_slave.v \
+      $(HOST_TO_CHIP)/host_to_chip.v \
       $(FLASH)/rd_crossbar.v \
       $(FLASH)/spi_arbiter.v \
       $(FLASH)/hk_boot_adapter.v \
