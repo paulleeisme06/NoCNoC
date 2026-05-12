@@ -192,3 +192,18 @@ define_pdn_grid \
 add_pdn_connect \
     -grid macro \
     -layers "$::env(PDN_VERTICAL_LAYER) $::env(PDN_HORIZONTAL_LAYER)"
+
+# SRAM macros (gf180mcu_ocd_ip_sram__sram1024x8m8wm1) expose VDD/VSS pins on
+# Metal1/Metal2/Metal3 only. PDN straps run on Metal4 (vertical) / Metal5
+# (horizontal), so we need a via stack down to Metal3 to reach the pins.
+add_pdn_connect \
+    -grid macro \
+    -layers "$::env(PDN_VERTICAL_LAYER) $::env(PDN_CORE_HORIZONTAL_LAYER)"
+
+add_pdn_connect \
+    -grid macro \
+    -layers "$::env(PDN_CORE_HORIZONTAL_LAYER) $::env(PDN_CORE_VERTICAL_LAYER)"
+
+add_pdn_connect \
+    -grid macro \
+    -layers "$::env(PDN_CORE_VERTICAL_LAYER) $::env(PDN_RAIL_LAYER)"

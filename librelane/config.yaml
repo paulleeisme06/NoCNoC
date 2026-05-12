@@ -205,62 +205,65 @@ MACROS:
       "*_ss_*":
         - dir::../libs/gf180mcu_ocd_ip_sram/cells/gf180mcu_ocd_ip_sram__sram1024x8m8wm1/gf180mcu_ocd_ip_sram__sram1024x8m8wm1__ss_125C_1v62.lib
     instances:
-      # 5x5 mesh = 25 tiles, each with 2 banks (u_bank0, u_bank1)
-      # Row 0
-      "i_chip_core.u_mesh.rows[0].cols[0].tile_inst.sram_inst.u_bank0": {location: [500, 500], orientation: N}
-      "i_chip_core.u_mesh.rows[0].cols[0].tile_inst.sram_inst.u_bank1": {location: [500, 800], orientation: N}
-      "i_chip_core.u_mesh.rows[0].cols[1].tile_inst.sram_inst.u_bank0": {location: [1000, 500], orientation: N}
-      "i_chip_core.u_mesh.rows[0].cols[1].tile_inst.sram_inst.u_bank1": {location: [1000, 800], orientation: N}
-      "i_chip_core.u_mesh.rows[0].cols[2].tile_inst.sram_inst.u_bank0": {location: [1500, 500], orientation: N}
-      "i_chip_core.u_mesh.rows[0].cols[2].tile_inst.sram_inst.u_bank1": {location: [1500, 800], orientation: N}
-      "i_chip_core.u_mesh.rows[0].cols[3].tile_inst.sram_inst.u_bank0": {location: [2000, 500], orientation: N}
-      "i_chip_core.u_mesh.rows[0].cols[3].tile_inst.sram_inst.u_bank1": {location: [2000, 800], orientation: N}
-      "i_chip_core.u_mesh.rows[0].cols[4].tile_inst.sram_inst.u_bank0": {location: [2500, 500], orientation: N}
-      "i_chip_core.u_mesh.rows[0].cols[4].tile_inst.sram_inst.u_bank1": {location: [2500, 800], orientation: N}
-      # Row 1
-      "i_chip_core.u_mesh.rows[1].cols[0].tile_inst.sram_inst.u_bank0": {location: [500, 1200], orientation: N}
-      "i_chip_core.u_mesh.rows[1].cols[0].tile_inst.sram_inst.u_bank1": {location: [500, 1500], orientation: N}
-      "i_chip_core.u_mesh.rows[1].cols[1].tile_inst.sram_inst.u_bank0": {location: [1000, 1200], orientation: N}
-      "i_chip_core.u_mesh.rows[1].cols[1].tile_inst.sram_inst.u_bank1": {location: [1000, 1500], orientation: N}
-      "i_chip_core.u_mesh.rows[1].cols[2].tile_inst.sram_inst.u_bank0": {location: [1500, 1200], orientation: N}
-      "i_chip_core.u_mesh.rows[1].cols[2].tile_inst.sram_inst.u_bank1": {location: [1500, 1500], orientation: N}
-      "i_chip_core.u_mesh.rows[1].cols[3].tile_inst.sram_inst.u_bank0": {location: [2000, 1200], orientation: N}
-      "i_chip_core.u_mesh.rows[1].cols[3].tile_inst.sram_inst.u_bank1": {location: [2000, 1500], orientation: N}
-      "i_chip_core.u_mesh.rows[1].cols[4].tile_inst.sram_inst.u_bank0": {location: [2500, 1200], orientation: N}
-      "i_chip_core.u_mesh.rows[1].cols[4].tile_inst.sram_inst.u_bank1": {location: [2500, 1500], orientation: N}
-      # Row 2
-      "i_chip_core.u_mesh.rows[2].cols[0].tile_inst.sram_inst.u_bank0": {location: [500, 1900], orientation: N}
-      "i_chip_core.u_mesh.rows[2].cols[0].tile_inst.sram_inst.u_bank1": {location: [500, 2200], orientation: N}
-      "i_chip_core.u_mesh.rows[2].cols[1].tile_inst.sram_inst.u_bank0": {location: [1000, 1900], orientation: N}
-      "i_chip_core.u_mesh.rows[2].cols[1].tile_inst.sram_inst.u_bank1": {location: [1000, 2200], orientation: N}
-      "i_chip_core.u_mesh.rows[2].cols[2].tile_inst.sram_inst.u_bank0": {location: [1500, 1900], orientation: N}
-      "i_chip_core.u_mesh.rows[2].cols[2].tile_inst.sram_inst.u_bank1": {location: [1500, 2200], orientation: N}
-      "i_chip_core.u_mesh.rows[2].cols[3].tile_inst.sram_inst.u_bank0": {location: [2000, 1900], orientation: N}
-      "i_chip_core.u_mesh.rows[2].cols[3].tile_inst.sram_inst.u_bank1": {location: [2000, 2200], orientation: N}
-      "i_chip_core.u_mesh.rows[2].cols[4].tile_inst.sram_inst.u_bank0": {location: [2500, 1900], orientation: N}
-      "i_chip_core.u_mesh.rows[2].cols[4].tile_inst.sram_inst.u_bank1": {location: [2500, 2200], orientation: N}
-      # Row 3
-      "i_chip_core.u_mesh.rows[3].cols[0].tile_inst.sram_inst.u_bank0": {location: [500, 2600], orientation: N}
-      "i_chip_core.u_mesh.rows[3].cols[0].tile_inst.sram_inst.u_bank1": {location: [500, 2900], orientation: N}
-      "i_chip_core.u_mesh.rows[3].cols[1].tile_inst.sram_inst.u_bank0": {location: [1000, 2600], orientation: N}
-      "i_chip_core.u_mesh.rows[3].cols[1].tile_inst.sram_inst.u_bank1": {location: [1000, 2900], orientation: N}
-      "i_chip_core.u_mesh.rows[3].cols[2].tile_inst.sram_inst.u_bank0": {location: [1500, 2600], orientation: N}
-      "i_chip_core.u_mesh.rows[3].cols[2].tile_inst.sram_inst.u_bank1": {location: [1500, 2900], orientation: N}
-      "i_chip_core.u_mesh.rows[3].cols[3].tile_inst.sram_inst.u_bank0": {location: [2000, 2600], orientation: N}
-      "i_chip_core.u_mesh.rows[3].cols[3].tile_inst.sram_inst.u_bank1": {location: [2000, 2900], orientation: N}
-      "i_chip_core.u_mesh.rows[3].cols[4].tile_inst.sram_inst.u_bank0": {location: [2500, 2600], orientation: N}
-      "i_chip_core.u_mesh.rows[3].cols[4].tile_inst.sram_inst.u_bank1": {location: [2500, 2900], orientation: N}
-      # Row 4
-      "i_chip_core.u_mesh.rows[4].cols[0].tile_inst.sram_inst.u_bank0": {location: [500, 3300], orientation: N}
-      "i_chip_core.u_mesh.rows[4].cols[0].tile_inst.sram_inst.u_bank1": {location: [500, 3600], orientation: N}
-      "i_chip_core.u_mesh.rows[4].cols[1].tile_inst.sram_inst.u_bank0": {location: [1000, 3300], orientation: N}
-      "i_chip_core.u_mesh.rows[4].cols[1].tile_inst.sram_inst.u_bank1": {location: [1000, 3600], orientation: N}
-      "i_chip_core.u_mesh.rows[4].cols[2].tile_inst.sram_inst.u_bank0": {location: [1500, 3300], orientation: N}
-      "i_chip_core.u_mesh.rows[4].cols[2].tile_inst.sram_inst.u_bank1": {location: [1500, 3600], orientation: N}
-      "i_chip_core.u_mesh.rows[4].cols[3].tile_inst.sram_inst.u_bank0": {location: [2000, 3300], orientation: N}
-      "i_chip_core.u_mesh.rows[4].cols[3].tile_inst.sram_inst.u_bank1": {location: [2000, 3600], orientation: N}
-      "i_chip_core.u_mesh.rows[4].cols[4].tile_inst.sram_inst.u_bank0": {location: [2500, 3300], orientation: N}
-      "i_chip_core.u_mesh.rows[4].cols[4].tile_inst.sram_inst.u_bank1": {location: [2500, 3600], orientation: N}
+      # SRAM is 301.3W x 515.81H um; CORE_AREA is 3048W x 4238H um.
+      # 5x5 mesh = 25 tiles, each with 2 banks (u_bank0 left, u_bank1 right).
+      # 10 bank-columns at uniform 304.3um pitch (3.0um gap) across each row.
+      # Row pitch 800um leaves ~284um routing channel between rows.
+      # Row 0 (y=460)
+      "i_chip_core.u_mesh.rows[0].cols[0].tile_inst.sram_inst.u_bank0": {location: [445.0, 460], orientation: N}
+      "i_chip_core.u_mesh.rows[0].cols[0].tile_inst.sram_inst.u_bank1": {location: [749.3, 460], orientation: N}
+      "i_chip_core.u_mesh.rows[0].cols[1].tile_inst.sram_inst.u_bank0": {location: [1053.6, 460], orientation: N}
+      "i_chip_core.u_mesh.rows[0].cols[1].tile_inst.sram_inst.u_bank1": {location: [1357.9, 460], orientation: N}
+      "i_chip_core.u_mesh.rows[0].cols[2].tile_inst.sram_inst.u_bank0": {location: [1662.2, 460], orientation: N}
+      "i_chip_core.u_mesh.rows[0].cols[2].tile_inst.sram_inst.u_bank1": {location: [1966.5, 460], orientation: N}
+      "i_chip_core.u_mesh.rows[0].cols[3].tile_inst.sram_inst.u_bank0": {location: [2270.8, 460], orientation: N}
+      "i_chip_core.u_mesh.rows[0].cols[3].tile_inst.sram_inst.u_bank1": {location: [2575.1, 460], orientation: N}
+      "i_chip_core.u_mesh.rows[0].cols[4].tile_inst.sram_inst.u_bank0": {location: [2879.4, 460], orientation: N}
+      "i_chip_core.u_mesh.rows[0].cols[4].tile_inst.sram_inst.u_bank1": {location: [3183.7, 460], orientation: N}
+      # Row 1 (y=1260)
+      "i_chip_core.u_mesh.rows[1].cols[0].tile_inst.sram_inst.u_bank0": {location: [445.0, 1260], orientation: N}
+      "i_chip_core.u_mesh.rows[1].cols[0].tile_inst.sram_inst.u_bank1": {location: [749.3, 1260], orientation: N}
+      "i_chip_core.u_mesh.rows[1].cols[1].tile_inst.sram_inst.u_bank0": {location: [1053.6, 1260], orientation: N}
+      "i_chip_core.u_mesh.rows[1].cols[1].tile_inst.sram_inst.u_bank1": {location: [1357.9, 1260], orientation: N}
+      "i_chip_core.u_mesh.rows[1].cols[2].tile_inst.sram_inst.u_bank0": {location: [1662.2, 1260], orientation: N}
+      "i_chip_core.u_mesh.rows[1].cols[2].tile_inst.sram_inst.u_bank1": {location: [1966.5, 1260], orientation: N}
+      "i_chip_core.u_mesh.rows[1].cols[3].tile_inst.sram_inst.u_bank0": {location: [2270.8, 1260], orientation: N}
+      "i_chip_core.u_mesh.rows[1].cols[3].tile_inst.sram_inst.u_bank1": {location: [2575.1, 1260], orientation: N}
+      "i_chip_core.u_mesh.rows[1].cols[4].tile_inst.sram_inst.u_bank0": {location: [2879.4, 1260], orientation: N}
+      "i_chip_core.u_mesh.rows[1].cols[4].tile_inst.sram_inst.u_bank1": {location: [3183.7, 1260], orientation: N}
+      # Row 2 (y=2060)
+      "i_chip_core.u_mesh.rows[2].cols[0].tile_inst.sram_inst.u_bank0": {location: [445.0, 2060], orientation: N}
+      "i_chip_core.u_mesh.rows[2].cols[0].tile_inst.sram_inst.u_bank1": {location: [749.3, 2060], orientation: N}
+      "i_chip_core.u_mesh.rows[2].cols[1].tile_inst.sram_inst.u_bank0": {location: [1053.6, 2060], orientation: N}
+      "i_chip_core.u_mesh.rows[2].cols[1].tile_inst.sram_inst.u_bank1": {location: [1357.9, 2060], orientation: N}
+      "i_chip_core.u_mesh.rows[2].cols[2].tile_inst.sram_inst.u_bank0": {location: [1662.2, 2060], orientation: N}
+      "i_chip_core.u_mesh.rows[2].cols[2].tile_inst.sram_inst.u_bank1": {location: [1966.5, 2060], orientation: N}
+      "i_chip_core.u_mesh.rows[2].cols[3].tile_inst.sram_inst.u_bank0": {location: [2270.8, 2060], orientation: N}
+      "i_chip_core.u_mesh.rows[2].cols[3].tile_inst.sram_inst.u_bank1": {location: [2575.1, 2060], orientation: N}
+      "i_chip_core.u_mesh.rows[2].cols[4].tile_inst.sram_inst.u_bank0": {location: [2879.4, 2060], orientation: N}
+      "i_chip_core.u_mesh.rows[2].cols[4].tile_inst.sram_inst.u_bank1": {location: [3183.7, 2060], orientation: N}
+      # Row 3 (y=2860)
+      "i_chip_core.u_mesh.rows[3].cols[0].tile_inst.sram_inst.u_bank0": {location: [445.0, 2860], orientation: N}
+      "i_chip_core.u_mesh.rows[3].cols[0].tile_inst.sram_inst.u_bank1": {location: [749.3, 2860], orientation: N}
+      "i_chip_core.u_mesh.rows[3].cols[1].tile_inst.sram_inst.u_bank0": {location: [1053.6, 2860], orientation: N}
+      "i_chip_core.u_mesh.rows[3].cols[1].tile_inst.sram_inst.u_bank1": {location: [1357.9, 2860], orientation: N}
+      "i_chip_core.u_mesh.rows[3].cols[2].tile_inst.sram_inst.u_bank0": {location: [1662.2, 2860], orientation: N}
+      "i_chip_core.u_mesh.rows[3].cols[2].tile_inst.sram_inst.u_bank1": {location: [1966.5, 2860], orientation: N}
+      "i_chip_core.u_mesh.rows[3].cols[3].tile_inst.sram_inst.u_bank0": {location: [2270.8, 2860], orientation: N}
+      "i_chip_core.u_mesh.rows[3].cols[3].tile_inst.sram_inst.u_bank1": {location: [2575.1, 2860], orientation: N}
+      "i_chip_core.u_mesh.rows[3].cols[4].tile_inst.sram_inst.u_bank0": {location: [2879.4, 2860], orientation: N}
+      "i_chip_core.u_mesh.rows[3].cols[4].tile_inst.sram_inst.u_bank1": {location: [3183.7, 2860], orientation: N}
+      # Row 4 (y=3660)
+      "i_chip_core.u_mesh.rows[4].cols[0].tile_inst.sram_inst.u_bank0": {location: [445.0, 3660], orientation: N}
+      "i_chip_core.u_mesh.rows[4].cols[0].tile_inst.sram_inst.u_bank1": {location: [749.3, 3660], orientation: N}
+      "i_chip_core.u_mesh.rows[4].cols[1].tile_inst.sram_inst.u_bank0": {location: [1053.6, 3660], orientation: N}
+      "i_chip_core.u_mesh.rows[4].cols[1].tile_inst.sram_inst.u_bank1": {location: [1357.9, 3660], orientation: N}
+      "i_chip_core.u_mesh.rows[4].cols[2].tile_inst.sram_inst.u_bank0": {location: [1662.2, 3660], orientation: N}
+      "i_chip_core.u_mesh.rows[4].cols[2].tile_inst.sram_inst.u_bank1": {location: [1966.5, 3660], orientation: N}
+      "i_chip_core.u_mesh.rows[4].cols[3].tile_inst.sram_inst.u_bank0": {location: [2270.8, 3660], orientation: N}
+      "i_chip_core.u_mesh.rows[4].cols[3].tile_inst.sram_inst.u_bank1": {location: [2575.1, 3660], orientation: N}
+      "i_chip_core.u_mesh.rows[4].cols[4].tile_inst.sram_inst.u_bank0": {location: [2879.4, 3660], orientation: N}
+      "i_chip_core.u_mesh.rows[4].cols[4].tile_inst.sram_inst.u_bank1": {location: [3183.7, 3660], orientation: N}
 
 PDN_MACRO_CONNECTIONS:
 - "i_chip_core.u_mesh.rows.*.cols.*.tile_inst.sram_inst.u_bank0 VDD VSS VDD VSS"
