@@ -438,10 +438,20 @@ def write_pbm(frame, filename):
     print(f"[testbench] wrote {path}")
 
 def print_frame(frame, label):
-    print(f"\n{'='*34}  {label}")
-    for row in frame:
-        print("  " + "".join("█" if v else "·" for v in row))
-    print("=" * 36)
+    SEP = "+" + "+".join(["-" * TILE_SIZE] * MESH_C) + "+"
+    print(f"\n{'='*38}  {label}")
+    print(f"  {SEP}")
+    for ridx, row in enumerate(frame):
+        if ridx > 0 and ridx % TILE_SIZE == 0:
+            print(f"  {SEP}")
+        line = ""
+        for cidx, v in enumerate(row):
+            if cidx % TILE_SIZE == 0:
+                line += "|"
+            line += "█" if v else "·"
+        print(f"  {line}|")
+    print(f"  {SEP}")
+    print("=" * 40)
 
 async def assert_frame(dut, gen_idx, label):
     act = await read_30x30(dut)
@@ -832,6 +842,11 @@ async def test_sram_dump_after_boot(dut):
                     print(f"  ✗ tile({tr},{tc}) grid({y},{x}) exp={exp} got={got}")
             else:
                 print(f"  ✓ tile({tr},{tc}): current_grid matches host-written seed")
+
+    # ---- Assembled 30×30 view ----
+    assembled = await read_30x30(dut)
+    print_frame(assembled, "ASSEMBLED 30×30 — all 9 tiles (host-written seed)")
+    print_pbm(INPUT_FRAME, "input.pbm — reference (tile borders shown)")
 
     # ---- Step 5: release reset ----
     await host_set_reset(dut, hold=False)

@@ -7,10 +7,9 @@ SIZE   = 10
 MESH_R = 3
 MESH_C = 3
 
-FIRMWARE_BIN_NAME = "firmware.bin"
 RESET_HOLD_MS     = 2
 SEED_SAMPLE_US    = 2000
-ITER_TIMEOUT_US   = 5000
+ITER_TIMEOUT_US   = 100000
 
 SRAM_GRID_BASE = 0x0500
 print(f"[testbench] current_grid @ 0x{SRAM_GRID_BASE:04x}")
@@ -30,21 +29,25 @@ DEBUG_SEND_BM        = DEBUG_BASE + 80
 DEBUG_ROW_TRACE_BASE = DEBUG_BASE + 52   # 0x0734
 DEBUG_ROW8_AT_CALL   = DEBUG_BASE + 52   # 0x0734
 DEBUG_ROW9_AT_CALL   = DEBUG_BASE + 56   # 0x0738
-# ── new debug addresses ────────────────────────────────────────────────────
 DEBUG_PRE_OR_S8      = DEBUG_BASE + 60   # 0x073C  shifted8 right before OR
 DEBUG_PRE_OR_S9      = DEBUG_BASE + 64   # 0x0740  shifted9 right before OR
 DEBUG_CELL9_RAW      = DEBUG_BASE + 68   # 0x0744  raw cell9 byte value
 DEBUG_BIT9_VAL       = DEBUG_BASE + 72   # 0x0748  bit9 after & 1
 
 
-
-
-
 def load_firmware_binary():
-    bin_file = os.path.join(os.path.dirname(__file__), FIRMWARE_BIN_NAME)
-    if os.path.exists(bin_file):
-        with open(bin_file, "rb") as f:
-            return list(f.read())
+    base = os.path.dirname(__file__)
+    candidates = [
+        os.path.join(base, "..", "firmware", "firmware.bin"),        # local layout
+        os.path.join(base, "..", "src", "firmware", "firmware.bin"), # server layout
+    ]
+    for p in candidates:
+        p = os.path.normpath(p)
+        if os.path.exists(p):
+            print(f"[testbench] loading firmware from {p}")
+            with open(p, "rb") as f:
+                return list(f.read())
+    print("[testbench] WARNING: firmware.bin not found — booting with all-zeros (SRAM will be empty)")
     return [0] * 2048
 
 
@@ -68,27 +71,32 @@ async def spi_flash_responder(dut):
                 break
 
 
+class TileHandle:
+    """Lightweight handle to one mesh tile, using RTL backdoor ports."""
+    def __init__(self, dut, r, c):
+        self._dut = dut
+        self._id  = (r << 2) | c   # matches firmware TILE_ID(r,c) encoding
+        self.clk  = dut.clk
+
+
 def get_tile(dut, r, c):
-    return dut.rows[r].cols[c].tile_inst
+    return TileHandle(dut, r, c)
 
 
-def sram_read_byte(tile, cpu_addr):
-    mem = tile.sram_inst.mem
-    elem_bits = len(mem[0])
-    if elem_bits <= 8:
-        return int(mem[cpu_addr].value) & 0xFF
-    bytes_per_word = elem_bits // 8
-    word_index = cpu_addr // bytes_per_word
-    byte_lane  = cpu_addr % bytes_per_word
-    word = int(mem[word_index].value)
-    return (word >> (8 * byte_lane)) & 0xFF
+async def sram_read_byte(tile, cpu_addr):
+    """Read one byte from tile's SRAM via the RTL backdoor ports."""
+    tile._dut.tb_tile_sel.value = tile._id
+    tile._dut.tb_raddr.value    = cpu_addr & 0x7FF
+    await RisingEdge(tile.clk)   # edge 1: addr captured by SRAM, NBA schedules tb_rdata update
+    await RisingEdge(tile.clk)   # edge 2: tb_rdata stable (works on Linux where VPI fires pre-NBA)
+    return int(tile._dut.tb_rdata.value) & 0xFF
 
 
-def sram_read_word(tile, cpu_addr):
-    b0 = sram_read_byte(tile, cpu_addr)
-    b1 = sram_read_byte(tile, cpu_addr + 1)
-    b2 = sram_read_byte(tile, cpu_addr + 2)
-    b3 = sram_read_byte(tile, cpu_addr + 3)
+async def sram_read_word(tile, cpu_addr):
+    b0 = await sram_read_byte(tile, cpu_addr)
+    b1 = await sram_read_byte(tile, cpu_addr + 1)
+    b2 = await sram_read_byte(tile, cpu_addr + 2)
+    b3 = await sram_read_byte(tile, cpu_addr + 3)
     return b0 | (b1 << 8) | (b2 << 16) | (b3 << 24)
 
 
@@ -96,20 +104,20 @@ async def wait_for_iter(tile, target_iter, timeout_us=ITER_TIMEOUT_US):
     cycles = int(timeout_us * 100)
     for _ in range(cycles):
         await RisingEdge(tile.clk)
-        cur = sram_read_word(tile, DEBUG_ITER_COUNT)
+        cur = await sram_read_word(tile, DEBUG_ITER_COUNT)
         if cur >= target_iter:
             return True
     return False
 
 
-def read_col_bitmap_trace(tile, label=""):
-    send_bm   = sram_read_word(tile, DEBUG_SEND_BM)
-    row8_val  = sram_read_word(tile, DEBUG_ROW8_AT_CALL)
-    row9_val  = sram_read_word(tile, DEBUG_ROW9_AT_CALL)
-    pre_or_s8 = sram_read_word(tile, DEBUG_PRE_OR_S8)
-    pre_or_s9 = sram_read_word(tile, DEBUG_PRE_OR_S9)
-    cell9_raw = sram_read_word(tile, DEBUG_CELL9_RAW)
-    bit9_val  = sram_read_word(tile, DEBUG_BIT9_VAL)
+async def read_col_bitmap_trace(tile, label=""):
+    send_bm   = await sram_read_word(tile, DEBUG_SEND_BM)
+    row8_val  = await sram_read_word(tile, DEBUG_ROW8_AT_CALL)
+    row9_val  = await sram_read_word(tile, DEBUG_ROW9_AT_CALL)
+    pre_or_s8 = await sram_read_word(tile, DEBUG_PRE_OR_S8)
+    pre_or_s9 = await sram_read_word(tile, DEBUG_PRE_OR_S9)
+    cell9_raw = await sram_read_word(tile, DEBUG_CELL9_RAW)
+    bit9_val  = await sram_read_word(tile, DEBUG_BIT9_VAL)
 
     print(f"\n{label} col_bitmap() trace:")
     print(f"  {'slot':<22} {'hex':>8}  {'binary':>12}  notes")
@@ -128,7 +136,6 @@ def read_col_bitmap_trace(tile, label=""):
 
     print()
 
-    # Diagnosis — walk the chain to find exactly where the value is lost
     if cell9_raw == 0:
         print("  [FAIL] cell9 was 0 at read time — grid not seeded or wrong SRAM address")
     elif bit9_val == 0:
@@ -150,16 +157,16 @@ def read_col_bitmap_trace(tile, label=""):
     return send_bm, row8_val, row9_val, pre_or_s8, pre_or_s9, cell9_raw, bit9_val
 
 
-def read_debug_info(tile, label=""):
-    recv_n      = sram_read_word(tile, DEBUG_LAST_RECV_N)
-    recv_s      = sram_read_word(tile, DEBUG_LAST_RECV_S)
-    recv_w      = sram_read_word(tile, DEBUG_LAST_RECV_W)
-    recv_e      = sram_read_word(tile, DEBUG_LAST_RECV_E)
-    ghost_flags = sram_read_word(tile, DEBUG_GHOST_FLAGS)
-    live_count  = sram_read_word(tile, DEBUG_LIVE_COUNT)
-    col0_bm     = sram_read_word(tile, DEBUG_COL0_BM)
-    my_id       = sram_read_word(tile, DEBUG_MY_ID)
-    send_bm     = sram_read_word(tile, DEBUG_SEND_BM)
+async def read_debug_info(tile, label=""):
+    recv_n      = await sram_read_word(tile, DEBUG_LAST_RECV_N)
+    recv_s      = await sram_read_word(tile, DEBUG_LAST_RECV_S)
+    recv_w      = await sram_read_word(tile, DEBUG_LAST_RECV_W)
+    recv_e      = await sram_read_word(tile, DEBUG_LAST_RECV_E)
+    ghost_flags = await sram_read_word(tile, DEBUG_GHOST_FLAGS)
+    live_count  = await sram_read_word(tile, DEBUG_LIVE_COUNT)
+    col0_bm     = await sram_read_word(tile, DEBUG_COL0_BM)
+    my_id       = await sram_read_word(tile, DEBUG_MY_ID)
+    send_bm     = await sram_read_word(tile, DEBUG_SEND_BM)
 
     sent_s = (ghost_flags >> 0) & 1
     sent_n = (ghost_flags >> 1) & 1
@@ -177,8 +184,10 @@ def read_debug_info(tile, label=""):
     return recv_n, recv_s, recv_w, recv_e, ghost_flags
 
 
-def read_debug_neighbor_histogram(tile, label=""):
-    hist  = [sram_read_byte(tile, DEBUG_NEIGHBOR_HIST + i) for i in range(9)]
+async def read_debug_neighbor_histogram(tile, label=""):
+    hist = []
+    for i in range(9):
+        hist.append(await sram_read_byte(tile, DEBUG_NEIGHBOR_HIST + i))
     total = sum(hist)
     print(f"\n{label} Neighbor Histogram (total cells={total}):")
     for n in range(9):
@@ -187,19 +196,19 @@ def read_debug_neighbor_histogram(tile, label=""):
     return hist
 
 
-def read_debug_iter_count(tile):
-    return sram_read_word(tile, DEBUG_ITER_COUNT)
+async def read_debug_iter_count(tile):
+    return await sram_read_word(tile, DEBUG_ITER_COUNT)
 
 
-def print_debug_state(dut, r, c, label=""):
+async def print_debug_state(dut, r, c, label=""):
     tile     = get_tile(dut, r, c)
-    iter_num = read_debug_iter_count(tile)
+    iter_num = await read_debug_iter_count(tile)
     hdr      = label if label else f"TILE ({r},{c})  iter={iter_num}"
     print(f"\n{'='*60}")
     print(hdr)
     print('='*60)
-    read_debug_info(tile, hdr)
-    read_debug_neighbor_histogram(tile, hdr)
+    await read_debug_info(tile, hdr)
+    await read_debug_neighbor_histogram(tile, hdr)
 
 
 GLOBAL_ROWS = MESH_R * SIZE
@@ -256,25 +265,29 @@ GOL_GLOBAL.append(gol_step_global(GOL_GLOBAL[0]))
 GOL_GLOBAL.append(gol_step_global(GOL_GLOBAL[1]))
 
 
-def read_grid_from_sram(tile):
-    return [
-        [sram_read_byte(tile, SRAM_GRID_BASE + y * SIZE + x) for x in range(SIZE)]
-        for y in range(SIZE)
-    ]
+async def read_grid_from_sram(tile):
+    rows = []
+    for y in range(SIZE):
+        row = []
+        for x in range(SIZE):
+            row.append(await sram_read_byte(tile, SRAM_GRID_BASE + y * SIZE + x))
+        rows.append(row)
+    return rows
 
 
-def dump_region(tile, base, count_bytes=64):
+async def dump_region(tile, base, count_bytes=64):
     print(f"\nDUMP @ 0x{base:04x} ({count_bytes} bytes):")
     for off in range(0, count_bytes, 16):
-        chunk = [sram_read_byte(tile, base + off + i)
-                 for i in range(min(16, count_bytes - off))]
+        chunk = []
+        for i in range(min(16, count_bytes - off)):
+            chunk.append(await sram_read_byte(tile, base + off + i))
         print("0x{:04x}: ".format(base + off) + " ".join(f"{b:02x}" for b in chunk))
 
 
-def print_iter_comparison(dut, r, c, iteration):
+async def print_iter_comparison(dut, r, c, iteration):
     tile = get_tile(dut, r, c)
     exp  = get_tile_expected(iteration, r, c)
-    act  = read_grid_from_sram(tile)
+    act  = await read_grid_from_sram(tile)
     print(f"\n===================================================")
     print(f"TILE ({r},{c})  ITERATION {iteration}")
     print("EXPECTED (Python GoL)   ACTUAL (SRAM)")
@@ -292,19 +305,20 @@ def print_iter_comparison(dut, r, c, iteration):
     return mismatches
 
 
-def diagnose_col_bitmap(dut, iteration):
+async def diagnose_col_bitmap(dut, iteration):
     tile01 = get_tile(dut, 0, 1)
     tile00 = get_tile(dut, 0, 0)
 
-    actual_col  = [sram_read_byte(tile01, SRAM_GRID_BASE + row * SIZE + 0)
-                   for row in range(SIZE)]
+    actual_col = []
+    for row in range(SIZE):
+        actual_col.append(await sram_read_byte(tile01, SRAM_GRID_BASE + row * SIZE + 0))
     expected_bm = 0
     for row, val in enumerate(actual_col):
         if val & 1:
             expected_bm |= (1 << row)
 
-    firmware_bm = sram_read_word(tile01, DEBUG_SEND_BM)
-    received_bm = sram_read_word(tile00, DEBUG_LAST_RECV_E)
+    firmware_bm = await sram_read_word(tile01, DEBUG_SEND_BM)
+    received_bm = await sram_read_word(tile00, DEBUG_LAST_RECV_E)
 
     print(f"\n{'='*60}")
     print(f"col_bitmap DIAGNOSTIC — after iter {iteration}")
@@ -314,7 +328,7 @@ def diagnose_col_bitmap(dut, iteration):
     print(f"  Firmware DEBUG_SEND_BM:   0x{firmware_bm:03x}  ({firmware_bm:010b})")
     print(f"  tile(0,0) DEBUG_RECV_E:   0x{received_bm:03x}  ({received_bm:010b})")
 
-    results = read_col_bitmap_trace(tile01, f"tile(0,1) iter={iteration}")
+    results = await read_col_bitmap_trace(tile01, f"tile(0,1) iter={iteration}")
     send_bm = results[0]
 
     if firmware_bm == expected_bm:
@@ -336,16 +350,18 @@ def diagnose_col_bitmap(dut, iteration):
 
 
 async def boot_mesh(dut):
-    cocotb.start_soon(Clock(dut.clk, 10, unit="ns").start())
-    dut.rst.value = 1
-    dut.flash_miso.value = 0
+    cocotb.start_soon(Clock(dut.clk, 10, units="ns").start())
+    dut.rst.value         = 1
+    dut.flash_miso.value  = 0
+    dut.tb_tile_sel.value = 0
+    dut.tb_raddr.value    = 0
     if hasattr(dut, "inject_00_nw"):
         dut.inject_00_nw.value = 0
-    await Timer(RESET_HOLD_MS, unit="ms")
+    await Timer(RESET_HOLD_MS, units="ms")
     dut.rst.value = 0
     cocotb.start_soon(spi_flash_responder(dut))
     while int(dut.cpu_rst_n.value) == 0:
-        await Timer(10, unit="us")
+        await Timer(10, units="us")
     dut._log.info("[boot] cpu_rst_n asserted — CPU running.")
 
 
@@ -356,12 +372,10 @@ async def boot_mesh(dut):
 async def test_magic_check(dut):
     """
     Firmware writes 0xDEADBEEF to 0x0730 and 0xCAFEBABE to 0x0734
-    at the very start of main(). If the testbench reads these back
-    correctly, address mapping is confirmed good.
-    If not, sram_read_word() is reading the wrong physical location.
+    at the very start of main(). Reads them back via RTL backdoor ports.
     """
     await boot_mesh(dut)
-    await Timer(SEED_SAMPLE_US, unit="us")
+    await Timer(SEED_SAMPLE_US, units="us")
 
     print("\n\n" + "="*60)
     print("MAGIC CHECK — verifying testbench address mapping")
@@ -371,34 +385,28 @@ async def test_magic_check(dut):
     for r in range(MESH_R):
         for c in range(MESH_C):
             tile   = get_tile(dut, r, c)
-            magic1 = sram_read_word(tile, 0x0730)
-            magic2 = sram_read_word(tile, 0x0734)
-            ok1    = magic1 == 0xDEADBEEF
-            ok2    = magic2 == 0xCAFEBABE
+            magic1 = await sram_read_word(tile, 0x0730)
+            magic2 = await sram_read_word(tile, 0x0734)
+            ok1     = magic1 == 0xDEADBEEF
+            # 0x0734 == DEBUG_ROW8_AT_CALL: firmware overwrites it during NOC phase,
+            # so only assert on 0x0730 which the firmware never reuses.
             status1 = "[OK]  " if ok1 else "[FAIL]"
-            status2 = "[OK]  " if ok2 else "[FAIL]"
+            status2 = "[OK]  " if magic2 == 0xCAFEBABE else "[INFO] overwritten by firmware NOC debug"
             print(f"\nTILE ({r},{c}):")
             print(f"  {status1} 0x0730 = 0x{magic1:08x}  (expect 0xDEADBEEF)")
             print(f"  {status2} 0x0734 = 0x{magic2:08x}  (expect 0xCAFEBABE)")
-
-            mem       = tile.sram_inst.mem
-            elem_bits = len(mem[0])
-            print(f"  SRAM: elem_bits={elem_bits}, depth={len(mem)}")
-            print(f"  Raw SRAM words around 0x0730:")
-            base_word = 0x0730 // (elem_bits // 8)
-            for wi in range(max(0, base_word - 2), base_word + 6):
-                raw = int(mem[wi].value)
-                print(f"    mem[{wi}] = 0x{raw:08x}")
-
-            if not (ok1 and ok2):
+            if not ok1:
                 all_pass = False
                 print(f"  -> ADDRESS MAPPING BROKEN for tile ({r},{c})")
-                print(f"     sram_read_word is not reading what firmware wrote")
+                print(f"  Raw SRAM bytes around 0x0730:")
+                for addr in range(0x072C, 0x073C):
+                    raw = await sram_read_byte(tile, addr)
+                    print(f"    byte[0x{addr:04x}] = 0x{raw:02x}")
 
     if all_pass:
         dut._log.info("MAGIC CHECK PASSED — address mapping confirmed correct on all tiles")
     else:
-        dut._log.error("MAGIC CHECK FAILED — fix sram_read_word() address mapping before debugging firmware")
+        dut._log.error("MAGIC CHECK FAILED — RTL backdoor not reading correct SRAM contents")
 
     assert all_pass, "Magic check failed: testbench cannot correctly read firmware-written addresses"
 
@@ -406,20 +414,20 @@ async def test_magic_check(dut):
 @cocotb.test()
 async def test_iter0_seed_only(dut):
     await boot_mesh(dut)
-    await Timer(SEED_SAMPLE_US, unit="us")
+    await Timer(SEED_SAMPLE_US, units="us")
 
     print("\n\n*** SEED SANITY CHECK — all tiles ***")
     for r in range(MESH_R):
         for c in range(MESH_C):
             tile = get_tile(dut, r, c)
-            read_debug_info(tile, f"TILE ({r},{c}) seed sanity")
-            dump_region(tile, SRAM_GRID_BASE, 100)
+            await read_debug_info(tile, f"TILE ({r},{c}) seed sanity")
+            await dump_region(tile, SRAM_GRID_BASE, 100)
 
     print("\n\n******** ITERATION 0 (seed) ********")
     total = 0
     for r in range(MESH_R):
         for c in range(MESH_C):
-            total += print_iter_comparison(dut, r, c, 0)
+            total += await print_iter_comparison(dut, r, c, 0)
 
     if total == 0:
         dut._log.info("ALL TILES: seed matches")
@@ -431,44 +439,44 @@ async def test_iter0_seed_only(dut):
 @cocotb.test()
 async def test_col_bitmap_diagnostic(dut):
     await boot_mesh(dut)
-    await Timer(SEED_SAMPLE_US, unit="us")
+    await Timer(SEED_SAMPLE_US, units="us")
 
     tile00 = get_tile(dut, 0, 0)
     tile01 = get_tile(dut, 0, 1)
 
     print("\n\n*** col_bitmap DIAGNOSTIC — ITER 0 ***")
-    diagnose_col_bitmap(dut, iteration=0)
+    await diagnose_col_bitmap(dut, iteration=0)
 
     print("\nTILE (0,1) grid dump at ITER 0:")
-    dump_region(tile01, SRAM_GRID_BASE, 100)
+    await dump_region(tile01, SRAM_GRID_BASE, 100)
 
     dut._log.info("Waiting for iter_count >= 1 on tile(0,0) ...")
     seen = await wait_for_iter(tile00, 1)
     if not seen:
         dut._log.warning("iter_count did not advance to 1 within timeout")
-    await Timer(10, unit="us")
+    await Timer(10, units="us")
 
     print("\n\n*** col_bitmap DIAGNOSTIC — ITER 1 ***")
-    diagnose_col_bitmap(dut, iteration=1)
+    await diagnose_col_bitmap(dut, iteration=1)
 
     print("\nTILE (0,1) grid dump at ITER 1:")
-    dump_region(tile01, SRAM_GRID_BASE, 100)
+    await dump_region(tile01, SRAM_GRID_BASE, 100)
 
     print("\nTILE (0,1) full debug info at ITER 1:")
-    read_debug_info(tile01, "TILE (0,1) iter=1")
+    await read_debug_info(tile01, "TILE (0,1) iter=1")
 
     print("\nTILE (0,0) full debug info at ITER 1:")
-    read_debug_info(tile00, "TILE (0,0) iter=1")
+    await read_debug_info(tile00, "TILE (0,0) iter=1")
 
     print("\n\n******** ITERATION 1 — tile(0,0) only ********")
-    mismatches = print_iter_comparison(dut, 0, 0, 1)
+    mismatches = await print_iter_comparison(dut, 0, 0, 1)
     if mismatches == 0:
         dut._log.info("tile(0,0) iter=1: PASS")
     else:
         dut._log.error(f"tile(0,0) iter=1: {mismatches} mismatches")
-        dump_region(tile00, SRAM_GRID_BASE, 100)
-        dump_region(tile00, 0x0600, 40)
-        dump_region(tile00, DEBUG_BASE, 128)
+        await dump_region(tile00, SRAM_GRID_BASE, 100)
+        await dump_region(tile00, 0x0600, 40)
+        await dump_region(tile00, DEBUG_BASE, 128)
 
     assert mismatches == 0, f"col_bitmap test: {mismatches} cell mismatches in tile(0,0) iter=1"
 
@@ -476,19 +484,19 @@ async def test_col_bitmap_diagnostic(dut):
 @cocotb.test()
 async def test_gol_iter1_iter2(dut):
     await boot_mesh(dut)
-    await Timer(SEED_SAMPLE_US, unit="us")
+    await Timer(SEED_SAMPLE_US, units="us")
 
     print("\n\n*** SEED SANITY CHECK — all tiles ***")
     for r in range(MESH_R):
         for c in range(MESH_C):
             tile = get_tile(dut, r, c)
-            read_debug_info(tile, f"TILE ({r},{c}) seed sanity")
+            await read_debug_info(tile, f"TILE ({r},{c}) seed sanity")
 
     print("\n\n******** ITERATION 0 (seed) ********")
     iter0_mismatches = 0
     for r in range(MESH_R):
         for c in range(MESH_C):
-            iter0_mismatches += print_iter_comparison(dut, r, c, 0)
+            iter0_mismatches += await print_iter_comparison(dut, r, c, 0)
 
     if iter0_mismatches == 0:
         dut._log.info("Iter 0: ALL tiles match seed")
@@ -500,19 +508,19 @@ async def test_gol_iter1_iter2(dut):
     seen = await wait_for_iter(tile00, 1)
     if not seen:
         dut._log.warning("iter_count did not advance to 1")
-    await Timer(10, unit="us")
+    await Timer(10, units="us")
 
     print("\n\n*** col_bitmap DIAGNOSTIC at ITER 1 ***")
-    diagnose_col_bitmap(dut, iteration=1)
+    await diagnose_col_bitmap(dut, iteration=1)
 
     print("\n\n******** ITERATION 1 ********")
     iter1_mismatches = 0
     for r in range(MESH_R):
         for c in range(MESH_C):
-            m = print_iter_comparison(dut, r, c, 1)
+            m = await print_iter_comparison(dut, r, c, 1)
             iter1_mismatches += m
             if m > 0:
-                print_debug_state(dut, r, c, f"TILE ({r},{c}) iter=1 MISMATCH debug")
+                await print_debug_state(dut, r, c, f"TILE ({r},{c}) iter=1 MISMATCH debug")
 
     if iter1_mismatches == 0:
         dut._log.info("Iter 1: ALL tiles match")
@@ -520,27 +528,27 @@ async def test_gol_iter1_iter2(dut):
         dut._log.error(f"Iter 1: {iter1_mismatches} mismatches")
         for r in range(MESH_R):
             for c in range(MESH_C):
-                dump_region(get_tile(dut, r, c), SRAM_GRID_BASE, 100)
-                dump_region(get_tile(dut, r, c), 0x0600, 40)
-                dump_region(get_tile(dut, r, c), DEBUG_BASE, 128)
+                await dump_region(get_tile(dut, r, c), SRAM_GRID_BASE, 100)
+                await dump_region(get_tile(dut, r, c), 0x0600, 40)
+                await dump_region(get_tile(dut, r, c), DEBUG_BASE, 128)
 
     dut._log.info("Waiting for debug_iter_count >= 2 ...")
     seen = await wait_for_iter(tile00, 2)
     if not seen:
         dut._log.warning("iter_count did not advance to 2")
-    await Timer(10, unit="us")
+    await Timer(10, units="us")
 
     print("\n\n*** col_bitmap DIAGNOSTIC at ITER 2 ***")
-    diagnose_col_bitmap(dut, iteration=2)
+    await diagnose_col_bitmap(dut, iteration=2)
 
     print("\n\n******** ITERATION 2 ********")
     iter2_mismatches = 0
     for r in range(MESH_R):
         for c in range(MESH_C):
-            m = print_iter_comparison(dut, r, c, 2)
+            m = await print_iter_comparison(dut, r, c, 2)
             iter2_mismatches += m
             if m > 0:
-                print_debug_state(dut, r, c, f"TILE ({r},{c}) iter=2 MISMATCH debug")
+                await print_debug_state(dut, r, c, f"TILE ({r},{c}) iter=2 MISMATCH debug")
 
     if iter2_mismatches == 0:
         dut._log.info("Iter 2: ALL tiles match")
