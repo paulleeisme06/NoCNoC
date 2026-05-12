@@ -48,7 +48,7 @@ VERILOG_SOURCES := \
     $(MESH)/mesh_3x3.v \
     $(MESH)/mesh_tile.v \
     $(MESH)/mesh_router.v \
-    $(SRC)/host-to-chip\ -\ Paul\&Andrea/host_to_chip.v \
+    $(SRC)/host_to_chip/host_to_chip.v \
     $(FLASH)/rd_crossbar.v \
     $(FLASH)/spi_arbiter.v \
     $(FLASH)/hk_boot_adapter.v \
