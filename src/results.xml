@@ -1,0 +1,12 @@
+<testsuites name="results">
+  <testsuite name="all" package="all">
+    <property name="random_seed" value="1778576691" />
+    <testcase name="test_magic_check" classname="test_mesh" file="/home/psi19/NoCNoC/cocotb/test_mesh.py" lineno="240" time="837.1401147842407" sim_time_ns="4700000.0" ratio_time="5614.352862795673" />
+    <testcase name="test_iter0_seed_only" classname="test_mesh" file="/home/psi19/NoCNoC/cocotb/test_mesh.py" lineno="276" time="890.0679183006287" sim_time_ns="4700000.0" ratio_time="5280.4959075185225">
+      <failure error_type="AssertionError" error_msg="Seed mismatch: 250 cells wrong." />
+    </testcase>
+    <testcase name="test_checkerboard_iter1_iter2" classname="test_mesh" file="/home/psi19/NoCNoC/cocotb/test_mesh.py" lineno="302" time="1825.6736266613007" sim_time_ns="6539340.0" ratio_time="3581.877891262971">
+      <failure error_type="AssertionError" error_msg="Checkerboard test failed: iter0=250, iter1=250, iter2=250" />
+    </testcase>
+  </testsuite>
+</testsuites>
