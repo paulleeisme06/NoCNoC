@@ -105,21 +105,28 @@ module mesh_tile #(
     wire        router_sram_wen;
 
     // -------------------------------------------------------------------------
-    // Address / Data MUX — router writes have highest priority
+    // Address / Data MUX
+    // Priority: router_sram_wen > dft_ce > boot_mode > CPU
     // -------------------------------------------------------------------------
+    wire dft_active = dft_ce;   // dft_ce already encodes dft_mode && tile_selected
+
     wire [10:0] final_a = router_sram_wen ? router_sram_waddr :
+                          dft_active       ? dft_addr :
                           boot_mode        ? boot_addr :
                           sram_wen         ? sram_waddr : sram_raddr;
     wire [7:0]  final_d = router_sram_wen ? router_sram_wdata :
+                          dft_active       ? dft_wdata :
                           boot_mode        ? boot_data : sram_wdata;
 
     // -------------------------------------------------------------------------
     // SRAM control signals
     // -------------------------------------------------------------------------
     wire sram_active = router_sram_wen ? 1'b1 :
-                       boot_mode       ? ~boot_wen : ~cpu_sram_init_pulse;
+                       dft_active       ? 1'b1 :
+                       boot_mode        ? ~boot_wen : ~cpu_sram_init_pulse;
     wire sram_write  = router_sram_wen ? 1'b1 :
-                       boot_mode       ? ~boot_wen : sram_wen;
+                       dft_active       ? dft_we :    // dft_we=0 → read-only
+                       boot_mode        ? ~boot_wen : sram_wen;
 
     // -------------------------------------------------------------------------
     // Subservient RISC-V core (bit-serial SERV)

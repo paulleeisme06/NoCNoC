@@ -12,7 +12,15 @@ module top (
     input  wire host_csb,
     input  wire host_sclk,
     input  wire host_mosi,
-    output wire host_miso
+    output wire host_miso,
+
+    // DFT SRAM debug ports (Ethan)
+    input  wire        dft_mode,
+    input  wire [3:0]  dft_tile_id,
+    input  wire        dft_we,
+    input  wire [10:0] dft_addr,
+    input  wire [7:0]  dft_wdata,
+    output wire [7:0]  dft_rdata
 );
 
     wire [35:0] monitor_22_se;
@@ -38,9 +46,14 @@ module top (
         .flash_cs_n    (flash_csb),
         .flash_clk     (flash_clk),
         .flash_mosi    (flash_mosi),
-        // Host reset control (write flits enter via inject_00_nw)
-        .host_rst_in     (host_rst),
-        .host_rst_en     (host_rst_en)
+        .host_rst_in   (host_rst),
+        .host_rst_en   (host_rst_en),
+        .dft_mode      (dft_mode),
+        .dft_tile_id   (dft_tile_id),
+        .dft_we        (dft_we),
+        .dft_addr      (dft_addr),
+        .dft_wdata     (dft_wdata),
+        .dft_rdata     (dft_rdata)
     );
 
     // -----------------------------------------------------------------------

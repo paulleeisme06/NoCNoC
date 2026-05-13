@@ -121,6 +121,24 @@ sim-host: ## Run host-to-chip SPI write test: boot flash then write input.pbm to
 		VERILOG_SOURCES="$(VERILOG_SOURCES)"
 .PHONY: sim-host
 
+sim-dft-flash: ## Boot from flash, then read SRAM via DFT debug ports
+	rm -f results.xml
+	$(MAKE) results.xml \
+		MODULE=test_dft_flash_read \
+		SIM_BUILD=sim_build/dft_flash \
+		PYTHONPATH=$(MAKEFILE_DIR)/cocotb:$(PYTHONPATH) \
+		VERILOG_SOURCES="$(VERILOG_SOURCES)"
+.PHONY: sim-dft-flash
+
+sim-dft-host: ## Flash boot + host SPI write, then read back via DFT ports
+	rm -f results.xml
+	$(MAKE) results.xml \
+		MODULE=test_dft_host_read \
+		SIM_BUILD=sim_build/dft_host \
+		PYTHONPATH=$(MAKEFILE_DIR)/cocotb:$(PYTHONPATH) \
+		VERILOG_SOURCES="$(VERILOG_SOURCES)"
+.PHONY: sim-dft-host
+
 clean:: ## Remove simulation build artifacts and results
 	rm -rf sim_build results.xml
 .PHONY: clean
