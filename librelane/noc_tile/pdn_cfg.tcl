@@ -60,6 +60,20 @@ add_pdn_connect \
     -grid stdcell_grid \
     -layers "$::env(PDN_VERTICAL_LAYER) $::env(PDN_HORIZONTAL_LAYER)"
 
+# Metal2 co-located with Metal3 stripes as intermediate for Metal1->Metal2->Metal3 via stack
+add_pdn_stripe \
+    -grid stdcell_grid \
+    -layer Metal2 \
+    -width $::env(PDN_VWIDTH) \
+    -pitch $::env(PDN_VPITCH) \
+    -offset $::env(PDN_VOFFSET) \
+    -spacing $::env(PDN_VSPACING) \
+    -starts_with POWER
+
+add_pdn_connect \
+    -grid stdcell_grid \
+    -layers "Metal2 $::env(PDN_VERTICAL_LAYER)"
+
 if { $::env(PDN_ENABLE_RAILS) == 1 } {
     add_pdn_stripe \
         -grid stdcell_grid \
@@ -69,7 +83,7 @@ if { $::env(PDN_ENABLE_RAILS) == 1 } {
 
     add_pdn_connect \
         -grid stdcell_grid \
-        -layers "$::env(PDN_RAIL_LAYER) $::env(PDN_VERTICAL_LAYER)"
+        -layers "$::env(PDN_RAIL_LAYER) Metal2"
 }
 
 # Default macro grid
@@ -98,24 +112,24 @@ add_pdn_connect \
 
 add_pdn_connect \
     -grid sram_bank0 \
-    -layers "$::env(PDN_HORIZONTAL_LAYER) Metal4"
+    -layers "$::env(PDN_HORIZONTAL_LAYER) Metal5"
 
 add_pdn_stripe \
     -grid sram_bank0 \
-    -layer Metal4 \
+    -layer Metal5 \
     -width 2.36 \
     -offset 1.18 \
-    -spacing 0.28 \
+    -spacing 0.46 \
     -pitch 426.86 \
     -starts_with GROUND \
     -number_of_straps 2
 
 add_pdn_stripe \
     -grid sram_bank0 \
-    -layer Metal4 \
+    -layer Metal5 \
     -width 4.00 \
     -offset 65.93 \
-    -spacing 0.28 \
+    -spacing 0.46 \
     -pitch 50 \
     -starts_with GROUND \
     -number_of_straps 7
@@ -134,24 +148,24 @@ add_pdn_connect \
 
 add_pdn_connect \
     -grid sram_bank1 \
-    -layers "$::env(PDN_HORIZONTAL_LAYER) Metal4"
+    -layers "$::env(PDN_HORIZONTAL_LAYER) Metal5"
 
 add_pdn_stripe \
     -grid sram_bank1 \
-    -layer Metal4 \
+    -layer Metal5 \
     -width 2.36 \
     -offset 1.18 \
-    -spacing 0.28 \
+    -spacing 0.46 \
     -pitch 426.86 \
     -starts_with GROUND \
     -number_of_straps 2
 
 add_pdn_stripe \
     -grid sram_bank1 \
-    -layer Metal4 \
+    -layer Metal5 \
     -width 4.00 \
     -offset 65.93 \
-    -spacing 0.28 \
+    -spacing 0.46 \
     -pitch 50 \
     -starts_with GROUND \
     -number_of_straps 7
