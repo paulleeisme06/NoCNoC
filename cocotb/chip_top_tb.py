@@ -108,10 +108,11 @@ def chip_top_runner():
     sources += [
         # IO pad models
         Path(pdk_root) / pdk / "libs.ref/gf180mcu_fd_io/verilog/gf180mcu_fd_io.v",
-        Path(pdk_root) / pdk / "libs.ref/gf180mcu_fd_io/verilog/gf180mcu_ws_io.v",
+        Path(pdk_root) / pdk / "libs.ref/gf180mcu_ws_io/verilog/gf180mcu_ws_io.v",
         
         # SRAM macros (3.3V)
         proj_path / "../libs/gf180mcu_ocd_ip_sram/cells/gf180mcu_ocd_ip_sram__sram512x8m8wm1/gf180mcu_ocd_ip_sram__sram512x8m8wm1.v",
+        proj_path / "../libs/gf180mcu_ocd_ip_sram/cells/gf180mcu_ocd_ip_sram__sram1024x8m8wm1/gf180mcu_ocd_ip_sram__sram1024x8m8wm1.v",
         
         # Custom IP
         proj_path / "../ip/gf180mcu_ws_ip__id/vh/gf180mcu_ws_ip__id.v",
@@ -124,7 +125,6 @@ def chip_top_runner():
         proj_path / "../src/mesh_psi_aan/mesh_tile.v",
         proj_path / "../src/mesh_psi_aan/mesh_router.v",
         proj_path / "../src/mesh_psi_aan/boot_controller.v",
-        # Add all .v files from subservient and serv submodules:
         *sorted((proj_path / "../src/subservient/rtl").glob("*.v")),
         *sorted((proj_path / "../src/serv/rtl").glob("*.v")),
         *sorted((proj_path / "../src/serv/servile").glob("*.v")),
