@@ -1,3 +1,4 @@
+
 runs/
 __pycache__/
 gf180mcu/
@@ -6,3 +7,10 @@ sim_build/
 final/
 img/
 *.lyrdb
+runs/
+run/
+**/runs/
+*.log
+*.pyc
+*.swp
+.DS_Store
