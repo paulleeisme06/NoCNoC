@@ -60,7 +60,7 @@ VERILOG_SOURCES := \
 
 export VERILOG_SOURCES
 
-SIM = verilator
+SIM = icarus
 
 COMPILE_ARGS += \
     --timing \
@@ -161,7 +161,7 @@ librelane-padring: ## Only create the padring
 .PHONY: librelane-padring
 
 sim: ## Run RTL simulation with cocotb
-	cd cocotb; PDK_ROOT=${PDK_ROOT} PDK=${PDK} SLOT=${SLOT} python3 chip_top_tb.py
+	cd cocotb; SIM=${SIM} PDK_ROOT=${PDK_ROOT} PDK=${PDK} SLOT=${SLOT} python3 chip_top_tb.py
 .PHONY: sim
 
 sim-gl: ## Run gate-level simulation with cocotb (after copy-final)

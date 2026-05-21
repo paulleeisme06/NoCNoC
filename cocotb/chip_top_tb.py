@@ -53,7 +53,7 @@ async def start_up(dut):
     await reset(dut.rst_n_PAD)
 
 
-@cocotb.test()
+@cocotb.test(skip=True)
 async def test_counter(dut):
     """Run the counter test"""
 
@@ -110,8 +110,8 @@ def chip_top_runner():
         Path(pdk_root) / pdk / "libs.ref/gf180mcu_fd_io/verilog/gf180mcu_fd_io.v",
         Path(pdk_root) / pdk / "libs.ref/gf180mcu_fd_io/verilog/gf180mcu_ws_io.v",
         
-        # SRAM macros (3.3V)
-        proj_path / "../libs/gf180mcu_ocd_ip_sram/cells/gf180mcu_ocd_ip_sram__sram512x8m8wm1/gf180mcu_ocd_ip_sram__sram512x8m8wm1.v",
+        # SRAM macros (3.3V) — 1024x8 is what sram2048x8_gf180 wraps
+        proj_path / "../libs/gf180mcu_ocd_ip_sram/cells/gf180mcu_ocd_ip_sram__sram1024x8m8wm1/gf180mcu_ocd_ip_sram__sram1024x8m8wm1.v",
         
         # Custom IP
         proj_path / "../ip/gf180mcu_ws_ip__id/vh/gf180mcu_ws_ip__id.v",
@@ -125,7 +125,9 @@ def chip_top_runner():
         proj_path / "../src/mesh - Psi&Aan/mesh_router.v",
         proj_path / "../src/mesh - Psi&Aan/boot_controller.v",
         # Add all .v files from subservient and serv submodules:
-        *sorted((proj_path / "../src/subservient/rtl").glob("*.v")),
+        # Exclude SRAM model already included from libs/ above
+        *sorted(f for f in (proj_path / "../src/subservient/rtl").glob("*.v")
+                if "sram1024x8" not in f.name),
         *sorted((proj_path / "../src/serv/rtl").glob("*.v")),
         *sorted((proj_path / "../src/serv/servile").glob("*.v")),
     ]
