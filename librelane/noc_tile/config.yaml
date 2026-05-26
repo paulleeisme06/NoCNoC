@@ -2,11 +2,9 @@ meta:
   version: 3
   flow: Classic
   substituting_steps:
-    OpenROAD.IRDropReport: null
 
     # Save time during development
     # Enable for sign-off
-    OpenROAD.IRDropReport: null
     Magic.DRC: null
     Checker.MagicDRC: null
     KLayout.XOR: null
@@ -38,20 +36,54 @@ FP_SIZING: absolute
 DIE_AREA: [0, 0, 900, 850]
 CORE_AREA: [10, 10, 890, 840]
 
-PL_TARGET_DENSITY_PCT: 35
+# increase for more logic
+PL_TARGET_DENSITY_PCT: 40
 
-PDN_CORE_RING: False
+PDN_CORE_RING: True
+
+# specify both vertical m2 and horizonstal m3 stripes to the stdcell grid 
+PDN_MULTILAYER: true
+
+# extend pdn stripes to the boundary of the die instead of the edge of stdcell placement area
+#PDN_EXTEND_TO: boundary
+
 PDN_ENABLE_PINS: True
-PDN_VERTICAL_LAYER: Metal3
-PDN_HORIZONTAL_LAYER: Metal4
+PDN_VERTICAL_LAYER: Metal2
+PDN_HORIZONTAL_LAYER: Metal3
 
 # width of vertical and horizontal straps
-PDN_VWIDTH: 2
-PDN_HWIDTH: 2
+PDN_VWIDTH: 5
+PDN_HWIDTH: 5
 
-# distance between straps
+# distance between straps - was 90
 PDN_VPITCH: 75
 PDN_HPITCH: 75
+
+
+
+# shift stripes to the right
+#PDN_VOFFSET: 10
+
+# [Metal1, Metal2, Metal3, Metal4, Metal5]
+#GRT_LAYER_ADJUSTMENTS: [0, 0.4, 0, 0, 0]
+
+# Fix antenna violations after DRT
+#DRT_ANTENNA_REPAIR_ITERS: 10
+
+# Will try and reroute antennas that are within 10% of a violation
+#DRT_ANTENNA_MARGIN: 10 # %
+
+# Space inbetween VSS and VDD pairs
+PDN_VSPACING: 1
+PDN_HSPACING: 1
+
+# blocks signal routing in a specific spot
+#ROUTING_OBSTRUCTIONS:
+#  - ["Metal2", 567.6, 10, 569.5, 840]
+
+EXTRA_EXCLUDED_CELLS:
+  - "gf180mcu_as_sc_mcu7t3v3__buff_2"
+  - "gf180mcu_as_sc_mcu7t3v3__buff_8"
 
 # include file for specifying pin locations
 FP_PIN_ORDER_CFG: dir::pin_order.cfg
@@ -84,7 +116,7 @@ PDN_MACRO_CONNECTIONS:
 
 
 
-PDN_CFG: dir::pdn_cfg.tcl
+#PDN_CFG: dir::pdn_cfg.tcl
 
 
 # Don't error on DRC for the small block during development
