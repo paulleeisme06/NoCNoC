@@ -5,12 +5,14 @@ meta:
 
     # Save time during development
     # Enable for sign-off
-    Magic.DRC: null
-    Checker.MagicDRC: null
-    KLayout.XOR: null
-    Netgen.LVS: null
-    Checker.LVS: null
-    KLayout.DRC: null
+
+    #OpenROAD.IRDropReport: null
+    #Magic.DRC: null
+    #Checker.MagicDRC: null
+    #KLayout.XOR: null
+    #Netgen.LVS: null
+    #Checker.LVS: null
+    #KLayout.DRC: null
 
 DESIGN_NAME: mesh_tile
 VERILOG_FILES:
@@ -37,19 +39,27 @@ DIE_AREA: [0, 0, 900, 850]
 CORE_AREA: [10, 10, 890, 840]
 
 # increase for more logic
-PL_TARGET_DENSITY_PCT: 40
+PL_TARGET_DENSITY_PCT: 35
 
-PDN_CORE_RING: True
+PDN_CORE_RING: False
 
-# specify both vertical m2 and horizonstal m3 stripes to the stdcell grid 
+
+# Fix 1: Core ring overflow → PDN-0239 → PSM-0069
+# Die-to-core gap is 10µm. Ring needs offset + width + spacing + width.
+# PDK default offset=6 → 6+1.6+1.7+1.6=10.9µm which overflows by 0.9µm.
+# Reducing offset to 3 → 3+1.6+1.7+1.6=7.9µm fits within the 10µm gap.
+#PDN_CORE_RING_VOFFSET: 3
+#PDN_CORE_RING_HOFFSET: 3
+
+# specify both vertical m2 and horizonstal m3 stripes to the stdcell grid
 PDN_MULTILAYER: true
 
 # extend pdn stripes to the boundary of the die instead of the edge of stdcell placement area
 #PDN_EXTEND_TO: boundary
 
 PDN_ENABLE_PINS: True
-PDN_VERTICAL_LAYER: Metal2
-PDN_HORIZONTAL_LAYER: Metal3
+#PDN_VERTICAL_LAYER: Metal2
+#PDN_HORIZONTAL_LAYER: Metal3
 
 # width of vertical and horizontal straps
 PDN_VWIDTH: 5
@@ -59,6 +69,7 @@ PDN_HWIDTH: 5
 PDN_VPITCH: 75
 PDN_HPITCH: 75
 
+VERILOG_POWER_DEFINE: "USE_POWER_PINS"
 
 
 # shift stripes to the right
@@ -68,7 +79,7 @@ PDN_HPITCH: 75
 #GRT_LAYER_ADJUSTMENTS: [0, 0.4, 0, 0, 0]
 
 # Fix antenna violations after DRT
-#DRT_ANTENNA_REPAIR_ITERS: 10
+DRT_ANTENNA_REPAIR_ITERS: 10
 
 # Will try and reroute antennas that are within 10% of a violation
 #DRT_ANTENNA_MARGIN: 10 # %
@@ -77,6 +88,8 @@ PDN_HPITCH: 75
 PDN_VSPACING: 1
 PDN_HSPACING: 1
 
+
+
 # blocks signal routing in a specific spot
 #ROUTING_OBSTRUCTIONS:
 #  - ["Metal2", 567.6, 10, 569.5, 840]
@@ -84,6 +97,8 @@ PDN_HSPACING: 1
 EXTRA_EXCLUDED_CELLS:
   - "gf180mcu_as_sc_mcu7t3v3__buff_2"
   - "gf180mcu_as_sc_mcu7t3v3__buff_8"
+  - "gf180mcu_as_sc_mcu7t3v3__buff_4"
+  - "gf180mcu_as_sc_mcu7t3v3__clkbuff_8"
 
 # include file for specifying pin locations
 FP_PIN_ORDER_CFG: dir::pin_order.cfg
@@ -115,9 +130,7 @@ PDN_MACRO_CONNECTIONS:
   - "sram2048.u_bank1 VDD VSS VDD VSS"
 
 
-
-#PDN_CFG: dir::pdn_cfg.tcl
-
+PDN_CFG: dir::pdn_cfg.tcl
 
 # Don't error on DRC for the small block during development
 ERROR_ON_MAGIC_DRC: False
