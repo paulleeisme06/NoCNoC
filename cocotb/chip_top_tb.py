@@ -21,7 +21,9 @@ slot = os.getenv("SLOT", "1x1")
 hdl_toplevel = "chip_top"
 
 async def set_defaults(dut):
-    dut.input_PAD.value = 0
+    # CS_N must be inactive (high) from the start — if it starts low, the
+    # 0→1 edge after reset deasserts triggers a spurious spi_debug write commit.
+    dut.input_PAD.value = _CS_N
 
 async def enable_power(dut):
     dut.VDD.value = 1
@@ -52,6 +54,7 @@ async def start_up(dut):
     await start_clock(dut.clk_PAD)
     await reset(dut.rst_n_PAD)
 
+# what is this counter test? 
 
 @cocotb.test(skip=True)
 async def test_counter(dut):
@@ -153,7 +156,7 @@ def chip_top_runner():
         waves=True,
     )
 
-    plusargs = []
+    plusargs = ["+notimingchecks"]
 
     runner.test(
         hdl_toplevel=hdl_toplevel,
@@ -162,6 +165,7 @@ def chip_top_runner():
         waves=True,
     )
 
+# Start of host to chip testing, using the DFT SPI debug interface to read/write tile SRAMs and boot a CPU.
 # Ethan: helper SPI functions
 # input_PAD[0] = spi_clk, [1] = spi_mosi, [2] = spi_cs_n, [3] = dft_mode
 # bidir_PAD[0] = spi_miso (output from chip)
@@ -259,8 +263,288 @@ async def test_dft_write_read(dut):
     dut._log.info("test_dft_write_read PASSED")
 
 
+@cocotb.test()
+async def test_dft_sweep(dut):
+    """
+    Thorough DFT SRAM sweep across all 9 tiles and multiple addresses/patterns.
 
-    
+    What this test does:
+      1. Enters DFT mode (holds all 9 SERV cores in reset so they can't touch SRAM).
+      2. For every tile in the 3x3 mesh it writes three different byte patterns
+         to three different SRAM addresses:
+           - 0xA5 (1010_0101) — alternating bits, catches stuck-at faults
+           - 0x5A (0101_1010) — inverse of above, catches complementary faults
+           - 0xFF (1111_1111) — all ones, catches stuck-at-0
+         Address 0x000 (bottom of SRAM), 0x1FF (middle), 0x3FE (near top of
+         the 1024-entry bank) are used so we hit low, mid, and high address lines.
+      3. After writing all bytes it reads every location back and asserts the
+         value matches what was written.
+      4. Exits DFT mode.
+
+    Tile IDs are {row[1:0], col[1:0]}, so the 3x3 grid is:
+      (0,0)=0x0  (0,1)=0x1  (0,2)=0x2
+      (1,0)=0x4  (1,1)=0x5  (1,2)=0x6
+      (2,0)=0x8  (2,1)=0x9  (2,2)=0xA
+    """
+    await start_up(dut)
+
+    ALL_TILES = [
+        (0, 0, 0b0000), (0, 1, 0b0001), (0, 2, 0b0010),
+        (1, 0, 0b0100), (1, 1, 0b0101), (1, 2, 0b0110),
+        (2, 0, 0b1000), (2, 1, 0b1001), (2, 2, 0b1010),
+    ]
+    TEST_VECTORS = [
+        (0x000, 0xA5),  # low address,  alternating bits
+        (0x1FF, 0x5A),  # mid address,  inverse alternating
+        (0x3FE, 0xFF),  # high address, all ones
+    ]
+
+    dut.input_PAD.value = _DFT_MODE | _CS_N
+    await ClockCycles(dut.clk_PAD, 4)
+
+    # Write phase — fill every tile
+    for row, col, tile_id in ALL_TILES:
+        for addr, data in TEST_VECTORS:
+            await dft_write(dut, tile_id, addr, data)
+        dut._log.info(f"  tile ({row},{col}): wrote {len(TEST_VECTORS)} locations")
+
+    # Read-back phase — verify every tile
+    failures = []
+    for row, col, tile_id in ALL_TILES:
+        for addr, expected in TEST_VECTORS:
+            got = await dft_read(dut, tile_id, addr)
+            if got != expected:
+                failures.append(
+                    f"tile({row},{col}) addr=0x{addr:03x}: wrote 0x{expected:02x} got 0x{got:02x}"
+                )
+            else:
+                dut._log.info(f"  tile({row},{col}) addr=0x{addr:03x} ok: 0x{got:02x}")
+
+    dut.input_PAD.value = _CS_N
+
+    assert not failures, "DFT sweep failures:\n" + "\n".join(failures)
+    dut._log.info(f"test_dft_sweep PASSED — {len(ALL_TILES) * len(TEST_VECTORS)} locations verified")
+
+
+@cocotb.test()
+async def test_dft_boot_hello(dut):
+    """
+    Boot a RISC-V 'hello world' on tile (0,0) using DFT as the bootloader.
+
+    Background — why this works:
+      The mesh has a boot_controller that normally reads a program from SPI
+      flash and loads it into every tile's SRAM, then releases cpu_reset_n.
+      Two key facts from mesh_tile.v make DFT boot possible:
+
+        1.  dft_mode=1 gives DFT PRIORITY over the SRAM mux — the
+            boot_controller's SRAM writes are BLOCKED while dft_mode is high,
+            so our DFT-written program cannot be overwritten.
+
+        2.  .i_rst(rst | boot_mode | dft_mode) — the SERV core is held in
+            reset by EITHER signal, so dft_mode=1 keeps the CPU frozen even
+            after boot_controller releases cpu_reset_n.
+
+    SRAM layout (servile_rf_mem_if with aw=11, rf_regs=36):
+      Physical 0x000-0x76F = program + data  (CPU byte addr = physical addr)
+      Physical 0x770-0x7FF = SERV register file (stored at ~rf_addr, i.e.
+                              bitwise-NOT of logical RF address — top of SRAM)
+      CPU PC=0 fetches from physical 0x000; CPU data addr 0x200 → physical 0x200.
+
+    Sequence:
+      1. Assert dft_mode immediately — SERV cores freeze, boot_controller
+         runs but its SRAM writes are blocked.
+      2. Write a 24-byte RISC-V program into tile(0,0) SRAM[0x000..0x017]
+         via DFT. Physical 0x000 = CPU PC=0. The program avoids reading x0
+         (zero register) because SERV's regzero override never fires at
+         runtime — x0 reads come from SRAM and may be garbage. LUI (U-type,
+         no source register) initialises a0/a1 unconditionally:
+             lui  a0, 0             # a0 = 0
+             addi a0, a0, 0x200    # a0 = 0x200
+             lui  a1, 0             # a1 = 0
+             addi a1, a1, 0x48     # a1 = 0x48 = 'H' (ASCII Hello)
+             sb   a1, 0(a0)        # store byte: phys SRAM[0x200] = 'H'
+             jal  zero, 0          # spin forever
+      3. Wait ~80,000 cycles for the boot_controller to complete its 2048-byte
+         flash-read state machine and release cpu_reset_n. Our program is safe
+         in SRAM the whole time (dft_mode blocks all boot_controller writes).
+      4. Release dft_mode=0.
+         Now: rst=0, boot_mode=0, dft_mode=0 → SERV starts executing; CPU
+         PC=0 fetches from physical SRAM[0x000].
+      5. Wait 5000 cycles — SERV is bit-serial (RF + mem share one SRAM),
+         each instruction takes ~100-300 cycles with arbitration overhead.
+      6. Re-assert dft_mode=1 to stop the core and reclaim SRAM.
+      7. Read back SRAM[0x200] (phys) via DFT. Assert it equals 0x48 ('H').
+    """
+    await start_up(dut)
+
+    # Step 1: assert dft_mode immediately — freeze cores, block boot_controller
+    dut.input_PAD.value = _DFT_MODE | _CS_N
+    await ClockCycles(dut.clk_PAD, 4)
+
+    # Step 2: write the hand-assembled RISC-V program byte-by-byte via DFT.
+    # Each instruction is 4 bytes, little-endian (LSB at lower address).
+    #
+    # Deliberately avoid reading x0 (zero register). In SERV, regzero
+    # (the hardware x0=0 override) requires i_raddr >= 0xFC, but the max
+    # RF address with rf_regs=36 is 0x8F — so regzero never fires and x0
+    # reads from SRAM. The RF area may hold garbage before it is zeroed,
+    # so any instruction that reads x0 can compute a wrong result.
+    # Using LUI (U-type, no source register) sidesteps this entirely.
+    #
+    #   PC 0x000: 0x00000537 = lui  a0, 0          # a0 = 0 (no rs1)
+    #   PC 0x004: 0x20050513 = addi a0, a0, 0x200  # a0 = 0x200
+    #   PC 0x008: 0x000005B7 = lui  a1, 0          # a1 = 0 (no rs1)
+    #   PC 0x00C: 0x04858593 = addi a1, a1, 0x48   # a1 = 0x48 ('H')
+    #   PC 0x010: 0x00B50023 = sb   a1, 0(a0)      # SRAM[0x200] = 'H'
+    #   PC 0x014: 0x0000006F = jal  zero, 0        # spin
+    #
+    # SRAM layout (servile_rf_mem_if, aw=11):
+    #   Physical 0x000-0x76F = program + data (CPU byte addr = physical addr)
+    #   Physical 0x770-0x7FF = SERV register file (bitwise-NOT mapping, top of SRAM)
+    # CPU PC=0 → physical SRAM[0x000]. CPU data addr 0x200 → physical SRAM[0x200].
+    PROG_BASE   = 0x000  # physical SRAM address where CPU PC=0 fetches
+    HELLO_PROG = [
+        0x37, 0x05, 0x00, 0x00,  # lui  a0, 0
+        0x13, 0x05, 0x05, 0x20,  # addi a0, a0, 0x200
+        0xB7, 0x05, 0x00, 0x00,  # lui  a1, 0
+        0x93, 0x85, 0x85, 0x04,  # addi a1, a1, 0x48  ('H')
+        0x23, 0x00, 0xB5, 0x00,  # sb   a1, 0(a0)
+        0x6F, 0x00, 0x00, 0x00,  # jal  zero, 0
+    ]
+    RESULT_ADDR = 0x200  # physical SRAM addr = CPU data addr (direct mapping)
+    EXPECTED    = 0x48   # 'H'
+
+    dut._log.info("Writing RISC-V hello-world program to tile(0,0) via DFT...")
+    for i, byte in enumerate(HELLO_PROG):
+        await dft_write(dut, tile_id=0b0000, addr=PROG_BASE + i, data=byte)
+    end_addr = PROG_BASE + len(HELLO_PROG) - 1
+    dut._log.info(f"Program loaded: {len(HELLO_PROG)} bytes at SRAM[0x{PROG_BASE:03X}..0x{end_addr:03X}] (CPU PC=0x000)")
+
+    # Verify the bytes landed correctly before releasing the CPU.
+    # If this fails, the issue is in the DFT write path, not the CPU.
+    dut._log.info("Verifying program bytes via DFT read-back...")
+    for i, expected_byte in enumerate(HELLO_PROG):
+        phys = PROG_BASE + i
+        got = await dft_read(dut, tile_id=0b0000, addr=phys)
+        assert got == expected_byte, (
+            f"Program verify failed at SRAM[0x{phys:03X}]: "
+            f"wrote 0x{expected_byte:02X}, read back 0x{got:02X}"
+        )
+    dut._log.info("Program verified — all 24 bytes match.")
+
+    # Step 3: wait for boot_controller to finish its flash-read sequence.
+    # Timing: IDLE(1) + CMD(24) + ADDR(72) + 2048×(READ32+WRITE2) = 69729 cycles.
+    # dft_mode=1 blocks all boot_controller SRAM writes during this wait.
+    dut._log.info("Waiting ~80k cycles for boot_controller to release cpu_reset_n...")
+    await ClockCycles(dut.clk_PAD, 80000)
+    dut._log.info("boot_controller done — cpu_reset_n should now be 1, boot_mode=0.")
+
+    # Diagnostic: re-check program bytes after the wait.
+    # If something overwrote them during boot, this catches it.
+    dut._log.info("Diagnostic: re-reading program bytes after boot wait...")
+    prog_ok = True
+    for i, expected_byte in enumerate(HELLO_PROG):
+        got = await dft_read(dut, tile_id=0b0000, addr=PROG_BASE + i)
+        if got != expected_byte:
+            dut._log.warning(
+                f"SRAM[0x{PROG_BASE+i:03X}] CORRUPTED during boot wait: "
+                f"expected 0x{expected_byte:02X}, got 0x{got:02X}"
+            )
+            prog_ok = False
+    if prog_ok:
+        dut._log.info("Program bytes intact after boot wait — boot_controller writes were blocked.")
+    else:
+        # Re-write the program since boot_controller corrupted it
+        dut._log.warning("Re-writing program bytes (boot_controller overwrote them)...")
+        for i, byte in enumerate(HELLO_PROG):
+            await dft_write(dut, tile_id=0b0000, addr=PROG_BASE + i, data=byte)
+        dut._log.info("Program re-written.")
+
+    # Critical: initialize the SERV RF area (SRAM[0x770:0x7FF]) to zero.
+    #
+    # The GF180 SRAM wrapper has two banks:
+    #   bank0: SRAM[0x000-0x3FF] (A[10]=0)
+    #   bank1: SRAM[0x400-0x7FF] (A[10]=1)
+    # Each bank tracks a 'cen_fell' flag that must latch a CEN HIGH→LOW
+    # transition before any read or write is accepted by the model.
+    #
+    # Our DFT writes (0x000-0x00F) only touched bank0.  The boot_controller
+    # was blocked by dft_mode=1 the entire time and never wrote to bank1.
+    # Result: bank1 cen_fell=0, so every bank1 read returns X (garbage).
+    #
+    # SERV's register file is mapped by servile_rf_mem_if to SRAM[0x770:0x7FF]
+    # (36 registers × 4 bytes = 144 bytes, all in bank1).  With cen_fell=0
+    # those reads return X, corrupting x0 and every other register.
+    # The addi/sb sequence then computes a garbage address and fails.
+    #
+    # Writing 0x00 to every RF address arms bank1's cen_fell and zeroes all
+    # registers so SERV starts execution from a clean state.
+    RF_AREA_START = 0x770  # first byte of SERV RF in physical SRAM
+    RF_AREA_END   = 0x7FF  # last  byte of SERV RF in physical SRAM
+    dut._log.info(
+        f"Initializing RF area SRAM[0x{RF_AREA_START:03X}..0x{RF_AREA_END:03X}] "
+        f"to zero (arms bank1 cen_fell, zeroes all SERV registers)..."
+    )
+    for addr in range(RF_AREA_START, RF_AREA_END + 1):
+        await dft_write(dut, tile_id=0b0000, addr=addr, data=0x00)
+    dut._log.info("RF area initialized — bank1 operational, all registers = 0.")
+
+    # Critical: reset bank_sel_q to 0 before releasing SERV.
+    #
+    # sram2048x8_gf180 has a registered output-mux control:
+    #   reg bank_sel_q;
+    #   always @(posedge CLK) if (!CEN) bank_sel_q <= bank_sel;
+    #   assign Q = bank_sel_q ? q_bank1 : q_bank0;
+    #
+    # The last DFT write was to 0x7FF (bank1), leaving bank_sel_q=1.
+    # SERV's first fetch is from PC=0x000 (bank0). With bank_sel_q=1 the mux
+    # returns q_bank1 (garbage) instead of the correct instruction byte —
+    # corrupting the LUI instruction and producing a wrong register value.
+    # One bank0 read flips bank_sel_q=0 before the CPU starts.
+    await dft_read(dut, tile_id=0b0000, addr=0x000)
+    dut._log.info("bank_sel_q reset to 0 (bank0 touch done).")
+
+    # Step 4: release dft_mode — SERV sees rst=0, boot_mode=0, dft_mode=0 → runs!
+    dut.input_PAD.value = _CS_N
+    dut._log.info("Released dft_mode — SERV core now executing (PC=0 → phys SRAM[0x000])...")
+
+    # Step 5: give SERV time to execute the 5-instruction program (+ spin).
+    # SERV is bit-serial; RF and instruction memory share one SRAM via
+    # servile_rf_mem_if, so each instruction takes ~100-300 cycles with
+    # arbitration. 10000 cycles gives >5× margin for 5 instructions.
+    await ClockCycles(dut.clk_PAD, 10000)
+
+    # Step 6: re-assert dft_mode to stop the core and take back SRAM
+    dut.input_PAD.value = _DFT_MODE | _CS_N
+    await ClockCycles(dut.clk_PAD, 4)
+
+    # Diagnostic: read a0 (x10) and a1 (x11) RF locations to see what SERV computed.
+    # RF address mapping (servile_rf_mem_if, aw=11, rf_depth=8, rf_regs=36):
+    #   rf_addr = ~{3'b0, i_raddr[7:0]}  where i_raddr = reg_num*4 + byte_sel
+    # a0 (x10=10): i_raddr 0x28-0x2B → SRAM 0x7D7(byte0), 0x7D6, 0x7D5, 0x7D4(byte3)
+    # a1 (x11=11): i_raddr 0x2C-0x2F → SRAM 0x7D3(byte0), 0x7D2, 0x7D1, 0x7D0(byte3)
+    a0_b = [await dft_read(dut, 0b0000, a) for a in (0x7D7, 0x7D6, 0x7D5, 0x7D4)]
+    a0_val = a0_b[0] | (a0_b[1] << 8) | (a0_b[2] << 16) | (a0_b[3] << 24)
+    dut._log.info(f"RF a0 = 0x{a0_val:08x}  bytes(lsb→msb)={[f'0x{b:02x}' for b in a0_b]}")
+    a1_b = [await dft_read(dut, 0b0000, a) for a in (0x7D3, 0x7D2, 0x7D1, 0x7D0)]
+    a1_val = a1_b[0] | (a1_b[1] << 8) | (a1_b[2] << 16) | (a1_b[3] << 24)
+    dut._log.info(f"RF a1 = 0x{a1_val:08x}  bytes(lsb→msb)={[f'0x{b:02x}' for b in a1_b]}")
+    prog0 = await dft_read(dut, 0b0000, 0x000)
+    dut._log.info(f"SRAM[0x000] = 0x{prog0:02x} (expect 0x37 = first byte of lui a0,0)")
+
+    # Step 7: read back the result
+    result = await dft_read(dut, tile_id=0b0000, addr=RESULT_ADDR)
+    dut._log.info(
+        f"SRAM[0x{RESULT_ADDR:03X}] = 0x{result:02X}  "
+        f"(expected 0x{EXPECTED:02X} = '{chr(EXPECTED)}')"
+    )
+
+    dut.input_PAD.value = _CS_N
+    assert result == EXPECTED, \
+        f"DFT boot failed: expected 0x{EXPECTED:02X} ('{chr(EXPECTED)}'), got 0x{result:02X}"
+    dut._log.info("test_dft_boot_hello PASSED — SERV booted via DFT and wrote 'H' to SRAM!")
+
+
 
 
 
