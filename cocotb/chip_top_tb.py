@@ -227,12 +227,11 @@ def chip_top_runner():
     sources += [
         # IO pad models
         Path(pdk_root) / pdk / "libs.ref/gf180mcu_fd_io/verilog/gf180mcu_fd_io.v",
-        Path(pdk_root) / pdk / "libs.ref/gf180mcu_ws_io/verilog/gf180mcu_ws_io.v",
-        
-        # SRAM macros (3.3V)
-        proj_path / "../libs/gf180mcu_ocd_ip_sram/cells/gf180mcu_ocd_ip_sram__sram512x8m8wm1/gf180mcu_ocd_ip_sram__sram512x8m8wm1.v",
+        Path(pdk_root) / pdk / "libs.ref/gf180mcu_fd_io/verilog/gf180mcu_ws_io.v",
+
+        # SRAM macros (3.3V) — 1024x8 is what sram2048x8_gf180 wraps
         proj_path / "../libs/gf180mcu_ocd_ip_sram/cells/gf180mcu_ocd_ip_sram__sram1024x8m8wm1/gf180mcu_ocd_ip_sram__sram1024x8m8wm1.v",
-        
+
         # Custom IP
         proj_path / "../ip/gf180mcu_ws_ip__id/vh/gf180mcu_ws_ip__id.v",
         proj_path / "../ip/gf180mcu_ws_ip__logo/vh/gf180mcu_ws_ip__logo.v",
@@ -240,13 +239,24 @@ def chip_top_runner():
         # Ethan: Added these files:
         proj_path / "../src/dft_ethan/spi_debug.v",
         proj_path / "../src/dft_ethan/gf180mcu_fd_ip_sram__sram2048x8m8wm1.v",
-        proj_path / "../src/mesh_psi_aan/mesh_rxc.v",
-        proj_path / "../src/mesh_psi_aan/mesh_tile.v",
+        proj_path / "../src/mesh_psi_aan/mesh_3x3.v",
+        # mesh_tile: use synthesized netlist in GL_TILE mode, RTL otherwise
+        *(
+            prepare_gl_tile_sources(Path(gl_tile), proj_path / "sim_build")
+            if gl_tile else
+            [proj_path / "../src/mesh_psi_aan/mesh_tile.v"]
+        ),
         proj_path / "../src/mesh_psi_aan/mesh_router.v",
         proj_path / "../src/mesh_psi_aan/boot_controller.v",
-        *sorted((proj_path / "../src/subservient/rtl").glob("*.v")),
-        *sorted((proj_path / "../src/serv/rtl").glob("*.v")),
-        *sorted((proj_path / "../src/serv/servile").glob("*.v")),
+        # Add all .v files from subservient and serv submodules:
+        # Exclude SRAM model already included from libs/ above
+        # In GL_TILE mode the synthesized netlist replaces all subservient/serv RTL
+        *([] if gl_tile else [
+            *sorted(f for f in (proj_path / "../src/subservient/rtl").glob("*.v")
+                    if "sram1024x8" not in f.name),
+            *sorted((proj_path / "../src/serv/rtl").glob("*.v")),
+            *sorted((proj_path / "../src/serv/servile").glob("*.v")),
+        ]),
     ]
 
     build_args = []
