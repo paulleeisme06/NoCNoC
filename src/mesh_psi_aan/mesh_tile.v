@@ -29,10 +29,12 @@ module mesh_tile #(
     output wire [35:0] ne_out, nw_out, se_out, sw_out
 );
 
+`ifndef SYNTHESIS
     initial begin
         $display("[TILE_ID_CHECK] TILE_ID param = %0d  (row=%0d col=%0d)",
                 TILE_ID, TILE_ID[5:3], TILE_ID[2:0]);
     end
+`endif
 
     wire [31:0] wb_adr, wb_dat_c2r, wb_dat_r2c;
     wire [3:0]  wb_sel;
@@ -67,6 +69,7 @@ module mesh_tile #(
     // -------------------------------------------------------------------------
     // Seed/grid write monitor (tile 1 only)
     // -------------------------------------------------------------------------
+`ifndef SYNTHESIS
     always @(posedge clk) begin
         if (!boot_mode && TILE_ID == 1) begin
             if (sram_wen && final_a >= 11'h500 && final_a <= 11'h563)
@@ -77,6 +80,7 @@ module mesh_tile #(
                         $time, final_a, sram_rdata);
         end
     end
+`endif
 
     // -------------------------------------------------------------------------
     // CEN startup-pulse generator
@@ -139,16 +143,19 @@ module mesh_tile #(
     // -------------------------------------------------------------------------
     // Debug: SRAM write monitor — tile 1
     // -------------------------------------------------------------------------
+`ifndef SYNTHESIS
     always @(posedge clk) begin
         if (!boot_mode && sram_wen && final_d != 8'h00 && TILE_ID == 1) begin
             $display("[SRAM t=%0t] MY_ID=%0d WRITE addr=0x%03x data=0x%02x",
                      $time, TILE_ID, final_a, final_d);
         end
     end
+`endif
 
     // -------------------------------------------------------------------------
     // Debug: SRAM read monitor — tile 1
     // -------------------------------------------------------------------------
+`ifndef SYNTHESIS
     reg [10:0] prev_raddr_t1;
     reg        prev_rvalid_t1;
     always @(posedge clk) begin
@@ -162,10 +169,12 @@ module mesh_tile #(
             $display("[SRAM_READ t=%0t] MY_ID=%0d READ addr=0x%03x data=0x%02x (1-cycle-delayed)",
                      $time, TILE_ID, prev_raddr_t1, sram_rdata);
     end
+`endif
 
     // -------------------------------------------------------------------------
     // Debug: ghost buffer write monitor — tile(0,0)
     // -------------------------------------------------------------------------
+`ifndef SYNTHESIS
     always @(posedge clk) begin
         if (!boot_mode && TILE_ID == 0 && sram_wen) begin
             if (final_a >= 11'h600 && final_a <= 11'h609)
@@ -182,10 +191,12 @@ module mesh_tile #(
                          $time, {21'b0, final_a} - 32'h61E, final_d, final_a);
         end
     end
+`endif
 
     // -------------------------------------------------------------------------
     // Debug: next_grid border-cell write monitor — tile(0,0)
     // -------------------------------------------------------------------------
+`ifndef SYNTHESIS
     always @(posedge clk) begin
         if (!boot_mode && TILE_ID == 0 && sram_wen &&
             final_a >= 11'h640 && final_a <= 11'h6A3) begin
@@ -200,6 +211,7 @@ module mesh_tile #(
             end
         end
     end
+`endif
 
     // -------------------------------------------------------------------------
     // Mesh router
