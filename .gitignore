@@ -13,4 +13,9 @@ run/
 *.log
 *.pyc
 *.swp
+librelane/noc_tile/runs/
+librelane/runs/
+sim-gl-tile.log
+simulation.log
+
 .DS_Store

@@ -168,6 +168,13 @@ sim-gl: ## Run gate-level simulation with cocotb (after copy-final)
 	cd cocotb; GL=1 PDK_ROOT=${PDK_ROOT} PDK=${PDK} SLOT=${SLOT} python3 chip_top_tb.py
 .PHONY: sim-gl
 
+NOC_TILE_RUN ?= $(shell ls -td librelane/noc_tile/runs/RUN_* 2>/dev/null | head -1)
+sim-gl-tile: ## Run mixed RTL/GL sim using the latest mesh_tile synthesis run
+	cd cocotb; PDK_ROOT=${PDK_ROOT} PDK=${PDK} SLOT=${SLOT} \
+		GL_TILE=$(MAKEFILE_DIR)/$(NOC_TILE_RUN)/final/nl/mesh_tile.nl.v \
+		python3 chip_top_tb.py
+.PHONY: sim-gl-tile
+
 sim-view: ## View simulation waveforms in GTKWave
 	gtkwave cocotb/sim_build/chip_top.fst
 .PHONY: sim-view

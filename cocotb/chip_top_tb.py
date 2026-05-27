@@ -4,6 +4,8 @@
 import os
 import random
 import logging
+import re
+import tempfile
 from pathlib import Path
 
 import cocotb
@@ -16,6 +18,7 @@ pdk_root = os.getenv("PDK_ROOT", Path("~/.ciel").expanduser())
 pdk = os.getenv("PDK", "gf180mcuD")
 scl = os.getenv("SCL", "gf180mcu_as_sc_mcu7t3v3")
 gl = os.getenv("GL", False)
+gl_tile = os.getenv("GL_TILE", "")   # path to mesh_tile.nl.v for mixed RTL/GL sim
 slot = os.getenv("SLOT", "1x1")
 
 hdl_toplevel = "chip_top"
@@ -85,6 +88,105 @@ async def test_counter(dut):
     logger.info("Done!")
 
 
+def prepare_gl_tile_sources(nl_path: Path, build_dir: Path):
+    """
+    Synthesized mesh_tile.nl.v has no parameters, but mesh_3x3.v passes
+    #(.TILE_ID(...)) on every instantiation.  Fix this without touching the
+    synthesis output:
+      1. Copy the netlist and rename  module mesh_tile → mesh_tile_gl
+      2. Write a thin wrapper  mesh_tile  that accepts TILE_ID (ignored) and
+         wires all ports straight through to mesh_tile_gl.
+    Returns [renamed_netlist_path, wrapper_path].
+    """
+    build_dir.mkdir(parents=True, exist_ok=True)
+
+    # 1. Rename the module in a temp copy + patch bank_sel_q timing bug.
+    #
+    # The synthesized netlist has a 2-cycle delay on bank_sel_q because the
+    # RTL simulation branch uses a blocking assignment for bank_sel_cap (making
+    # it 0-cycle), but the synthesis branch uses a D-FF (1-cycle), so
+    # bank_sel_q ends up 2 cycles behind A[10] instead of 1.  This causes the
+    # output mux to select the wrong bank on every bank0<->bank1 transition,
+    # corrupting SERV instruction/data reads.
+    #
+    # Fix: in the netlist the mux feeding bank_sel_q's D input is:
+    #   mux2(S=CEN_gated, B=bank_sel_cap, A=bank_sel_q) -> bank_sel_q FF D
+    # Change B from bank_sel_cap to A[10] so bank_sel_q gets 1-cycle delay
+    # directly from A[10], matching the RTL simulation behaviour.
+    nl_text = nl_path.read_text()
+    nl_renamed = re.sub(r'\bmodule\s+mesh_tile\b', 'module mesh_tile_gl', nl_text)
+    # Patch the mux: replace the one instance where B drives bank_sel_q's D
+    # (B=bank_sel_cap) with B=A[10].  The replacement is exact-string safe
+    # because the mux also has A=bank_sel_q on the next line.
+    nl_renamed = nl_renamed.replace(
+        '.B(\\sram2048.bank_sel_cap ),\n    .A(\\sram2048.bank_sel_q ),\n    .Y(_0211_))',
+        '.B(\\sram2048.A[10] ),\n    .A(\\sram2048.bank_sel_q ),\n    .Y(_0211_))'
+    )
+    renamed_path = build_dir / "mesh_tile_gl.nl.v"
+    renamed_path.write_text(nl_renamed)
+    # Verify the patch applied (detect netlist layout changes between runs)
+    if r'\sram2048.bank_sel_cap ),\n    .A(\sram2048.bank_sel_q ),\n    .Y(_0211_))' in nl_renamed:
+        raise RuntimeError(
+            "bank_sel_q netlist patch did not apply — "
+            "netlist layout changed, update the patch in prepare_gl_tile_sources()"
+        )
+
+    # 2. Build wrapper with TILE_ID param + full port passthrough
+    wrapper = """\
+// Auto-generated wrapper: adds TILE_ID parameter dropped by synthesis.
+// TILE_ID is accepted but unused — post-synthesis the value is baked in.
+module mesh_tile #(parameter [3:0] TILE_ID = 0) (
+    input  wire        boot_mode,
+    input  wire        boot_wen,
+    input  wire        clk,
+    input  wire        dft_ce,
+    input  wire        dft_mode,
+    input  wire        dft_we,
+    input  wire        rst,
+    input  wire [10:0] boot_addr,
+    input  wire  [7:0] boot_data,
+    input  wire [10:0] dft_addr,
+    output wire  [7:0] dft_rdata,
+    input  wire  [7:0] dft_wdata,
+    input  wire [33:0] east_in,
+    output wire [33:0] east_out,
+    input  wire [33:0] ne_in,
+    output wire [33:0] ne_out,
+    input  wire [33:0] north_in,
+    output wire [33:0] north_out,
+    input  wire [33:0] nw_in,
+    output wire [33:0] nw_out,
+    input  wire [33:0] se_in,
+    output wire [33:0] se_out,
+    input  wire [33:0] south_in,
+    output wire [33:0] south_out,
+    input  wire [33:0] sw_in,
+    output wire [33:0] sw_out,
+    input  wire [33:0] west_in,
+    output wire [33:0] west_out
+);
+    mesh_tile_gl u_gl (
+        .boot_mode(boot_mode), .boot_wen(boot_wen),
+        .clk(clk), .dft_ce(dft_ce), .dft_mode(dft_mode), .dft_we(dft_we),
+        .rst(rst), .boot_addr(boot_addr), .boot_data(boot_data),
+        .dft_addr(dft_addr), .dft_rdata(dft_rdata), .dft_wdata(dft_wdata),
+        .east_in(east_in),   .east_out(east_out),
+        .ne_in(ne_in),       .ne_out(ne_out),
+        .north_in(north_in), .north_out(north_out),
+        .nw_in(nw_in),       .nw_out(nw_out),
+        .se_in(se_in),       .se_out(se_out),
+        .south_in(south_in), .south_out(south_out),
+        .sw_in(sw_in),       .sw_out(sw_out),
+        .west_in(west_in),   .west_out(west_out)
+    );
+endmodule
+"""
+    wrapper_path = build_dir / "mesh_tile_gl_wrapper.v"
+    wrapper_path.write_text(wrapper)
+
+    return [renamed_path, wrapper_path]
+
+
 def chip_top_runner():
 
     proj_path = Path(__file__).resolve().parent
@@ -94,7 +196,7 @@ def chip_top_runner():
     includes = [proj_path / "../src/"]
 
     if gl:
-        # SCL models
+        # Full chip GLS: powered netlist replaces everything
         sources.append(Path(pdk_root) / pdk / "libs.ref" / scl / "verilog" / f"{scl}.v")
         primitives = Path(pdk_root) / pdk / "libs.ref" / scl / "verilog" / "primitives.v"
         if primitives.exists():
@@ -104,6 +206,20 @@ def chip_top_runner():
         sources.append(proj_path / f"../final/pnl/{hdl_toplevel}.pnl.v")
 
         defines = {"FUNCTIONAL": True, "USE_POWER_PINS": True}
+    elif gl_tile:
+        # Mixed RTL/GL: chip_top + chip_core stay RTL; mesh_tile is gate-level.
+        # SCL standard-cell behavioral models (needed by the synthesized tile netlist)
+        sources.append(Path(pdk_root) / pdk / "libs.ref" / scl / "verilog" / f"{scl}.v")
+        primitives = Path(pdk_root) / pdk / "libs.ref" / scl / "verilog" / "primitives.v"
+        if primitives.exists():
+            sources.append(primitives)
+        # Stubs for cells missing from the functional library (ao211, aoi211, oai211)
+        sources.append(proj_path / "gf180mcu_as_sc_mcu7t3v3_stubs.v")
+        # Rest of chip stays RTL
+        sources.append(proj_path / "../src/chip_top.sv")
+        sources.append(proj_path / "../src/chip_core.sv")
+        # FUNCTIONAL suppresses timing checks inside std-cell models
+        defines["FUNCTIONAL"] = True
     else:
         sources.append(proj_path / "../src/chip_top.sv")
         sources.append(proj_path / "../src/chip_core.sv")
@@ -112,10 +228,10 @@ def chip_top_runner():
         # IO pad models
         Path(pdk_root) / pdk / "libs.ref/gf180mcu_fd_io/verilog/gf180mcu_fd_io.v",
         Path(pdk_root) / pdk / "libs.ref/gf180mcu_fd_io/verilog/gf180mcu_ws_io.v",
-        
+
         # SRAM macros (3.3V) — 1024x8 is what sram2048x8_gf180 wraps
         proj_path / "../libs/gf180mcu_ocd_ip_sram/cells/gf180mcu_ocd_ip_sram__sram1024x8m8wm1/gf180mcu_ocd_ip_sram__sram1024x8m8wm1.v",
-        
+
         # Custom IP
         proj_path / "../ip/gf180mcu_ws_ip__id/vh/gf180mcu_ws_ip__id.v",
         proj_path / "../ip/gf180mcu_ws_ip__logo/vh/gf180mcu_ws_ip__logo.v",
@@ -124,15 +240,23 @@ def chip_top_runner():
         proj_path / "../src/dft - Ethan/spi_debug.v",
         proj_path / "../src/dft - Ethan/gf180mcu_fd_ip_sram__sram2048x8m8wm1.v",
         proj_path / "../src/mesh - Psi&Aan/mesh_3x3.v",
-        proj_path / "../src/mesh - Psi&Aan/mesh_tile.v",
+        # mesh_tile: use synthesized netlist in GL_TILE mode, RTL otherwise
+        *(
+            prepare_gl_tile_sources(Path(gl_tile), proj_path / "sim_build")
+            if gl_tile else
+            [proj_path / "../src/mesh - Psi&Aan/mesh_tile.v"]
+        ),
         proj_path / "../src/mesh - Psi&Aan/mesh_router.v",
         proj_path / "../src/mesh - Psi&Aan/boot_controller.v",
         # Add all .v files from subservient and serv submodules:
         # Exclude SRAM model already included from libs/ above
-        *sorted(f for f in (proj_path / "../src/subservient/rtl").glob("*.v")
-                if "sram1024x8" not in f.name),
-        *sorted((proj_path / "../src/serv/rtl").glob("*.v")),
-        *sorted((proj_path / "../src/serv/servile").glob("*.v")),
+        # In GL_TILE mode the synthesized netlist replaces all subservient/serv RTL
+        *([] if gl_tile else [
+            *sorted(f for f in (proj_path / "../src/subservient/rtl").glob("*.v")
+                    if "sram1024x8" not in f.name),
+            *sorted((proj_path / "../src/serv/rtl").glob("*.v")),
+            *sorted((proj_path / "../src/serv/servile").glob("*.v")),
+        ]),
     ]
 
     build_args = []
