@@ -13,9 +13,11 @@ run/
 *.log
 *.pyc
 *.swp
+*.txt
+*.bin
+*.elf
 librelane/noc_tile/runs/
 librelane/runs/
-sim-gl-tile.log
-simulation.log
-
+src/firmware/firmware.bin
+src/firmware/test.txt
 .DS_Store
