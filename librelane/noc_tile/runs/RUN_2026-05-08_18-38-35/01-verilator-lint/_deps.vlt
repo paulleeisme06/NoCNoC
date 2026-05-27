@@ -1,9 +1,0 @@
-`verilator_config
-lint_off -rule DECLFILENAME
-lint_off -rule EOFNEWLINE
-lint_off -rule UNDRIVEN -file "/home/etcfranc/NoCNoC/librelane/noc_tile/runs/RUN_2026-05-08_18-38-35/tmp/41835ff3bba04c30bce78734ad64bba7.bb.v"
-lint_off -rule UNUSEDSIGNAL -file "/home/etcfranc/NoCNoC/librelane/noc_tile/runs/RUN_2026-05-08_18-38-35/tmp/41835ff3bba04c30bce78734ad64bba7.bb.v"
-lint_off -rule UNDRIVEN -file "/home/etcfranc/NoCNoC/librelane/noc_tile/runs/RUN_2026-05-08_18-38-35/tmp/d43945a3c8e845d3bb09662376f9e96f.bb.v"
-lint_off -rule UNUSEDSIGNAL -file "/home/etcfranc/NoCNoC/librelane/noc_tile/runs/RUN_2026-05-08_18-38-35/tmp/d43945a3c8e845d3bb09662376f9e96f.bb.v"
-lint_off -rule UNDRIVEN -file "/home/etcfranc/NoCNoC/libs/gf180mcu_ocd_ip_sram/cells/gf180mcu_ocd_ip_sram__sram1024x8m8wm1/gf180mcu_ocd_ip_sram__sram1024x8m8wm1.blackbox.v"
-lint_off -rule UNUSEDSIGNAL -file "/home/etcfranc/NoCNoC/libs/gf180mcu_ocd_ip_sram/cells/gf180mcu_ocd_ip_sram__sram1024x8m8wm1/gf180mcu_ocd_ip_sram__sram1024x8m8wm1.blackbox.v"
