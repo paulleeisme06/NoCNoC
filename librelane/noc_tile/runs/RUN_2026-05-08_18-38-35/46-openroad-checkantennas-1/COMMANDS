@@ -1,1 +1,0 @@
-openroad -exit -no_splash -metrics /home/etcfranc/NoCNoC/librelane/noc_tile/runs/RUN_2026-05-08_18-38-35/46-openroad-checkantennas-1/or_metrics_out.json /nix/store/xjkk69lna4pw6jkb6bhsvqkgmfkjqxg5-python3-3.13.9-env/lib/python3.13/site-packages/librelane/scripts/openroad/antenna_check.tcl

@@ -1,2 +1,0 @@
-set_driving_cell gf180mcu_as_sc_mcu7t3v3__inv_2/Y
-set_load 72.91
