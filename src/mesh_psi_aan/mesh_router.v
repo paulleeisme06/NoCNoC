@@ -188,9 +188,6 @@ module mesh_router #(
 
     assign eject_flit_next = next_eject;
 
-    // -------------------------------------------------------------------------
-    // Output registers + debug logging (simulation only)
-    // -------------------------------------------------------------------------
     // ── TILE(0,0) transit & misroute monitor ─────────────────────────────────
     // Shows every flit that passes THROUGH tile (0,0) without being ejected,
     // and flags any ghost flit that is being forwarded instead of ejected

@@ -1,0 +1,95 @@
+meta:
+  version: 3
+  flow: Classic
+  substituting_steps:
+    OpenROAD.IRDropReport: null
+
+    # Save time during development
+    # Enable for sign-off
+    OpenROAD.IRDropReport: null
+    Magic.DRC: null
+    Checker.MagicDRC: null
+    KLayout.XOR: null
+    Netgen.LVS: null
+    Checker.LVS: null
+    KLayout.DRC: null
+
+DESIGN_NAME: mesh_tile
+VERILOG_FILES:
+  - dir::../../src/mesh - Psi&Aan/mesh_tile.v
+  - dir::../../src/mesh - Psi&Aan/mesh_router.v
+  - dir::../../src/serv/rtl/*.v 
+  - dir::../../src/serv/servile/*.v
+  - dir::../../src/subservient/rtl/sram2048x8_gf180.v
+  - dir::../../src/subservient/rtl/subservient_core.v
+  - dir::../../src/subservient/rtl/subservient_rf_ram_if.v
+
+
+# What should the clock port be?
+CLOCK_PORT: clk
+CLOCK_PERIOD: 25
+
+VDD_NETS:
+  - VDD
+GND_NETS:
+  - VSS
+
+FP_SIZING: absolute
+DIE_AREA: [0, 0, 900, 850]
+CORE_AREA: [10, 10, 890, 840]
+
+PL_TARGET_DENSITY_PCT: 35
+
+PDN_CORE_RING: False
+PDN_ENABLE_PINS: True
+PDN_VERTICAL_LAYER: Metal3
+PDN_HORIZONTAL_LAYER: Metal4
+
+# width of vertical and horizontal straps
+PDN_VWIDTH: 2
+PDN_HWIDTH: 2
+
+# distance between straps
+PDN_VPITCH: 75
+PDN_HPITCH: 75
+
+# include file for specifying pin locations
+FP_PIN_ORDER_CFG: dir::pin_order.cfg
+
+
+MACROS:
+  gf180mcu_ocd_ip_sram__sram1024x8m8wm1:
+    gds:
+      - dir::../../libs/gf180mcu_ocd_ip_sram/cells/gf180mcu_ocd_ip_sram__sram1024x8m8wm1/gf180mcu_ocd_ip_sram__sram1024x8m8wm1.gds
+    lef:
+      - dir::../../libs/gf180mcu_ocd_ip_sram/cells/gf180mcu_ocd_ip_sram__sram1024x8m8wm1/gf180mcu_ocd_ip_sram__sram1024x8m8wm1.lef
+    vh:
+      - dir::../../libs/gf180mcu_ocd_ip_sram/cells/gf180mcu_ocd_ip_sram__sram1024x8m8wm1/gf180mcu_ocd_ip_sram__sram1024x8m8wm1.blackbox.v
+    lib:
+      "*_tt_025C_3v30":
+        - dir::../../libs/gf180mcu_ocd_ip_sram/cells/gf180mcu_ocd_ip_sram__sram1024x8m8wm1/gf180mcu_ocd_ip_sram__sram1024x8m8wm1__tt_025C_3v30.lib
+      "*_ff_n40C_3v60":
+        - dir::../../libs/gf180mcu_ocd_ip_sram/cells/gf180mcu_ocd_ip_sram__sram1024x8m8wm1/gf180mcu_ocd_ip_sram__sram1024x8m8wm1__ff_n40C_3v60.lib
+    instances:
+      sram2048.u_bank0:
+        location: [146, 167]
+        orientation: N
+      sram2048.u_bank1:
+        location: [452, 167]
+        orientation: N
+
+PDN_MACRO_CONNECTIONS:
+  - "sram2048.u_bank0 VDD VSS VDD VSS"
+  - "sram2048.u_bank1 VDD VSS VDD VSS"
+
+
+
+PDN_CFG: dir::pdn_cfg.tcl
+
+
+# Don't error on DRC for the small block during development
+ERROR_ON_MAGIC_DRC: False
+
+
+
+
