@@ -119,8 +119,12 @@ CLOCK_NET: clk_pad/Y
 CLOCK_PERIOD: 25 # Was set to 40 for previous run
 
 # Fix hold violations
-PL_RESIZER_HOLD_SLACK_MARGIN: 0.5 # Was set to 0.7
-GRT_RESIZER_HOLD_SLACK_MARGIN: 0.4 # Was set to 0.6
+# pre placement slack margin to guide hold buffer insertion; set to 0.0 for no margin, or a positive value to allow hold buffers even if they cause a minor hold violation.
+PL_RESIZER_HOLD_SLACK_MARGIN: 0.7 # Was set to 0.7
+# post placement slack margin to guide hold buffer insertion; set to 0.0 for no margin, or a positive value to allow hold buffers even if they cause a minor hold violation.
+GRT_RESIZER_HOLD_SLACK_MARGIN: 0.6 # Was set to 0.6
+# makes sure everything is passing with the positive 0.6 of hold slack
+
 # Allow hold buffers even if they cause a minor setup violation.
 # Hold violations are dead-on-arrival; setup violations only reduce max frequency.
 # Fix hold time violations no matter what, even if it causes a minor setup violation.

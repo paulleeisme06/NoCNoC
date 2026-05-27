@@ -109,5 +109,5 @@ set_output_delay -clock $clocks -max 2 [get_ports {bidir_PAD[*]}]
 set_output_delay -clock $clocks -min 0 [get_ports {bidir_PAD[*]}]
 
 # Extra clock uncertainty
-set_clock_uncertainty -setup 0.3 $clocks
-set_clock_uncertainty -hold 0.5 $clocks
+# set_clock_uncertainty -setup 0.3 $clocks
+# set_clock_uncertainty -hold 0.5 $clocks
