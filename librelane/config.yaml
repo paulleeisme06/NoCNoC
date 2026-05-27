@@ -96,15 +96,51 @@ IGNORE_DISCONNECTED_MODULES:
 - gf180mcu_ws_ip__id
 - gf180mcu_ws_ip__logo
 
+# Skip every fill / tap / decap cell from the 3.3V SCL and IO libraries
+# during LVS. The 3.3V flow inserts hundreds of thousands of fillcap_16
+# / tap_2 cells; netgen's partition refinement does not converge in
+# reasonable time at that scale. These cells connect only to power /
+# ground rails, so dropping them does not affect LVS coverage.
+LVS_IGNORE_CELLS:
+  # 3.3V standard-cell library
+  - gf180mcu_as_sc_mcu7t3v3__fill_1
+  - gf180mcu_as_sc_mcu7t3v3__fill_2
+  - gf180mcu_as_sc_mcu7t3v3__fill_4
+  - gf180mcu_as_sc_mcu7t3v3__fill_8
+  - gf180mcu_as_sc_mcu7t3v3__fillcap_4
+  - gf180mcu_as_sc_mcu7t3v3__fillcap_8
+  - gf180mcu_as_sc_mcu7t3v3__fillcap_16
+  - gf180mcu_as_sc_mcu7t3v3__tap_2
+  # IO library fill cells
+  - gf180mcu_fd_io__fill1
+  - gf180mcu_fd_io__fill5
+  - gf180mcu_fd_io__fill10
+  - gf180mcu_fd_io__fillnc
+
 # Clock
 CLOCK_PORT: clk_PAD
 CLOCK_NET: clk_pad/Y
-CLOCK_PERIOD: 25 # 40 MHz
-# CLOCK_PERIOD: 40 # 25 MHz -- old one 
+CLOCK_PERIOD: 25 # Was set to 40 for previous run
 
 # Fix hold violations
-PL_RESIZER_HOLD_SLACK_MARGIN: 0.35
-GRT_RESIZER_HOLD_SLACK_MARGIN: 0.3
+# pre placement slack margin to guide hold buffer insertion; set to 0.0 for no margin, or a positive value to allow hold buffers even if they cause a minor hold violation.
+PL_RESIZER_HOLD_SLACK_MARGIN: 0.7 # Was set to 0.7
+# post placement slack margin to guide hold buffer insertion; set to 0.0 for no margin, or a positive value to allow hold buffers even if they cause a minor hold violation.
+GRT_RESIZER_HOLD_SLACK_MARGIN: 0.6 # Was set to 0.6
+# makes sure everything is passing with the positive 0.6 of hold slack
+
+# Allow hold buffers even if they cause a minor setup violation.
+# Hold violations are dead-on-arrival; setup violations only reduce max frequency.
+# Fix hold time violations no matter what, even if it causes a minor setup violation.
+# set up time violations can be fixed by manually adjusting the clock period constraint and re-running STA, but hold time violations are much more difficult to fix manually.
+PL_RESIZER_ALLOW_SETUP_VIOS: True
+GRT_RESIZER_ALLOW_SETUP_VIOS: True
+
+# Clock tree synthesis: cluster sinks more tightly to cut skew.
+# Worst hold path showed -0.451ns skew, 2.1ns clock network delay across 12815 sinks.
+# Tighter clustering reduces inter-sink skew so hold buffers can close the gap.
+CTS_SINK_CLUSTERING_SIZE: 20
+CTS_SINK_CLUSTERING_MAX_DIAMETER: 40
 
 # Increase for more logic
 # on your die
