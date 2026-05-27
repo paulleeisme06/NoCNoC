@@ -16,8 +16,8 @@ meta:
 
 DESIGN_NAME: mesh_tile
 VERILOG_FILES:
-  - dir::../../src/mesh - Psi&Aan/mesh_tile.v
-  - dir::../../src/mesh - Psi&Aan/mesh_router.v
+  - dir::../../src/mesh_psi_aan/mesh_tile.v
+  - dir::../../src/mesh_psi_aan/mesh_router.v
   - dir::../../src/serv/rtl/*.v 
   - dir::../../src/serv/servile/*.v
   - dir::../../src/subservient/rtl/sram2048x8_gf180.v

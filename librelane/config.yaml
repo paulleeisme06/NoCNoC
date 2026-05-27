@@ -1,4 +1,4 @@
-xmeta:
+meta:
   version: 3
   flow: Chip
   substituting_steps:
@@ -28,24 +28,24 @@ DESIGN_NAME: chip_top
 VERILOG_FILES:
 - dir::../src/chip_top.sv
 - dir::../src/chip_core.sv
-- dir::../src/dft - Ethan/spi_debug.v
-- dir::../src/mesh - Psi&Aan/mesh_3x3.v
-- dir::../src/mesh - Psi&Aan/mesh_tile.v
-- dir::../src/mesh - Psi&Aan/mesh_router.v
-- dir::../src/mesh - Psi&Aan/boot_loader.v
+- dir::../src/dft_ethan/spi_debug.v
+- dir::../src/mesh_psi_aan/mesh_3x3.v
+- dir::../src/mesh_psi_aan/mesh_tile.v
+- dir::../src/mesh_psi_aan/mesh_router.v
+- dir::../src/mesh_psi_aan/boot_loader.v
 - dir::../src/host-to-chip - Paul&Andrea/host_to_chip.v
-- dir::../src/flash - Sumi/flash_clk.sv
-- dir::../src/flash - Sumi/hk_boot_adapter.v
-- dir::../src/flash - Sumi/housekeeping.sv
-- dir::../src/flash - Sumi/shiftregister.sv
+- dir::../src/flash_Sumi/flash_clk.sv
+- dir::../src/flash_Sumi/hk_boot_adapter.v
+- dir::../src/flash_Sumi/housekeeping.sv
+- dir::../src/flash_Sumi/shiftregister.sv
 - dir::../src/serv/*.v 
 - dir::../src/subservient/*.v
 - dir::../src/serv/servile/*.v
 
 
 # Enable plugin for better SystemVerilog support
-# USE_SLANG: True
-# SLANG_ARGUMENTS: ['--keep-hierarchy']
+USE_SLANG: True
+SLANG_ARGUMENTS: ['--keep-hierarchy']
 
 # Slightly smaller file sizes
 PRIMARY_GDSII_STREAMOUT_TOOL: klayout
@@ -158,6 +158,8 @@ KLAYOUT_FILLER_OPTIONS:
 # Because we have multiple power pads for one power domain
 MAGIC_EXT_UNIQUE: notopports
 
+LVS_INCLUDE_MARCO_NETLISTS: True
+
 MACROS:
   gf180mcu_ws_ip__id:
     gds:
@@ -209,6 +211,32 @@ MACROS:
       i_chip_core.sram_1:
         location: [970, 500]
         orientation: E
+
+  mesh_tile:
+    gds:
+      - dir::hard_tile/gds/mesh_tile.gds
+    lef:
+      - dir::hard_tile/lef/mesh_tile.lef
+    # The RTL source serves as the blackbox header so Verilator and
+    # synthesis pick up the correct interface (incl. USE_POWER_PINS).
+    vh:
+      - dir::hard_tile/vh/mesh_tile.vh
+    nl:
+      - dir::hard_tile/nl/mesh_tile.nl.v
+    spef:
+      "min_*":
+        - dir::hard_tile/spef/min/mesh_tile.min.spef
+      "nom_*":
+        - dir::hard_tile/spef/nom/mesh_tile.nom.spef
+      "max_*":
+        - dir::hard_tile/spef/max/mesh_tile.max.spef
+    lib:
+      "*_tt_025C_3v30":
+        - dir::hard_tile/lib/nom_tt_025C_3v30/mesh_tile__nom_tt_025C_3v30.lib
+      "*_ff_n40C_3v60":
+        - dir::librelane/hard_tile/lib/nom_ff_n40C_3v60/mesh_tile__nom_ff_n40C_3v60.lib
+    instances:
+      # Fill this part in
 
 # This is an alternative method compared to
 # specifying the power connections in the RTL
