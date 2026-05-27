@@ -38,8 +38,12 @@ module chip_core #(
     assign input_pu = '0;
     assign input_pd = '0;
 
+    // moved this declaration up since its used in line 45
+    wire        spi_miso;
+
     // Set the bidir as output
     assign bidir_out[0] = spi_miso;
+    assign bidir_out[NUM_BIDIR_PADS-1:4] = '0;
     assign bidir_oe = {{NUM_BIDIR_PADS-4{1'b0}}, 4'b1111};  // [3:1]=flash outputs, [0]=miso
     assign bidir_cs = '0;
     assign bidir_sl = '0;
@@ -76,7 +80,7 @@ module chip_core #(
     wire [7:0]  dbg_wdata;
     wire [7:0]  dbg_rdata;
     wire        dbg_ack;
-    wire        spi_miso;
+    
 
     spi_debug my_spi_debug (
         .clk        (clk),
