@@ -265,7 +265,26 @@ module mesh_tile #(
                      $time, TILE_ID, final_a, final_d);
         end
     end
-    `endif 
+    `endif
+
+    // DEBUG: first 400 CPU SRAM accesses on tile(0,0) — trace instruction fetch and RF r/w
+    `ifndef SYNTHESIS
+    integer _cpu_cyc;
+    always @(posedge clk) begin
+        if (boot_mode || dft_mode) _cpu_cyc <= 0;
+        else                       _cpu_cyc <= _cpu_cyc + 1;
+    end
+    always @(posedge clk) begin
+        if (!boot_mode && !dft_mode && TILE_ID == 0 && _cpu_cyc < 400) begin
+            if (sram_wen)
+                $display("[CPU#%0d t=%0t] T0 WRITE addr=0x%03x data=0x%02x",
+                         _cpu_cyc, $time, final_a, final_d);
+            else
+                $display("[CPU#%0d t=%0t] T0 READ  addr=0x%03x q=0x%02x",
+                         _cpu_cyc, $time, final_a, sram_rdata);
+        end
+    end
+    `endif
 
 
     // ── TILE(0,0) ghost buffer write monitor ─────────────────────────────────
