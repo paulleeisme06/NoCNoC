@@ -43,6 +43,7 @@ module chip_core #(
 
     // Set the bidir as output
     assign bidir_out[0] = spi_miso;
+    assign bidir_out[NUM_BIDIR_PADS-1:4] = '0;
     assign bidir_oe = {{NUM_BIDIR_PADS-4{1'b0}}, 4'b1111};  // [3:1]=flash outputs, [0]=miso
     assign bidir_cs = '0;
     assign bidir_sl = '0;

@@ -17,7 +17,7 @@
  * Project:             018 5VGREEN SRAM
  * Author:              GlobalFoundries PDK Authors
  * Data Created:        05-06-2014
- * Revision:		0.0	
+ * Revision:		0.0
  *
  * Description:         gf180mcu_fd_ip_sram__sram2048x8m8wm1 Simulation Model
  */
@@ -41,7 +41,7 @@ input           CLK;
 input           CEN;    //Chip Enable
 input           GWEN;   //Global Write Enable
 input   [7:0]  	WEN;    //Write Enable
-input   [10:0]   A;
+input   [10:0]  A;
 input   [7:0]  	D;
 output	[7:0]	Q;
 inout		VDD;
@@ -88,6 +88,8 @@ wire    [7:0]  cd5;
 reg    	[7:0]  cdx;
 
 reg	[10:0]	marked_a;
+reg		gwen_cap;   // GWEN captured at posedge CLK before NB updates
+reg	[7:0]	ddata_cap;  // D    captured at posedge CLK before NB updates
 
 integer         i;
 
@@ -106,6 +108,7 @@ assign mem_3 = mem[3];
 always @(CEN) cen_dly = #100 CEN;
 always @(CEN or cen_dly) begin
   if (!CEN & cen_dly) cen_fell = 1'b1;
+  else cen_fell = cen_fell;
 end
 
 always @(posedge CLK) begin
@@ -129,24 +132,9 @@ assign read_flag  =  cen_fell & !CEN &  GWEN;
 reg cen_flag_dly;
 always @(cen_flag) cen_flag_dly = #100 cen_flag;
 
-localparam Tdly  = 100;
-localparam Tcyc = 55600;
-localparam Tckh = 25000;
-localparam Tckl = 25000;
-localparam tcs  = 5000;
-localparam tas  = 5000;
-localparam tds  = 5000;
-localparam tws  = 5000;
-localparam twis = 5000;
-localparam tch  = 10000;
-localparam tah  = 10000;
-localparam tdh  = 10000;
-localparam twh  = 10000;
-localparam twih = 10000;
-localparam ta   = 45000;
-
+`ifndef VERILATOR
 specify
-  /*specparam Tcyc = 55600 : 55600 : 55600;
+  specparam Tcyc = 55600 : 55600 : 55600;
   specparam Tckh = 25000 : 25000 : 25000;
   specparam Tckl = 25000 : 25000 : 25000;
 
@@ -162,9 +150,8 @@ specify
   specparam twh  = 10000 : 10000 : 10000;
   specparam twih = 10000 : 10000 : 10000;
 
-  specparam ta   = 45000 : 45000 : 45000;*/
-
-  
+  specparam ta   = 45000 : 45000 : 45000;
+  specparam Tdly = 100   : 100   : 100;
 
 //---- CLK period/pulse timing
   $period (negedge CLK, Tcyc, ntf_Tcyc);
@@ -309,10 +296,6 @@ specify
   $hold  (posedge CLK &&& write_flag, posedge D[7],  tdh, ntf_tdh);
 
 //---- Output delay
-// rise transition:     0->1, z->1, Ta
-// fall transition:     1->0, 1->z, Ta
-// turn-off transition: 0->z, 1->z, Tcqx
-//if (!CEN & GWEN) (posedge CLK => (Q : 8'bx)) = (Ta, Ta, Tcqx);
 if ((CEN == 1'b0) && (GWEN == 1'b1)) (posedge CLK => (Q[0]  : 1'bx)) = (ta, ta);
 if ((CEN == 1'b0) && (GWEN == 1'b1)) (posedge CLK => (Q[1]  : 1'bx)) = (ta, ta);
 if ((CEN == 1'b0) && (GWEN == 1'b1)) (posedge CLK => (Q[2]  : 1'bx)) = (ta, ta);
@@ -322,16 +305,19 @@ if ((CEN == 1'b0) && (GWEN == 1'b1)) (posedge CLK => (Q[5]  : 1'bx)) = (ta, ta);
 if ((CEN == 1'b0) && (GWEN == 1'b1)) (posedge CLK => (Q[6]  : 1'bx)) = (ta, ta);
 if ((CEN == 1'b0) && (GWEN == 1'b1)) (posedge CLK => (Q[7]  : 1'bx)) = (ta, ta);
 endspecify
+`endif
 
 assign no_st_viol = ~(|{ntf_tcs, ntf_tas, ntf_tds, ntf_tws, ntf_twis});
 assign no_hd_viol = ~(|{ntf_tch, ntf_tah, ntf_tdh, ntf_twh, ntf_twih});
 assign no_ck_viol = ~(|{ntf_Tcyc, ntf_Tckh, ntf_Tckl});
 
-always @(CLK) clk_dly        = #Tdly CLK;
+always @(CLK) clk_dly        = #100 CLK;
 always @(CLK) write_flag_dly = #200 write_flag;
 always @(CLK) read_flag_dly  = #200 read_flag;
 
-always @(posedge CLK) marked_a = A;
+always @(posedge CLK) marked_a  = A;
+always @(posedge CLK) gwen_cap  = GWEN;  // blocking: pre-NB capture
+always @(posedge CLK) ddata_cap = D;     // blocking: pre-NB capture
 
 assign we  = ~WEN;
 assign cd2 = mem[A] & WEN;	//set write bits to 0, others unchanged
@@ -341,16 +327,16 @@ assign cd5 = cd2 | cd4;		//memory content after write
 always @(posedge CLK) cdx = {8{1'bx}} & we;    //latch cdx
 
 always @(posedge clk_dly) begin
-  if (write_flag) begin 	//write
+  if (cen_fell & !CEN & !gwen_cap & !(&WEN)) begin //write (gwen_cap/marked_a/ddata_cap: pre-NB)
     if (no_st_viol) begin 	//write, no viol
-      mem[A] = cd5;
+      mem[marked_a] = (mem[marked_a] & WEN) | (ddata_cap & ~WEN);
     end
     else begin                 	//write, with viol
-      mem[A] = mem[A] ^ cdx;    //1^x = x
+      mem[marked_a] = mem[marked_a] ^ cdx;  //1^x = x
       qo_reg = qo_reg ^ cdx;
     end
   end //write
-  else if (read_flag) begin     //read
+  else if (cen_fell & !CEN & gwen_cap) begin //read (gwen_cap: pre-NB GWEN)
     if (no_st_viol) begin 	//read, no viol
       qo_reg = mem[marked_a];
     end
@@ -364,7 +350,7 @@ always @(negedge clk_dly) begin         	//invalidate write/read when hold/clk v
   if (no_hd_viol == 0 | no_ck_viol == 0) begin
     if (write_flag_dly) begin
       if (ntf_twh) begin
-        mem[marked_a] = mem[marked_a] ^ 8'bx; //GWEN can't be used to generate cdx
+        mem[marked_a] = mem[marked_a] ^ 8'bx;
         qo_reg        = qo_reg ^ 8'bx;
       end
       else begin
@@ -407,7 +393,7 @@ always @(posedge ntf_tcs or posedge ntf_tas or posedge ntf_tds or
          posedge ntf_twh or posedge ntf_twih or
          posedge ntf_Tcyc or posedge ntf_Tckh or posedge ntf_Tckl) begin
   if (cen_fell) begin
-    #Tdly;
+    #100;
     if (ntf_tcs)  $display("---- ERROR: CEN setup violation! ----");
     if (ntf_tas)  $display("---- ERROR: A setup violation! ----");
     if (ntf_tds)  $display("---- ERROR: D setup violation! ----");
@@ -426,8 +412,8 @@ always @(posedge ntf_tcs or posedge ntf_tas or posedge ntf_tds or
   end
 end
 
-always @(posedge cen_fell) begin	//reset fasle notifiers
-  ntf_tcs  = 0;				//after CEN reset (CEN from 1 to 0)
+always @(posedge cen_fell) begin	//reset false notifiers
+  ntf_tcs  = 0;
   ntf_tas  = 0;
   ntf_tds  = 0;
   ntf_tws  = 0;
@@ -472,7 +458,9 @@ initial begin			//initialization
   ntf_twh  = 0;
   ntf_twih = 0;
 
-  marked_a = 11'd0;
+  marked_a  = 11'd0;
+  gwen_cap  = 1'b1;  // default to read mode
+  ddata_cap = 8'd0;
 
   qo_reg         = 8'd0;
   clk_dly        = 0;
