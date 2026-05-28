@@ -38,6 +38,9 @@ VERILOG_FILES:
 - dir::../src/flash_Sumi/hk_boot_adapter.v
 - dir::../src/flash_Sumi/housekeeping.sv
 - dir::../src/flash_Sumi/shiftregister.sv
+- dir::../src/serv/*.v 
+- dir::../src/subservient/*.v
+- dir::../src/serv/servile/*.v
 - dir::../src/serv/rtl/serv_alu.v
 - dir::../src/serv/rtl/serv_aligner.v
 - dir::../src/serv/rtl/serv_bufreg.v
@@ -72,8 +75,8 @@ VERILOG_FILES:
 
 
 # Enable plugin for better SystemVerilog support
-# USE_SLANG: True
-# SLANG_ARGUMENTS: ['--keep-hierarchy']
+USE_SLANG: True
+SLANG_ARGUMENTS: ['--keep-hierarchy']
 
 # Slightly smaller file sizes
 PRIMARY_GDSII_STREAMOUT_TOOL: klayout
@@ -223,6 +226,8 @@ KLAYOUT_FILLER_OPTIONS:
 # Because we have multiple power pads for one power domain
 MAGIC_EXT_UNIQUE: notopports
 
+LVS_INCLUDE_MARCO_NETLISTS: True
+
 MACROS:
   gf180mcu_ws_ip__id:
     gds:
@@ -325,6 +330,34 @@ MACROS:
         location: [2831, 3318]
         orientation: N
 
+  mesh_tile:
+    gds:
+      - dir::hard_tile/gds/mesh_tile.gds
+    lef:
+      - dir::hard_tile/lef/mesh_tile.lef
+    # The RTL source serves as the blackbox header so Verilator and
+    # synthesis pick up the correct interface (incl. USE_POWER_PINS).
+    vh:
+      - dir::hard_tile/vh/mesh_tile.vh
+    nl:
+      - dir::hard_tile/nl/mesh_tile.nl.v
+    spef:
+      "min_*":
+        - dir::hard_tile/spef/min/mesh_tile.min.spef
+      "nom_*":
+        - dir::hard_tile/spef/nom/mesh_tile.nom.spef
+      "max_*":
+        - dir::hard_tile/spef/max/mesh_tile.max.spef
+    lib:
+      "*_tt_025C_3v30":
+        - dir::hard_tile/lib/nom_tt_025C_3v30/mesh_tile__nom_tt_025C_3v30.lib
+      "*_ff_n40C_3v60":
+        - dir::librelane/hard_tile/lib/nom_ff_n40C_3v60/mesh_tile__nom_ff_n40C_3v60.lib
+    instances:
+      # Fill this part in
+
+# This is an alternative method compared to
+# specifying the power connections in the RTL
 PDN_MACRO_CONNECTIONS:
 - "i_chip_core.u_mesh.rows\\[0\\].cols\\[0\\].tile_inst.sram2048.u_bank0 VDD VSS VDD VSS"
 - "i_chip_core.u_mesh.rows\\[0\\].cols\\[0\\].tile_inst.sram2048.u_bank1 VDD VSS VDD VSS"
