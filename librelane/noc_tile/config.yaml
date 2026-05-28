@@ -21,6 +21,7 @@ VERILOG_FILES:
   - dir::../../src/serv/rtl/*.v 
   - dir::../../src/serv/servile/*.v
   - dir::../../src/subservient/rtl/sram2048x8_gf180.v
+  - dir::../../src/subservient/rtl/gf180mcu_fd_ip_sram__sram2048x8m8wm1.v
   - dir::../../src/subservient/rtl/subservient_core.v
   - dir::../../src/subservient/rtl/subservient_rf_ram_if.v
 
@@ -118,16 +119,16 @@ MACROS:
       "*_ff_n40C_3v60":
         - dir::../../libs/gf180mcu_ocd_ip_sram/cells/gf180mcu_ocd_ip_sram__sram1024x8m8wm1/gf180mcu_ocd_ip_sram__sram1024x8m8wm1__ff_n40C_3v60.lib
     instances:
-      sram2048.u_bank0:
+      sram_inst.u.u_bank0:
         location: [146, 167]
         orientation: N
-      sram2048.u_bank1:
+      sram_inst.u.u_bank1:
         location: [452, 167]
         orientation: N
 
 PDN_MACRO_CONNECTIONS:
-  - "sram2048.u_bank0 VDD VSS VDD VSS"
-  - "sram2048.u_bank1 VDD VSS VDD VSS"
+  - "sram_inst.u.u_bank0 VDD VSS VDD VSS"
+  - "sram_inst.u.u_bank1 VDD VSS VDD VSS"
 
 
 PDN_CFG: dir::pdn_cfg.tcl

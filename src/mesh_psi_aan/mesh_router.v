@@ -193,6 +193,7 @@ module mesh_router #(
     // and flags any ghost flit that is being forwarded instead of ejected
     // (which would indicate a destination ID mismatch / routing bug).
     // Combinatorial — fires in the same always @(*) evaluation window.
+`ifndef SYNTHESIS
     always @(*) begin
         if (MY_ID == 0) begin
             // South-bound transit (heading to row 1 or 2)
@@ -231,6 +232,7 @@ module mesh_router #(
             end
         end
     end
+`endif
 
     always @(posedge clk) begin
         if (rst) begin
@@ -242,6 +244,7 @@ module mesh_router #(
             ne_out <= next_ne; nw_out <= next_nw;
             se_out <= next_se; sw_out <= next_sw;
 
+`ifndef SYNTHESIS
             // ── Wishbone write cycle monitor ─────────────────────────────────
             if (local_wb_stb && local_wb_we && local_wb_adr == 32'h80000000) begin
                 $display("[WB_CYCLE t=%0t] TILE=%0d stb=%b we=%b ack=%b dat_o=0x%08x",
@@ -282,6 +285,7 @@ module mesh_router #(
                          $time, MY_ID, next_s[34:32], next_s[31:29], next_s[28:0]);
 
             $fflush();
+`endif
         end
     end
 
