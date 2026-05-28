@@ -26,7 +26,14 @@ module mesh_tile #(
     input  wire [35:0] north_in, south_in, east_in, west_in,
     output wire [35:0] north_out, south_out, east_out, west_out,
     input  wire [35:0] ne_in, nw_in, se_in, sw_in,
-    output wire [35:0] ne_out, nw_out, se_out, sw_out
+    output wire [35:0] ne_out, nw_out, se_out, sw_out,
+
+    input  wire        dft_mode,
+    input  wire        dft_ce,
+    input  wire        dft_we,
+    input  wire [10:0] dft_addr,
+    input  wire [7:0]  dft_wdata,
+    output wire [7:0]  dft_rdata
 );
 
 `ifndef SYNTHESIS
@@ -67,6 +74,12 @@ module mesh_tile #(
     end
 
     // -------------------------------------------------------------------------
+    // Address / Data MUX (declared here so all always blocks below can use them)
+    // -------------------------------------------------------------------------
+    wire [10:0] final_a = boot_mode ? boot_addr  : (sram_wen ? sram_waddr : sram_raddr);
+    wire [7:0]  final_d = boot_mode ? boot_data  : sram_wdata;
+
+    // -------------------------------------------------------------------------
     // Seed/grid write monitor (tile 1 only)
     // -------------------------------------------------------------------------
 `ifndef SYNTHESIS
@@ -93,12 +106,6 @@ module mesh_tile #(
     wire cpu_sram_init_pulse = boot_mode_q & ~boot_mode;
 
     // -------------------------------------------------------------------------
-    // Address / Data MUX
-    // -------------------------------------------------------------------------
-    wire [10:0] final_a = boot_mode ? boot_addr  : (sram_wen ? sram_waddr : sram_raddr);
-    wire [7:0]  final_d = boot_mode ? boot_data  : sram_wdata;
-
-    // -------------------------------------------------------------------------
     // SRAM control signals
     // -------------------------------------------------------------------------
     wire sram_active = boot_mode ? ~boot_wen            : ~cpu_sram_init_pulse;
@@ -109,7 +116,7 @@ module mesh_tile #(
     // -------------------------------------------------------------------------
     subservient_core #(.memsize(2048)) core_inst (
         .i_clk       (clk),
-        .i_rst       (rst | boot_mode),
+        .i_rst       (rst | boot_mode | dft_mode),
         .o_sram_waddr(sram_waddr),
         .o_sram_wdata(sram_wdata),
         .o_sram_wen  (sram_wen),
@@ -130,15 +137,17 @@ module mesh_tile #(
     // -------------------------------------------------------------------------
     gf180mcu_fd_ip_sram__sram2048x8m8wm1 sram_inst (
         .CLK (clk),
-        .CEN (~sram_active),
-        .GWEN(~sram_write),
+        .CEN (dft_ce ? 1'b0       : ~sram_active),
+        .GWEN(dft_ce ? ~dft_we    : ~sram_write),
         .WEN (8'b0),
-        .A   (final_a),
-        .D   (final_d),
+        .A   (dft_ce ? dft_addr   : final_a),
+        .D   (dft_ce ? dft_wdata  : final_d),
         .Q   (sram_rdata),
         .VDD (),
         .VSS ()
     );
+
+    assign dft_rdata = sram_rdata;
 
     // -------------------------------------------------------------------------
     // Debug: SRAM write monitor — tile 1

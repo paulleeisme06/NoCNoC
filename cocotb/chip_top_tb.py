@@ -239,7 +239,7 @@ def chip_top_runner():
         # Ethan: Added these files:
         proj_path / "../src/dft_ethan/spi_debug.v",
         proj_path / "../src/dft_ethan/gf180mcu_fd_ip_sram__sram2048x8m8wm1.v",
-        proj_path / "../src/mesh_psi_aan/mesh_3x3.v",
+        proj_path / "../src/mesh_psi_aan/mesh_rxc.v",
         # mesh_tile: use synthesized netlist in GL_TILE mode, RTL otherwise
         *(
             prepare_gl_tile_sources(Path(gl_tile), proj_path / "sim_build")
@@ -253,7 +253,7 @@ def chip_top_runner():
         # In GL_TILE mode the synthesized netlist replaces all subservient/serv RTL
         *([] if gl_tile else [
             *sorted(f for f in (proj_path / "../src/subservient/rtl").glob("*.v")
-                    if "sram1024x8" not in f.name),
+                    if "sram1024x8" not in f.name and "sram2048" not in f.name),
             *sorted((proj_path / "../src/serv/rtl").glob("*.v")),
             *sorted((proj_path / "../src/serv/servile").glob("*.v")),
         ]),
