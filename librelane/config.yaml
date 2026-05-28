@@ -38,6 +38,9 @@ VERILOG_FILES:
 - dir::../src/flash_Sumi/hk_boot_adapter.v
 - dir::../src/flash_Sumi/housekeeping.sv
 - dir::../src/flash_Sumi/shiftregister.sv
+- dir::../src/serv/*.v 
+- dir::../src/subservient/*.v
+- dir::../src/serv/servile/*.v
 - dir::../src/serv/rtl/serv_alu.v
 - dir::../src/serv/rtl/serv_aligner.v
 - dir::../src/serv/rtl/serv_bufreg.v
@@ -72,8 +75,8 @@ VERILOG_FILES:
 
 
 # Enable plugin for better SystemVerilog support
-# USE_SLANG: True
-# SLANG_ARGUMENTS: ['--keep-hierarchy']
+USE_SLANG: True
+SLANG_ARGUMENTS: ['--keep-hierarchy']
 
 # Slightly smaller file sizes
 PRIMARY_GDSII_STREAMOUT_TOOL: klayout
@@ -96,15 +99,51 @@ IGNORE_DISCONNECTED_MODULES:
 - gf180mcu_ws_ip__id
 - gf180mcu_ws_ip__logo
 
+# Skip every fill / tap / decap cell from the 3.3V SCL and IO libraries
+# during LVS. The 3.3V flow inserts hundreds of thousands of fillcap_16
+# / tap_2 cells; netgen's partition refinement does not converge in
+# reasonable time at that scale. These cells connect only to power /
+# ground rails, so dropping them does not affect LVS coverage.
+LVS_IGNORE_CELLS:
+  # 3.3V standard-cell library
+  - gf180mcu_as_sc_mcu7t3v3__fill_1
+  - gf180mcu_as_sc_mcu7t3v3__fill_2
+  - gf180mcu_as_sc_mcu7t3v3__fill_4
+  - gf180mcu_as_sc_mcu7t3v3__fill_8
+  - gf180mcu_as_sc_mcu7t3v3__fillcap_4
+  - gf180mcu_as_sc_mcu7t3v3__fillcap_8
+  - gf180mcu_as_sc_mcu7t3v3__fillcap_16
+  - gf180mcu_as_sc_mcu7t3v3__tap_2
+  # IO library fill cells
+  - gf180mcu_fd_io__fill1
+  - gf180mcu_fd_io__fill5
+  - gf180mcu_fd_io__fill10
+  - gf180mcu_fd_io__fillnc
+
 # Clock
 CLOCK_PORT: clk_PAD
 CLOCK_NET: clk_pad/Y
-CLOCK_PERIOD: 25 # 40 MHz
-# CLOCK_PERIOD: 40 # 25 MHz -- old one 
+CLOCK_PERIOD: 25 # Was set to 40 for previous run
 
 # Fix hold violations
-PL_RESIZER_HOLD_SLACK_MARGIN: 0.35
-GRT_RESIZER_HOLD_SLACK_MARGIN: 0.3
+# pre placement slack margin to guide hold buffer insertion; set to 0.0 for no margin, or a positive value to allow hold buffers even if they cause a minor hold violation.
+PL_RESIZER_HOLD_SLACK_MARGIN: 0.7 # Was set to 0.7
+# post placement slack margin to guide hold buffer insertion; set to 0.0 for no margin, or a positive value to allow hold buffers even if they cause a minor hold violation.
+GRT_RESIZER_HOLD_SLACK_MARGIN: 0.6 # Was set to 0.6
+# makes sure everything is passing with the positive 0.6 of hold slack
+
+# Allow hold buffers even if they cause a minor setup violation.
+# Hold violations are dead-on-arrival; setup violations only reduce max frequency.
+# Fix hold time violations no matter what, even if it causes a minor setup violation.
+# set up time violations can be fixed by manually adjusting the clock period constraint and re-running STA, but hold time violations are much more difficult to fix manually.
+PL_RESIZER_ALLOW_SETUP_VIOS: True
+GRT_RESIZER_ALLOW_SETUP_VIOS: True
+
+# Clock tree synthesis: cluster sinks more tightly to cut skew.
+# Worst hold path showed -0.451ns skew, 2.1ns clock network delay across 12815 sinks.
+# Tighter clustering reduces inter-sink skew so hold buffers can close the gap.
+CTS_SINK_CLUSTERING_SIZE: 20
+CTS_SINK_CLUSTERING_MAX_DIAMETER: 40
 
 # Increase for more logic
 # on your die
@@ -186,6 +225,8 @@ KLAYOUT_FILLER_OPTIONS:
 
 # Because we have multiple power pads for one power domain
 MAGIC_EXT_UNIQUE: notopports
+
+LVS_INCLUDE_MARCO_NETLISTS: True
 
 MACROS:
   gf180mcu_ws_ip__id:
@@ -289,6 +330,34 @@ MACROS:
         location: [2831, 3318]
         orientation: N
 
+  mesh_tile:
+    gds:
+      - dir::hard_tile/gds/mesh_tile.gds
+    lef:
+      - dir::hard_tile/lef/mesh_tile.lef
+    # The RTL source serves as the blackbox header so Verilator and
+    # synthesis pick up the correct interface (incl. USE_POWER_PINS).
+    vh:
+      - dir::hard_tile/vh/mesh_tile.vh
+    nl:
+      - dir::hard_tile/nl/mesh_tile.nl.v
+    spef:
+      "min_*":
+        - dir::hard_tile/spef/min/mesh_tile.min.spef
+      "nom_*":
+        - dir::hard_tile/spef/nom/mesh_tile.nom.spef
+      "max_*":
+        - dir::hard_tile/spef/max/mesh_tile.max.spef
+    lib:
+      "*_tt_025C_3v30":
+        - dir::hard_tile/lib/nom_tt_025C_3v30/mesh_tile__nom_tt_025C_3v30.lib
+      "*_ff_n40C_3v60":
+        - dir::librelane/hard_tile/lib/nom_ff_n40C_3v60/mesh_tile__nom_ff_n40C_3v60.lib
+    instances:
+      # Fill this part in
+
+# This is an alternative method compared to
+# specifying the power connections in the RTL
 PDN_MACRO_CONNECTIONS:
 - "i_chip_core.u_mesh.rows\\[0\\].cols\\[0\\].tile_inst.sram2048.u_bank0 VDD VSS VDD VSS"
 - "i_chip_core.u_mesh.rows\\[0\\].cols\\[0\\].tile_inst.sram2048.u_bank1 VDD VSS VDD VSS"

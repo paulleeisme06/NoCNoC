@@ -80,3 +80,34 @@ if { [info exists ::env(OPENLANE_SDC_IDEAL_CLOCKS)] && $::env(OPENLANE_SDC_IDEAL
     set_propagated_clock [all_clocks]
 }
 
+
+# ============================================================================
+# Targeted constraints for NoCNoC 5x5 chip
+# ============================================================================
+
+# Async reset
+set_false_path -from [get_ports rst_n_PAD]
+
+# DFT mode static config
+set_false_path -from [get_ports {input_PAD[7]}]
+
+# Host SPI domain
+set_false_path -from [get_ports {input_PAD[1]}]
+set_false_path -from [get_ports {input_PAD[2]}]
+set_false_path -from [get_ports {input_PAD[3]}]
+
+# DFT SPI domain
+set_false_path -from [get_ports {input_PAD[4]}]
+set_false_path -from [get_ports {input_PAD[5]}]
+set_false_path -from [get_ports {input_PAD[6]}]
+
+# Flash MISO
+set_false_path -from [get_ports {input_PAD[0]}]
+
+# Monitor outputs - loose constraints
+set_output_delay -clock $clocks -max 2 [get_ports {bidir_PAD[*]}]
+set_output_delay -clock $clocks -min 0 [get_ports {bidir_PAD[*]}]
+
+# Extra clock uncertainty
+# set_clock_uncertainty -setup 0.3 $clocks
+# set_clock_uncertainty -hold 0.5 $clocks
