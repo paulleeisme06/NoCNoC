@@ -88,6 +88,8 @@ wire    [7:0]  cd5;
 reg    	[7:0]  cdx;
 
 reg	[10:0]	marked_a;
+reg		gwen_cap;   // GWEN captured at posedge CLK before NB updates
+reg	[7:0]	ddata_cap;  // D    captured at posedge CLK before NB updates
 
 integer         i;
 
@@ -313,7 +315,9 @@ always @(CLK) clk_dly        = #100 CLK;
 always @(CLK) write_flag_dly = #200 write_flag;
 always @(CLK) read_flag_dly  = #200 read_flag;
 
-always @(posedge CLK) marked_a = A;
+always @(posedge CLK) marked_a  = A;
+always @(posedge CLK) gwen_cap  = GWEN;  // blocking: pre-NB capture
+always @(posedge CLK) ddata_cap = D;     // blocking: pre-NB capture
 
 assign we  = ~WEN;
 assign cd2 = mem[A] & WEN;	//set write bits to 0, others unchanged
@@ -323,16 +327,16 @@ assign cd5 = cd2 | cd4;		//memory content after write
 always @(posedge CLK) cdx = {8{1'bx}} & we;    //latch cdx
 
 always @(posedge clk_dly) begin
-  if (write_flag) begin 	//write
+  if (cen_fell & !CEN & !gwen_cap & !(&WEN)) begin //write (gwen_cap/marked_a/ddata_cap: pre-NB)
     if (no_st_viol) begin 	//write, no viol
-      mem[A] = cd5;
+      mem[marked_a] = (mem[marked_a] & WEN) | (ddata_cap & ~WEN);
     end
     else begin                 	//write, with viol
-      mem[A] = mem[A] ^ cdx;    //1^x = x
+      mem[marked_a] = mem[marked_a] ^ cdx;  //1^x = x
       qo_reg = qo_reg ^ cdx;
     end
   end //write
-  else if (read_flag) begin     //read
+  else if (cen_fell & !CEN & gwen_cap) begin //read (gwen_cap: pre-NB GWEN)
     if (no_st_viol) begin 	//read, no viol
       qo_reg = mem[marked_a];
     end
@@ -454,7 +458,9 @@ initial begin			//initialization
   ntf_twh  = 0;
   ntf_twih = 0;
 
-  marked_a = 11'd0;
+  marked_a  = 11'd0;
+  gwen_cap  = 1'b1;  // default to read mode
+  ddata_cap = 8'd0;
 
   qo_reg         = 8'd0;
   clk_dly        = 0;

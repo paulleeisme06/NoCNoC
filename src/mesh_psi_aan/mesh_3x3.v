@@ -45,13 +45,6 @@ module mesh_3x3 (
         .sram_wdata(boot_data), .sram_waddr(boot_addr), .sram_wen(boot_wen), .cpu_reset_n(cpu_rst_n)
     );
 
-    //testing for flash:
-    // In mesh_3x3, after boot_controller instantiation:
-always @(negedge boot_wen) begin
-    $display("[BOOT t=%0t] boot_wen pulse: addr=0x%03x data=0x%02x",
-             $time, boot_addr, boot_data);
-end
-
     wire [33:0] grid_n [0:2][0:2], grid_s [0:2][0:2], grid_e [0:2][0:2], grid_w [0:2][0:2];
     wire [33:0] grid_ne[0:2][0:2], grid_nw[0:2][0:2], grid_se[0:2][0:2], grid_sw[0:2][0:2];
 
