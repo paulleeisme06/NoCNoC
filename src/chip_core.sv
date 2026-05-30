@@ -43,6 +43,7 @@ module chip_core #(
 
     // Set the bidir as output
     assign bidir_out[0] = spi_miso;
+    assign bidir_out[NUM_BIDIR_PADS-1:4] = '0;
     assign bidir_oe = {{NUM_BIDIR_PADS-4{1'b0}}, 4'b1111};  // [3:1]=flash outputs, [0]=miso
     assign bidir_cs = '0;
     assign bidir_sl = '0;
@@ -107,12 +108,11 @@ module chip_core #(
     end
     assign dbg_ack = dbg_ack_r;
 
-    // Ethan: mesh 3x3 instantiation:
-    mesh_3x3 u_mesh (
+    mesh_rxc #(.MESH_R(3), .MESH_C(3)) u_mesh (
         .clk          (clk),
         .rst          (~rst_n),
-        .inject_00_nw (34'b0),       // tie off unused NoC injection for now
-        .monitor_22_se(),
+        .inject_00_nw (36'b0),
+        .monitor_se   (),
 
         // Flash boot pins — assign to remaining input/bidir pads
         .flash_miso   (input_in[4]),
