@@ -16,6 +16,10 @@ module mesh_tile #(
     parameter integer MESH_R  = 5,
     parameter integer MESH_C  = 5
 )(
+`ifdef USE_POWER_PINS
+    inout wire VDD,
+    inout wire VSS,
+`endif
     input wire clk,
     input wire rst,
     input wire boot_mode,
@@ -135,16 +139,18 @@ module mesh_tile #(
     // -------------------------------------------------------------------------
     // GF180 2048×8 SRAM
     // -------------------------------------------------------------------------
-    gf180mcu_fd_ip_sram__sram2048x8m8wm1 sram_inst (
+    sram2048x8_gf180 sram2048 (
+`ifdef USE_POWER_PINS
+        .VDD (VDD),
+        .VSS (VSS),
+`endif
         .CLK (clk),
         .CEN (dft_ce ? 1'b0       : ~sram_active),
         .GWEN(dft_ce ? ~dft_we    : ~sram_write),
         .WEN (8'b0),
         .A   (dft_ce ? dft_addr   : final_a),
         .D   (dft_ce ? dft_wdata  : final_d),
-        .Q   (sram_rdata),
-        .VDD (),
-        .VSS ()
+        .Q   (sram_rdata)
     );
 
     assign dft_rdata = sram_rdata;

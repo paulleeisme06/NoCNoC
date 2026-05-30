@@ -242,6 +242,12 @@ if { $::env(PDN_CORE_RING) == 1 } {
 
 
 
+# gf180mcu_ocd_ip_sram__sram1024x8m8wm1 has VDD/VSS on Metal2 and Metal3
+# only — no Metal4 pins. A PDN ring at pad_offsets=0 places the Metal3
+# segment flush against the top macro boundary, contacting the Metal3 stubs
+# there. One connect rule per grid avoids PDN-0186 duplicate errors.
+# This configuration produced clean LVS + DRC on RUN_2026-05-27_17-17-57.
+
 define_pdn_grid \
     -macro \
     -instances "sram2048.u_bank0 sram2048.u_bank1" \
@@ -279,4 +285,3 @@ add_pdn_stripe \
     -pitch 50 \
     -starts_with GROUND \
     -number_of_straps 7
-
