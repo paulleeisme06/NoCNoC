@@ -81,19 +81,14 @@ PDN_MULTILAYER: true
 PDN_EXTEND_TO: boundary
 
 PDN_ENABLE_PINS: True
-
-# Tile PDN exposes power on Metal2 (vertical) and Metal3 (horizontal), and the
-# tile's internal signal routing is restricted to Metal1-Metal3 (RT_MAX_LAYER).
-# This leaves Metal4 and Metal5 COMPLETELY UNOBSTRUCTED inside the tile so the
-# chip-level PDN can route its Metal4 vertical / Metal5 horizontal straps
-# straight through the tile region. Chip-level then uses the macro grid's
-# Metal4→Metal3 via to bridge down to the tile's exposed Metal3 power pins.
-# This is the same pattern the hardened SRAMs use (which proved to work at
-# chip level), and avoids the OBS / pin-alignment fight we hit when the tile
-# exposed power on Metal4/5.
-PDN_VERTICAL_LAYER: Metal2
-PDN_HORIZONTAL_LAYER: Metal3
-RT_MAX_LAYER: Metal3
+# Tile PDN layer scheme: kept at PDK defaults (Metal4 vertical / Metal5
+# horizontal). Power pins are exposed on the tile boundary by PDN_ENABLE_PINS
+# + PDN_EXTEND_TO: boundary, above. This produced clean tile-level signoff
+# in RUN_2026-06-01_10-41-09. Chip-level integration on top of this tile
+# is the open question being investigated; do not change this section
+# without revisiting that investigation.
+#PDN_VERTICAL_LAYER: Metal2
+#PDN_HORIZONTAL_LAYER: Metal3
 
 # width of vertical and horizontal straps
 PDN_VWIDTH: 5
