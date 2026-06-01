@@ -55,7 +55,9 @@ PDN_CORE_RING: False
 PDN_MULTILAYER: true
 
 # extend pdn stripes to the boundary of the die instead of the edge of stdcell placement area
-#PDN_EXTEND_TO: boundary
+# Required: chip-top straps stop at the tile die boundary; without this the tile's straps
+# are inset 10 µm inside the core area and there is a physical gap → PSM-0069 at chip level.
+PDN_EXTEND_TO: boundary
 
 PDN_ENABLE_PINS: True
 #PDN_VERTICAL_LAYER: Metal2

@@ -11,8 +11,8 @@
 
 #define SIZE 10
 
-#define PHYS_ROWS    5
-#define PHYS_COLS    5
+#define PHYS_ROWS    3
+#define PHYS_COLS    3
 
 /* Must match ACTIVE_R / ACTIVE_C in test_mesh.py */
 #define ACTIVE_ROWS  4

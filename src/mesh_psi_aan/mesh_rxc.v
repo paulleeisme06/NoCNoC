@@ -174,53 +174,55 @@ module mesh_rxc #(
     // =========================================================================
     // INTER-TILE WIRE MONITOR (compile-time guarded — only when MESH_COLS >= 2)
     // =========================================================================
-    generate
-        if (MESH_C >= 2) begin : wire_monitor
-            always @(posedge clk) begin
+    // `ifndef SYNTHESIS
+    // generate
+    //     if (MESH_C >= 2) begin : wire_monitor
+    //         always @(posedge clk) begin
 
-                // ── (0,0) east output ─────────────────────────────────────────
-                if (rows[0].cols[0].tile_inst.router_inst.e_out[33]) begin
-                    $display("[WIRE t=%0t] (0,0).east_out   VALID  dest=%0d  payload=0x%08x",
-                             $time,
-                             rows[0].cols[0].tile_inst.router_inst.e_out[32:29],
-                             rows[0].cols[0].tile_inst.router_inst.e_out[28:0]);
-                end
+    //             // ── (0,0) east output ─────────────────────────────────────────
+    //             if (rows[0].cols[0].tile_inst.router_inst.e_out[33]) begin
+    //                 $display("[WIRE t=%0t] (0,0).east_out   VALID  dest=%0d  payload=0x%08x",
+    //                          $time,
+    //                          rows[0].cols[0].tile_inst.router_inst.e_out[32:29],
+    //                          rows[0].cols[0].tile_inst.router_inst.e_out[28:0]);
+    //             end
 
-                // ── (0,1) west input ──────────────────────────────────────────
-                if (rows[0].cols[1].tile_inst.router_inst.w_in[33]) begin
-                    $display("[WIRE t=%0t] (0,1).west_in     VALID  dest=%0d  payload=0x%08x",
-                             $time,
-                             rows[0].cols[1].tile_inst.router_inst.w_in[32:29],
-                             rows[0].cols[1].tile_inst.router_inst.w_in[28:0]);
-                end
+    //             // ── (0,1) west input ──────────────────────────────────────────
+    //             if (rows[0].cols[1].tile_inst.router_inst.w_in[33]) begin
+    //                 $display("[WIRE t=%0t] (0,1).west_in     VALID  dest=%0d  payload=0x%08x",
+    //                          $time,
+    //                          rows[0].cols[1].tile_inst.router_inst.w_in[32:29],
+    //                          rows[0].cols[1].tile_inst.router_inst.w_in[28:0]);
+    //             end
 
-                // ── (0,1) ejection decision ───────────────────────────────────
-                if (rows[0].cols[1].tile_inst.router_inst.next_eject[33]) begin
-                    $display("[WIRE t=%0t] (0,1).next_eject  VALID  payload=0x%08x  fifo_full=%0b  fifo_count=%0d",
-                             $time,
-                             rows[0].cols[1].tile_inst.router_inst.next_eject[28:0],
-                             rows[0].cols[1].tile_inst.router_inst.fifo_full,
-                             rows[0].cols[1].tile_inst.router_inst.fifo_count);
-                end
+    //             // ── (0,1) ejection decision ───────────────────────────────────
+    //             if (rows[0].cols[1].tile_inst.router_inst.next_eject[33]) begin
+    //                 $display("[WIRE t=%0t] (0,1).next_eject  VALID  payload=0x%08x  fifo_full=%0b  fifo_count=%0d",
+    //                          $time,
+    //                          rows[0].cols[1].tile_inst.router_inst.next_eject[28:0],
+    //                          rows[0].cols[1].tile_inst.router_inst.fifo_full,
+    //                          rows[0].cols[1].tile_inst.router_inst.fifo_count);
+    //             end
 
-                // ── (0,1) FIFO push confirmation ──────────────────────────────
-                if (rows[0].cols[1].tile_inst.router_inst.fifo_push) begin
-                    $display("[WIRE t=%0t] (0,1).fifo_push   count_after=%0d",
-                             $time,
-                             rows[0].cols[1].tile_inst.router_inst.fifo_count + 1);
-                end
+    //             // ── (0,1) FIFO push confirmation ──────────────────────────────
+    //             if (rows[0].cols[1].tile_inst.router_inst.fifo_push) begin
+    //                 $display("[WIRE t=%0t] (0,1).fifo_push   count_after=%0d",
+    //                          $time,
+    //                          rows[0].cols[1].tile_inst.router_inst.fifo_count + 1);
+    //             end
 
-                // ── (0,0) inject flit ─────────────────────────────────────────
-                if (rows[0].cols[0].tile_inst.router_inst.inject_flit[33]) begin
-                    $display("[WIRE t=%0t] (0,0).inject_flit VALID  dest=%0d  payload=0x%08x",
-                             $time,
-                             rows[0].cols[0].tile_inst.router_inst.inject_flit[32:29],
-                             rows[0].cols[0].tile_inst.router_inst.inject_flit[28:0]);
-                end
+    //             // ── (0,0) inject flit ─────────────────────────────────────────
+    //             if (rows[0].cols[0].tile_inst.router_inst.inject_flit[33]) begin
+    //                 $display("[WIRE t=%0t] (0,0).inject_flit VALID  dest=%0d  payload=0x%08x",
+    //                          $time,
+    //                          rows[0].cols[0].tile_inst.router_inst.inject_flit[32:29],
+    //                          rows[0].cols[0].tile_inst.router_inst.inject_flit[28:0]);
+    //             end
 
-                $fflush();
-            end
-        end
-    endgenerate
+    //             $fflush();
+    //         end
+    //     end
+    // endgenerate
+    // `endif
 
 endmodule
