@@ -20,7 +20,7 @@ VERILOG_FILES:
   - dir::../../src/mesh_psi_aan/mesh_router.v
   - dir::../../src/serv/rtl/*.v 
   - dir::../../src/serv/servile/*.v
-  - dir::../../src/sram2048x8_gf180.v
+  - dir::../../src/subservient/rtl/sram2048x8_gf180.v
   - dir::../../src/subservient/rtl/subservient_core.v
   - dir::../../src/subservient/rtl/subservient_rf_ram_if.v
 
