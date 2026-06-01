@@ -251,57 +251,74 @@ MACROS:
       "*_ff_n40C_3v60":
         - dir::hard_tile/lib/nom_ff_n40C_3v60/mesh_tile__nom_ff_n40C_3v60.lib
     instances:
-      # 4 cols × 4 rows = 16 tiles. Each tile is 730 × 820 µm.
+      # 4 cols × 4 rows = 16 tiles. Each tile is 730 × 920 µm.
       # 4×4 chosen over 4×5 so DFT can address every tile uniquely with the
       # current 4-bit dft_tile_id (5 rows would alias row 4 onto row 0).
-      # X = 442 + col × 772 (730 tile + 42 µm chip-level routing channel)
-      # Y = 442 + row × 853 (820 tile + 33 µm chip-level routing channel)
-      # Rightmost tile right edge = 3488 (1.5 µm under core right=3490)
-      # Topmost tile top edge   = 3821 — leaves 856 µm of empty space above the
-      # mesh that the chip-level router/CTS can use; harmless.
+      # X = 442 + col × 772  (730 tile + 42 µm chip-level routing channel)
+      # Y = 442 + row × 1038 (920 tile + 118 µm chip-level routing channel)
+      # Rightmost tile right edge = 3488  (1.5 µm under core right=3490)
+      # Topmost tile top edge     = 4476  (~201 µm under core top = 4677)
+      # The 201 µm top margin gives the chip-level PDN room to route its
+      # Metal4 horizontal straps above the top row of tiles (PDN-0179 needs
+      # at least one strap-pitch (75µm) of clearance — 200 µm is generous).
       i_chip_core.u_mesh.rows[0].cols[0].tile_inst: { location: [442,  442], orientation: N }
       i_chip_core.u_mesh.rows[0].cols[1].tile_inst: { location: [1214, 442], orientation: N }
       i_chip_core.u_mesh.rows[0].cols[2].tile_inst: { location: [1986, 442], orientation: N }
       i_chip_core.u_mesh.rows[0].cols[3].tile_inst: { location: [2758, 442], orientation: N }
-      i_chip_core.u_mesh.rows[1].cols[0].tile_inst: { location: [442,  1295], orientation: N }
-      i_chip_core.u_mesh.rows[1].cols[1].tile_inst: { location: [1214, 1295], orientation: N }
-      i_chip_core.u_mesh.rows[1].cols[2].tile_inst: { location: [1986, 1295], orientation: N }
-      i_chip_core.u_mesh.rows[1].cols[3].tile_inst: { location: [2758, 1295], orientation: N }
-      i_chip_core.u_mesh.rows[2].cols[0].tile_inst: { location: [442,  2148], orientation: N }
-      i_chip_core.u_mesh.rows[2].cols[1].tile_inst: { location: [1214, 2148], orientation: N }
-      i_chip_core.u_mesh.rows[2].cols[2].tile_inst: { location: [1986, 2148], orientation: N }
-      i_chip_core.u_mesh.rows[2].cols[3].tile_inst: { location: [2758, 2148], orientation: N }
-      i_chip_core.u_mesh.rows[3].cols[0].tile_inst: { location: [442,  3001], orientation: N }
-      i_chip_core.u_mesh.rows[3].cols[1].tile_inst: { location: [1214, 3001], orientation: N }
-      i_chip_core.u_mesh.rows[3].cols[2].tile_inst: { location: [1986, 3001], orientation: N }
-      i_chip_core.u_mesh.rows[3].cols[3].tile_inst: { location: [2758, 3001], orientation: N }
+      i_chip_core.u_mesh.rows[1].cols[0].tile_inst: { location: [442,  1480], orientation: N }
+      i_chip_core.u_mesh.rows[1].cols[1].tile_inst: { location: [1214, 1480], orientation: N }
+      i_chip_core.u_mesh.rows[1].cols[2].tile_inst: { location: [1986, 1480], orientation: N }
+      i_chip_core.u_mesh.rows[1].cols[3].tile_inst: { location: [2758, 1480], orientation: N }
+      i_chip_core.u_mesh.rows[2].cols[0].tile_inst: { location: [442,  2518], orientation: N }
+      i_chip_core.u_mesh.rows[2].cols[1].tile_inst: { location: [1214, 2518], orientation: N }
+      i_chip_core.u_mesh.rows[2].cols[2].tile_inst: { location: [1986, 2518], orientation: N }
+      i_chip_core.u_mesh.rows[2].cols[3].tile_inst: { location: [2758, 2518], orientation: N }
+      i_chip_core.u_mesh.rows[3].cols[0].tile_inst: { location: [442,  3556], orientation: N }
+      i_chip_core.u_mesh.rows[3].cols[1].tile_inst: { location: [1214, 3556], orientation: N }
+      i_chip_core.u_mesh.rows[3].cols[2].tile_inst: { location: [1986, 3556], orientation: N }
+      i_chip_core.u_mesh.rows[3].cols[3].tile_inst: { location: [2758, 3556], orientation: N }
 
 # Hierarchical: connect each hardened mesh_tile macro's VDD/VSS pins
 # to the chip-level VDD/VSS nets. (SRAM banks live inside the tile now.)
 # 16 entries for the 4×4 mesh.
+#
+# Patterns: a leading ".*" absorbs the Verilog-escaped-identifier "\" that
+# prefixes generate-block instance names (Yosys writes them as e.g.
+# "\i_chip_core.u_mesh.rows[0].cols[0].tile_inst "). Brackets are matched
+# with "." (any-char) — escaped brackets get mangled through Tcl list
+# canonicalization and don't match here. The patterns are still anchored
+# (^...$ added by set_global_connections.tcl) and the dots have a fixed
+# count, so each line matches exactly one tile instance.
 PDN_MACRO_CONNECTIONS:
-- "i_chip_core.u_mesh.rows\\[0\\].cols\\[0\\].tile_inst VDD VSS VDD VSS"
-- "i_chip_core.u_mesh.rows\\[0\\].cols\\[1\\].tile_inst VDD VSS VDD VSS"
-- "i_chip_core.u_mesh.rows\\[0\\].cols\\[2\\].tile_inst VDD VSS VDD VSS"
-- "i_chip_core.u_mesh.rows\\[0\\].cols\\[3\\].tile_inst VDD VSS VDD VSS"
-- "i_chip_core.u_mesh.rows\\[1\\].cols\\[0\\].tile_inst VDD VSS VDD VSS"
-- "i_chip_core.u_mesh.rows\\[1\\].cols\\[1\\].tile_inst VDD VSS VDD VSS"
-- "i_chip_core.u_mesh.rows\\[1\\].cols\\[2\\].tile_inst VDD VSS VDD VSS"
-- "i_chip_core.u_mesh.rows\\[1\\].cols\\[3\\].tile_inst VDD VSS VDD VSS"
-- "i_chip_core.u_mesh.rows\\[2\\].cols\\[0\\].tile_inst VDD VSS VDD VSS"
-- "i_chip_core.u_mesh.rows\\[2\\].cols\\[1\\].tile_inst VDD VSS VDD VSS"
-- "i_chip_core.u_mesh.rows\\[2\\].cols\\[2\\].tile_inst VDD VSS VDD VSS"
-- "i_chip_core.u_mesh.rows\\[2\\].cols\\[3\\].tile_inst VDD VSS VDD VSS"
-- "i_chip_core.u_mesh.rows\\[3\\].cols\\[0\\].tile_inst VDD VSS VDD VSS"
-- "i_chip_core.u_mesh.rows\\[3\\].cols\\[1\\].tile_inst VDD VSS VDD VSS"
-- "i_chip_core.u_mesh.rows\\[3\\].cols\\[2\\].tile_inst VDD VSS VDD VSS"
-- "i_chip_core.u_mesh.rows\\[3\\].cols\\[3\\].tile_inst VDD VSS VDD VSS"
+- "i_chip_core.u_mesh.rows..0...cols..0...tile_inst VDD VSS VDD VSS"
+- "i_chip_core.u_mesh.rows..0...cols..1...tile_inst VDD VSS VDD VSS"
+- "i_chip_core.u_mesh.rows..0...cols..2...tile_inst VDD VSS VDD VSS"
+- "i_chip_core.u_mesh.rows..0...cols..3...tile_inst VDD VSS VDD VSS"
+- "i_chip_core.u_mesh.rows..1...cols..0...tile_inst VDD VSS VDD VSS"
+- "i_chip_core.u_mesh.rows..1...cols..1...tile_inst VDD VSS VDD VSS"
+- "i_chip_core.u_mesh.rows..1...cols..2...tile_inst VDD VSS VDD VSS"
+- "i_chip_core.u_mesh.rows..1...cols..3...tile_inst VDD VSS VDD VSS"
+- "i_chip_core.u_mesh.rows..2...cols..0...tile_inst VDD VSS VDD VSS"
+- "i_chip_core.u_mesh.rows..2...cols..1...tile_inst VDD VSS VDD VSS"
+- "i_chip_core.u_mesh.rows..2...cols..2...tile_inst VDD VSS VDD VSS"
+- "i_chip_core.u_mesh.rows..2...cols..3...tile_inst VDD VSS VDD VSS"
+- "i_chip_core.u_mesh.rows..3...cols..0...tile_inst VDD VSS VDD VSS"
+- "i_chip_core.u_mesh.rows..3...cols..1...tile_inst VDD VSS VDD VSS"
+- "i_chip_core.u_mesh.rows..3...cols..2...tile_inst VDD VSS VDD VSS"
+- "i_chip_core.u_mesh.rows..3...cols..3...tile_inst VDD VSS VDD VSS"
 
 # Halo size around macros while cutting rows.
 # Workaround for: https://github.com/The-OpenROAD-Project/OpenROAD/issues/8868
 FP_MACRO_HORIZONTAL_HALO: 10
 FP_MACRO_VERTICAL_HALO: 10
-PDN_HORIZONTAL_HALO: 5
-PDN_VERTICAL_HALO: 5
+# PDN halo dropped to 0 for the hierarchical 4×4: the hardened mesh_tile
+# already has Metal4/Metal5 power pins exposed at its boundary, plus full
+# Metal1–5 OBS internally. A non-zero PDN halo creates a metal-free gap
+# between chip-level Metal4 straps and the tile's exposed Metal4 pins,
+# producing PSM-0039 'Unconnected instance VDD' for every tile. With halo=0
+# the chip's straps abut the tile boundary and overlap the exposed pins
+# directly.
+PDN_HORIZONTAL_HALO: 0
+PDN_VERTICAL_HALO: 0
 
 PDN_CFG: dir::pdn_cfg.tcl

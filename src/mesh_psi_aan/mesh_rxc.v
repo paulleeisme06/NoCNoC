@@ -138,11 +138,14 @@ module mesh_rxc #(
                                  : (r > 0  && c > 0 ) ? grid_se[r-1][c-1]
                                  :                       36'b0;
 
-                mesh_tile #(
-                    .TILE_ID(THIS_TILE_ID),
-                    .MESH_R (MESH_R),
-                    .MESH_C (MESH_C)
-                ) tile_inst (
+                // mesh_tile in this build is the HARDENED macro — its blackbox
+                // .vh has no parameters at all (they were baked in at harden time).
+                // So we cannot pass MESH_R / MESH_C here; they live as defaults
+                // inside the hardened tile and only affect $display anyway.
+                // TILE_ID is driven through the port list (was a parameter
+                // before the hierarchical conversion).
+                mesh_tile tile_inst (
+                    .TILE_ID  (THIS_TILE_ID),
                     .clk      (clk),
                     .rst      (!cpu_rst_n),
                     .boot_mode(boot_mode),
