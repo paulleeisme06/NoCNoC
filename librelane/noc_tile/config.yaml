@@ -72,8 +72,13 @@ PDN_CORE_RING: False
 # specify both vertical m2 and horizonstal m3 stripes to the stdcell grid
 PDN_MULTILAYER: true
 
-# extend pdn stripes to the boundary of the die instead of the edge of stdcell placement area
-#PDN_EXTEND_TO: boundary
+# Extend PDN stripes to the tile boundary (not just to the edge of the stdcell
+# placement area). REQUIRED for hierarchical integration: at chip level, chip's
+# Metal4 verticals stop at the macro boundary; the tile's pins must reach all
+# the way to the same boundary so they abut and electrically connect.
+# Without this, pins are inset ~11 µm and chip straps can't reach them
+# (causes PSM-0039 "Unconnected instance VDD" on every tile_inst).
+PDN_EXTEND_TO: boundary
 
 PDN_ENABLE_PINS: True
 #PDN_VERTICAL_LAYER: Metal2

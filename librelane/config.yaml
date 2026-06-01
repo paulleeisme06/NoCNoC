@@ -126,6 +126,15 @@ PDN_VSPACING: 1
 PDN_HSPACING: 1
 PDN_VPITCH: 75
 PDN_HPITCH: 75
+# Align chip's Metal4 vertical straps with the hardened tile's Metal4 pins.
+# Tile's first M4 pin is at tile-local x=23.9. Col 0 at chip x=442 ⇒ pin at 465.9.
+# For straps to land on the pins: x = PDN_VOFFSET + N*75 must equal 465.9 for N=6
+# ⇒ PDN_VOFFSET = 15.9. With col stride 750 (multiple of 75) all 4 cols align.
+PDN_VOFFSET: 15.9
+# Same idea for Metal5 horizontals. Tile M5 pin tile-local y=25.91, row 0 at
+# chip y=542 ⇒ first pin at chip y=567.91. PDN_HOFFSET such that
+# 567.91 = HOFFSET + N*75 for some integer N. 567.91 mod 75 = 42.91.
+PDN_HOFFSET: 42.91
 
 # PDN - Core ring
 PDN_CORE_RING: True
@@ -252,31 +261,32 @@ MACROS:
         - dir::hard_tile/lib/nom_ff_n40C_3v60/mesh_tile__nom_ff_n40C_3v60.lib
     instances:
       # 4 cols × 4 rows = 16 tiles. Each tile is 730 × 920 µm.
-      # 4×4 chosen over 4×5 so DFT can address every tile uniquely with the
-      # current 4-bit dft_tile_id (5 rows would alias row 4 onto row 0).
-      # X = 442 + col × 772  (730 tile + 42 µm chip-level routing channel)
-      # Y = 442 + row × 1038 (920 tile + 118 µm chip-level routing channel)
-      # Rightmost tile right edge = 3488  (1.5 µm under core right=3490)
-      # Topmost tile top edge     = 4476  (~201 µm under core top = 4677)
-      # The 201 µm top margin gives the chip-level PDN room to route its
-      # Metal4 horizontal straps above the top row of tiles (PDN-0179 needs
-      # at least one strap-pitch (75µm) of clearance — 200 µm is generous).
-      i_chip_core.u_mesh.rows[0].cols[0].tile_inst: { location: [442,  442], orientation: N }
-      i_chip_core.u_mesh.rows[0].cols[1].tile_inst: { location: [1214, 442], orientation: N }
-      i_chip_core.u_mesh.rows[0].cols[2].tile_inst: { location: [1986, 442], orientation: N }
-      i_chip_core.u_mesh.rows[0].cols[3].tile_inst: { location: [2758, 442], orientation: N }
-      i_chip_core.u_mesh.rows[1].cols[0].tile_inst: { location: [442,  1480], orientation: N }
-      i_chip_core.u_mesh.rows[1].cols[1].tile_inst: { location: [1214, 1480], orientation: N }
-      i_chip_core.u_mesh.rows[1].cols[2].tile_inst: { location: [1986, 1480], orientation: N }
-      i_chip_core.u_mesh.rows[1].cols[3].tile_inst: { location: [2758, 1480], orientation: N }
-      i_chip_core.u_mesh.rows[2].cols[0].tile_inst: { location: [442,  2518], orientation: N }
-      i_chip_core.u_mesh.rows[2].cols[1].tile_inst: { location: [1214, 2518], orientation: N }
-      i_chip_core.u_mesh.rows[2].cols[2].tile_inst: { location: [1986, 2518], orientation: N }
-      i_chip_core.u_mesh.rows[2].cols[3].tile_inst: { location: [2758, 2518], orientation: N }
-      i_chip_core.u_mesh.rows[3].cols[0].tile_inst: { location: [442,  3556], orientation: N }
-      i_chip_core.u_mesh.rows[3].cols[1].tile_inst: { location: [1214, 3556], orientation: N }
-      i_chip_core.u_mesh.rows[3].cols[2].tile_inst: { location: [1986, 3556], orientation: N }
-      i_chip_core.u_mesh.rows[3].cols[3].tile_inst: { location: [2758, 3556], orientation: N }
+      # IMPORTANT: col/row strides are MULTIPLES of PDN_VPITCH/HPITCH (75 µm)
+      # so every tile's Metal4 vertical pin (offset 23.9 in tile-local) and
+      # Metal5 horizontal pin (offset 25.91) lands on the chip's PDN grid.
+      # If the strides aren't multiples of 75, only some tiles align and the
+      # rest report PSM-0039 "Unconnected instance VDD".
+      #
+      # X = 442 + col × 750  (730 tile + 20 µm channel; 750 = 10 × 75 µm)
+      # Y = 542 + row × 975  (920 tile + 55 µm channel; 975 = 13 × 75 µm)
+      # Bottom margin: 100 µm  | Top margin: 290 µm
+      # Right edge col 3: 3422 (R = 68 µm)  | Top edge row 3: 4387 (T = 290 µm)
+      i_chip_core.u_mesh.rows[0].cols[0].tile_inst: { location: [442,  542], orientation: N }
+      i_chip_core.u_mesh.rows[0].cols[1].tile_inst: { location: [1192, 542], orientation: N }
+      i_chip_core.u_mesh.rows[0].cols[2].tile_inst: { location: [1942, 542], orientation: N }
+      i_chip_core.u_mesh.rows[0].cols[3].tile_inst: { location: [2692, 542], orientation: N }
+      i_chip_core.u_mesh.rows[1].cols[0].tile_inst: { location: [442,  1517], orientation: N }
+      i_chip_core.u_mesh.rows[1].cols[1].tile_inst: { location: [1192, 1517], orientation: N }
+      i_chip_core.u_mesh.rows[1].cols[2].tile_inst: { location: [1942, 1517], orientation: N }
+      i_chip_core.u_mesh.rows[1].cols[3].tile_inst: { location: [2692, 1517], orientation: N }
+      i_chip_core.u_mesh.rows[2].cols[0].tile_inst: { location: [442,  2492], orientation: N }
+      i_chip_core.u_mesh.rows[2].cols[1].tile_inst: { location: [1192, 2492], orientation: N }
+      i_chip_core.u_mesh.rows[2].cols[2].tile_inst: { location: [1942, 2492], orientation: N }
+      i_chip_core.u_mesh.rows[2].cols[3].tile_inst: { location: [2692, 2492], orientation: N }
+      i_chip_core.u_mesh.rows[3].cols[0].tile_inst: { location: [442,  3467], orientation: N }
+      i_chip_core.u_mesh.rows[3].cols[1].tile_inst: { location: [1192, 3467], orientation: N }
+      i_chip_core.u_mesh.rows[3].cols[2].tile_inst: { location: [1942, 3467], orientation: N }
+      i_chip_core.u_mesh.rows[3].cols[3].tile_inst: { location: [2692, 3467], orientation: N }
 
 # Hierarchical: connect each hardened mesh_tile macro's VDD/VSS pins
 # to the chip-level VDD/VSS nets. (SRAM banks live inside the tile now.)
