@@ -25,53 +25,18 @@ meta:
     #Checker.LVS: null
 
 DESIGN_NAME: chip_top
+# Hierarchical flow: chip-level only elaborates what lives OUTSIDE the
+# hardened mesh_tile macro. The tile's internals (mesh_router, sram2048
+# wrapper, SERV core, subservient, etc.) are blackboxed via
+# hard_tile/vh/mesh_tile.vh (declared in the MACROS section below).
+# Including those files here would either conflict with the blackbox or
+# uselessly elaborate code that the chip will never re-synthesize.
 VERILOG_FILES:
 - dir::../src/chip_top.sv
 - dir::../src/chip_core.sv
+- dir::../src/mesh_psi_aan/mesh_rxc.v
+- dir::../src/mesh_psi_aan/boot_controller.v
 - dir::../src/dft_ethan/spi_debug.v
-- dir::../src/mesh_psi_aan/mesh_3x3.v
-- dir::../src/mesh_psi_aan/mesh_tile.v
-- dir::../src/mesh_psi_aan/mesh_router.v
-- dir::../src/mesh_psi_aan/boot_loader.v
-- dir::../src/host-to-chip - Paul&Andrea/host_to_chip.v
-- dir::../src/flash_Sumi/flash_clk.sv
-- dir::../src/flash_Sumi/hk_boot_adapter.v
-- dir::../src/flash_Sumi/housekeeping.sv
-- dir::../src/flash_Sumi/shiftregister.sv
-- dir::../src/serv/*.v 
-- dir::../src/subservient/*.v
-- dir::../src/serv/servile/*.v
-- dir::../src/serv/rtl/serv_alu.v
-- dir::../src/serv/rtl/serv_aligner.v
-- dir::../src/serv/rtl/serv_bufreg.v
-- dir::../src/serv/rtl/serv_bufreg2.v
-- dir::../src/serv/rtl/serv_compdec.v
-- dir::../src/serv/rtl/serv_csr.v
-- dir::../src/serv/rtl/serv_ctrl.v
-- dir::../src/serv/rtl/serv_debug.v
-- dir::../src/serv/rtl/serv_decode.v
-- dir::../src/serv/rtl/serv_immdec.v
-- dir::../src/serv/rtl/serv_mem_if.v
-- dir::../src/serv/rtl/serv_rf_if.v
-- dir::../src/serv/rtl/serv_rf_ram.v
-- dir::../src/serv/rtl/serv_rf_ram_if.v
-- dir::../src/serv/rtl/serv_rf_top.v
-- dir::../src/serv/rtl/serv_state.v
-- dir::../src/serv/rtl/serv_synth_wrapper.v
-- dir::../src/serv/rtl/serv_top.v
-- dir::../src/serv/servile/servile.v
-- dir::../src/serv/servile/servile_arbiter.v
-- dir::../src/serv/servile/servile_mux.v
-- dir::../src/serv/servile/servile_rf_mem_if.v
-- dir::../src/subservient/rtl/subservient.v
-- dir::../src/subservient/rtl/subservient_core.v
-- dir::../src/subservient/rtl/subservient_debug_switch.v
-- dir::../src/subservient/rtl/subservient_generic_ram.v
-- dir::../src/subservient/rtl/subservient_gpio.v
-- dir::../src/subservient/rtl/subservient_gf180_ram_1024x8.v
-- dir::../src/subservient/rtl/subservient_ram.v
-- dir::../src/subservient/rtl/subservient_rf_ram_if.v
-- dir::../src/subservient/rtl/sram2048x8_gf180.v
 
 
 # Enable plugin for better SystemVerilog support
@@ -259,76 +224,8 @@ MACROS:
         location: ["expr::$DIE_AREA[2] + -169.25", "expr::$DIE_AREA[3] + -169.25"]
         orientation: N
 
-  gf180mcu_ocd_ip_sram__sram1024x8m8wm1:
-    gds:
-      - dir::../libs/gf180mcu_ocd_ip_sram/cells/gf180mcu_ocd_ip_sram__sram1024x8m8wm1/gf180mcu_ocd_ip_sram__sram1024x8m8wm1.gds
-    lef:
-      - dir::../libs/gf180mcu_ocd_ip_sram/cells/gf180mcu_ocd_ip_sram__sram1024x8m8wm1/gf180mcu_ocd_ip_sram__sram1024x8m8wm1.lef
-    vh:
-      - dir::../libs/gf180mcu_ocd_ip_sram/cells/gf180mcu_ocd_ip_sram__sram1024x8m8wm1/gf180mcu_ocd_ip_sram__sram1024x8m8wm1.blackbox.v
-    lib:
-      "*_tt_025C_3v30":
-        - dir::../libs/gf180mcu_ocd_ip_sram/cells/gf180mcu_ocd_ip_sram__sram1024x8m8wm1/gf180mcu_ocd_ip_sram__sram1024x8m8wm1__tt_025C_3v30.lib
-      "*_ff_n40C_3v60":
-        - dir::../libs/gf180mcu_ocd_ip_sram/cells/gf180mcu_ocd_ip_sram__sram1024x8m8wm1/gf180mcu_ocd_ip_sram__sram1024x8m8wm1__ff_n40C_3v60.lib
-    instances:
-      # 3x3 mesh, each tile has 2 banks (bank0 and bank1)
-      # Core area [442,442] to [3490,4680]; tile grid ~1016x1413 um each
-      # SRAM size: 301.3 x 515.8 um; bank0 at tile_x+50, bank1 at tile_x+357
-      i_chip_core.u_mesh.rows[0].cols[0].tile_inst.sram2048.u_bank0:
-        location: [492, 492]
-        orientation: N
-      i_chip_core.u_mesh.rows[0].cols[0].tile_inst.sram2048.u_bank1:
-        location: [799, 492]
-        orientation: N
-      i_chip_core.u_mesh.rows[0].cols[1].tile_inst.sram2048.u_bank0:
-        location: [1508, 492]
-        orientation: N
-      i_chip_core.u_mesh.rows[0].cols[1].tile_inst.sram2048.u_bank1:
-        location: [1815, 492]
-        orientation: N
-      i_chip_core.u_mesh.rows[0].cols[2].tile_inst.sram2048.u_bank0:
-        location: [2524, 492]
-        orientation: N
-      i_chip_core.u_mesh.rows[0].cols[2].tile_inst.sram2048.u_bank1:
-        location: [2831, 492]
-        orientation: N
-      i_chip_core.u_mesh.rows[1].cols[0].tile_inst.sram2048.u_bank0:
-        location: [492, 1905]
-        orientation: N
-      i_chip_core.u_mesh.rows[1].cols[0].tile_inst.sram2048.u_bank1:
-        location: [799, 1905]
-        orientation: N
-      i_chip_core.u_mesh.rows[1].cols[1].tile_inst.sram2048.u_bank0:
-        location: [1508, 1905]
-        orientation: N
-      i_chip_core.u_mesh.rows[1].cols[1].tile_inst.sram2048.u_bank1:
-        location: [1815, 1905]
-        orientation: N
-      i_chip_core.u_mesh.rows[1].cols[2].tile_inst.sram2048.u_bank0:
-        location: [2524, 1905]
-        orientation: N
-      i_chip_core.u_mesh.rows[1].cols[2].tile_inst.sram2048.u_bank1:
-        location: [2831, 1905]
-        orientation: N
-      i_chip_core.u_mesh.rows[2].cols[0].tile_inst.sram2048.u_bank0:
-        location: [492, 3318]
-        orientation: N
-      i_chip_core.u_mesh.rows[2].cols[0].tile_inst.sram2048.u_bank1:
-        location: [799, 3318]
-        orientation: N
-      i_chip_core.u_mesh.rows[2].cols[1].tile_inst.sram2048.u_bank0:
-        location: [1508, 3318]
-        orientation: N
-      i_chip_core.u_mesh.rows[2].cols[1].tile_inst.sram2048.u_bank1:
-        location: [1815, 3318]
-        orientation: N
-      i_chip_core.u_mesh.rows[2].cols[2].tile_inst.sram2048.u_bank0:
-        location: [2524, 3318]
-        orientation: N
-      i_chip_core.u_mesh.rows[2].cols[2].tile_inst.sram2048.u_bank1:
-        location: [2831, 3318]
-        orientation: N
+  # NOTE: the gf180mcu_ocd_ip_sram__sram1024x8m8wm1 macros are no longer placed
+  # at chip level — they live inside the hardened mesh_tile macro below.
 
   mesh_tile:
     gds:
@@ -352,31 +249,53 @@ MACROS:
       "*_tt_025C_3v30":
         - dir::hard_tile/lib/nom_tt_025C_3v30/mesh_tile__nom_tt_025C_3v30.lib
       "*_ff_n40C_3v60":
-        - dir::librelane/hard_tile/lib/nom_ff_n40C_3v60/mesh_tile__nom_ff_n40C_3v60.lib
+        - dir::hard_tile/lib/nom_ff_n40C_3v60/mesh_tile__nom_ff_n40C_3v60.lib
     instances:
-      # Fill this part in
+      # 4 cols × 4 rows = 16 tiles. Each tile is 730 × 820 µm.
+      # 4×4 chosen over 4×5 so DFT can address every tile uniquely with the
+      # current 4-bit dft_tile_id (5 rows would alias row 4 onto row 0).
+      # X = 442 + col × 772 (730 tile + 42 µm chip-level routing channel)
+      # Y = 442 + row × 853 (820 tile + 33 µm chip-level routing channel)
+      # Rightmost tile right edge = 3488 (1.5 µm under core right=3490)
+      # Topmost tile top edge   = 3821 — leaves 856 µm of empty space above the
+      # mesh that the chip-level router/CTS can use; harmless.
+      i_chip_core.u_mesh.rows[0].cols[0].tile_inst: { location: [442,  442], orientation: N }
+      i_chip_core.u_mesh.rows[0].cols[1].tile_inst: { location: [1214, 442], orientation: N }
+      i_chip_core.u_mesh.rows[0].cols[2].tile_inst: { location: [1986, 442], orientation: N }
+      i_chip_core.u_mesh.rows[0].cols[3].tile_inst: { location: [2758, 442], orientation: N }
+      i_chip_core.u_mesh.rows[1].cols[0].tile_inst: { location: [442,  1295], orientation: N }
+      i_chip_core.u_mesh.rows[1].cols[1].tile_inst: { location: [1214, 1295], orientation: N }
+      i_chip_core.u_mesh.rows[1].cols[2].tile_inst: { location: [1986, 1295], orientation: N }
+      i_chip_core.u_mesh.rows[1].cols[3].tile_inst: { location: [2758, 1295], orientation: N }
+      i_chip_core.u_mesh.rows[2].cols[0].tile_inst: { location: [442,  2148], orientation: N }
+      i_chip_core.u_mesh.rows[2].cols[1].tile_inst: { location: [1214, 2148], orientation: N }
+      i_chip_core.u_mesh.rows[2].cols[2].tile_inst: { location: [1986, 2148], orientation: N }
+      i_chip_core.u_mesh.rows[2].cols[3].tile_inst: { location: [2758, 2148], orientation: N }
+      i_chip_core.u_mesh.rows[3].cols[0].tile_inst: { location: [442,  3001], orientation: N }
+      i_chip_core.u_mesh.rows[3].cols[1].tile_inst: { location: [1214, 3001], orientation: N }
+      i_chip_core.u_mesh.rows[3].cols[2].tile_inst: { location: [1986, 3001], orientation: N }
+      i_chip_core.u_mesh.rows[3].cols[3].tile_inst: { location: [2758, 3001], orientation: N }
 
-# This is an alternative method compared to
-# specifying the power connections in the RTL
+# Hierarchical: connect each hardened mesh_tile macro's VDD/VSS pins
+# to the chip-level VDD/VSS nets. (SRAM banks live inside the tile now.)
+# 16 entries for the 4×4 mesh.
 PDN_MACRO_CONNECTIONS:
-- "i_chip_core.u_mesh.rows\\[0\\].cols\\[0\\].tile_inst.sram2048.u_bank0 VDD VSS VDD VSS"
-- "i_chip_core.u_mesh.rows\\[0\\].cols\\[0\\].tile_inst.sram2048.u_bank1 VDD VSS VDD VSS"
-- "i_chip_core.u_mesh.rows\\[0\\].cols\\[1\\].tile_inst.sram2048.u_bank0 VDD VSS VDD VSS"
-- "i_chip_core.u_mesh.rows\\[0\\].cols\\[1\\].tile_inst.sram2048.u_bank1 VDD VSS VDD VSS"
-- "i_chip_core.u_mesh.rows\\[0\\].cols\\[2\\].tile_inst.sram2048.u_bank0 VDD VSS VDD VSS"
-- "i_chip_core.u_mesh.rows\\[0\\].cols\\[2\\].tile_inst.sram2048.u_bank1 VDD VSS VDD VSS"
-- "i_chip_core.u_mesh.rows\\[1\\].cols\\[0\\].tile_inst.sram2048.u_bank0 VDD VSS VDD VSS"
-- "i_chip_core.u_mesh.rows\\[1\\].cols\\[0\\].tile_inst.sram2048.u_bank1 VDD VSS VDD VSS"
-- "i_chip_core.u_mesh.rows\\[1\\].cols\\[1\\].tile_inst.sram2048.u_bank0 VDD VSS VDD VSS"
-- "i_chip_core.u_mesh.rows\\[1\\].cols\\[1\\].tile_inst.sram2048.u_bank1 VDD VSS VDD VSS"
-- "i_chip_core.u_mesh.rows\\[1\\].cols\\[2\\].tile_inst.sram2048.u_bank0 VDD VSS VDD VSS"
-- "i_chip_core.u_mesh.rows\\[1\\].cols\\[2\\].tile_inst.sram2048.u_bank1 VDD VSS VDD VSS"
-- "i_chip_core.u_mesh.rows\\[2\\].cols\\[0\\].tile_inst.sram2048.u_bank0 VDD VSS VDD VSS"
-- "i_chip_core.u_mesh.rows\\[2\\].cols\\[0\\].tile_inst.sram2048.u_bank1 VDD VSS VDD VSS"
-- "i_chip_core.u_mesh.rows\\[2\\].cols\\[1\\].tile_inst.sram2048.u_bank0 VDD VSS VDD VSS"
-- "i_chip_core.u_mesh.rows\\[2\\].cols\\[1\\].tile_inst.sram2048.u_bank1 VDD VSS VDD VSS"
-- "i_chip_core.u_mesh.rows\\[2\\].cols\\[2\\].tile_inst.sram2048.u_bank0 VDD VSS VDD VSS"
-- "i_chip_core.u_mesh.rows\\[2\\].cols\\[2\\].tile_inst.sram2048.u_bank1 VDD VSS VDD VSS"
+- "i_chip_core.u_mesh.rows\\[0\\].cols\\[0\\].tile_inst VDD VSS VDD VSS"
+- "i_chip_core.u_mesh.rows\\[0\\].cols\\[1\\].tile_inst VDD VSS VDD VSS"
+- "i_chip_core.u_mesh.rows\\[0\\].cols\\[2\\].tile_inst VDD VSS VDD VSS"
+- "i_chip_core.u_mesh.rows\\[0\\].cols\\[3\\].tile_inst VDD VSS VDD VSS"
+- "i_chip_core.u_mesh.rows\\[1\\].cols\\[0\\].tile_inst VDD VSS VDD VSS"
+- "i_chip_core.u_mesh.rows\\[1\\].cols\\[1\\].tile_inst VDD VSS VDD VSS"
+- "i_chip_core.u_mesh.rows\\[1\\].cols\\[2\\].tile_inst VDD VSS VDD VSS"
+- "i_chip_core.u_mesh.rows\\[1\\].cols\\[3\\].tile_inst VDD VSS VDD VSS"
+- "i_chip_core.u_mesh.rows\\[2\\].cols\\[0\\].tile_inst VDD VSS VDD VSS"
+- "i_chip_core.u_mesh.rows\\[2\\].cols\\[1\\].tile_inst VDD VSS VDD VSS"
+- "i_chip_core.u_mesh.rows\\[2\\].cols\\[2\\].tile_inst VDD VSS VDD VSS"
+- "i_chip_core.u_mesh.rows\\[2\\].cols\\[3\\].tile_inst VDD VSS VDD VSS"
+- "i_chip_core.u_mesh.rows\\[3\\].cols\\[0\\].tile_inst VDD VSS VDD VSS"
+- "i_chip_core.u_mesh.rows\\[3\\].cols\\[1\\].tile_inst VDD VSS VDD VSS"
+- "i_chip_core.u_mesh.rows\\[3\\].cols\\[2\\].tile_inst VDD VSS VDD VSS"
+- "i_chip_core.u_mesh.rows\\[3\\].cols\\[3\\].tile_inst VDD VSS VDD VSS"
 
 # Halo size around macros while cutting rows.
 # Workaround for: https://github.com/The-OpenROAD-Project/OpenROAD/issues/8868

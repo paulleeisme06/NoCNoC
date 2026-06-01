@@ -20,7 +20,7 @@ VERILOG_FILES:
   - dir::../../src/mesh_psi_aan/mesh_router.v
   - dir::../../src/serv/rtl/*.v 
   - dir::../../src/serv/servile/*.v
-  - dir::../../src/subservient/rtl/sram2048x8_gf180.v
+  - dir::../../src/sram2048x8_gf180.v
   - dir::../../src/subservient/rtl/subservient_core.v
   - dir::../../src/subservient/rtl/subservient_rf_ram_if.v
 
@@ -35,11 +35,29 @@ GND_NETS:
   - VSS
 
 FP_SIZING: absolute
-DIE_AREA: [0, 0, 780, 780]
-CORE_AREA: [10, 10, 770, 770]
+# Sized for 4×4 chip-level integration in core 3048×4234 µm.
+# 4 × 730 + 3 × 42  = 3046  (col channels = 42 µm)
+# 4 × 920 + 3 × 158 = 4234 (row channels very comfortable)
+#
+# Height history: 820 → 880 → 920. Bumped because making TILE_ID a runtime
+# port (needed for hierarchical correctness) disabled constant-propagation
+# through the router comparisons, growing buffer count 359 → ~585. At
+# 880 µm we were 4 cells shy of legalization (67.6% utilization). 920 µm
+# gives a comfortable cushion.
+DIE_AREA: [0, 0, 730, 920]
+CORE_AREA: [10, 10, 720, 910]
 
-# increase for more logic
-PL_TARGET_DENSITY_PCT: 35
+# Bumped 35 → 50 → 60 → 65 across iterations. With TILE_ID as a runtime port
+# the natural placement density measured ~0.643, so 0.65 lets GPL pack
+# decisively instead of trying to spread cells it can't actually spread.
+PL_TARGET_DENSITY_PCT: 65
+
+# Macro halo: 0. The gf180mcu_ocd_ip_sram__sram1024x8m8wm1 LEF already includes
+# its own keep-out boundary; adding extra LibreLane halo was blocking the
+# repair-pass buffers from sitting close to the SRAM pins, where their
+# high-fanout signals actually need to land.
+FP_MACRO_HORIZONTAL_HALO: 0
+FP_MACRO_VERTICAL_HALO: 0
 
 PDN_CORE_RING: False
 
@@ -118,11 +136,16 @@ MACROS:
       "*_ff_n40C_3v60":
         - dir::../../libs/gf180mcu_ocd_ip_sram/cells/gf180mcu_ocd_ip_sram__sram1024x8m8wm1/gf180mcu_ocd_ip_sram__sram1024x8m8wm1__ff_n40C_3v60.lib
     instances:
+      # Repositioned for 730×820 tile.
+      # Each SRAM is 301.3 µm wide × 515.8 µm tall.
+      # bank0: x=40..341, bank1: x=385..686 → 44 µm right margin, 44 µm gap between banks,
+      # 40 µm left margin. The 44 µm gap is wide enough for stdcell columns (was 18 µm before,
+      # which was unusable and caused DPL-0036 from layout fragmentation).
       sram2048.u_bank0:
-        location: [80, 80]
+        location: [40, 80]
         orientation: N
       sram2048.u_bank1:
-        location: [401, 80]
+        location: [385, 80]
         orientation: N
 
 PDN_MACRO_CONNECTIONS:
