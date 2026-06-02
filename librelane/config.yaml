@@ -247,36 +247,33 @@ MACROS:
       "*_ff_n40C_3v60":
         - dir::hard_tile/lib/nom_ff_n40C_3v60/mesh_tile__nom_ff_n40C_3v60.lib
     instances:
-      # 4 cols × 4 rows = 16 tiles. Each tile is 730 × 920 µm.
-      # CRITICAL: rows[0] is PHYSICALLY AT THE TOP (highest Y).
-      # The mesh RTL connects north_in of rows[r] = south_out of rows[r-1],
-      # so rows[r-1] must be physically above rows[r]. If rows[0] is placed at
-      # the bottom (as we mistakenly had it), NoC flit signals between adjacent
-      # rows have to route across the entire chip — global routing fails or
-      # takes days. This matches the convention in the working 3×3 chip.
+      # 3 cols × 4 rows = 12 tiles (3×4 mesh). Each tile is 730 × 920 µm.
+      # Core area = [442, 442, 3490, 4680] = 3048 × 4238 µm.
       #
-      # Row 0 (top):    y = 3705   (T margin = 52 µm)
-      # Row 1:          y = 2634   (118 µm gap below row 0)
-      # Row 2:          y = 1563   (118 µm gap below row 1)
-      # Row 3 (bottom): y = 492    (118 µm gap below row 2;  B margin = 50)
-      # Col 0:  x =  442   Col 1:  x = 1192   Col 2: x = 1942   Col 3: x = 2692
-      # Col stride 750 (730 tile + 20 µm ch); col 3 right edge = 3422 (R = 68)
-      i_chip_core.u_mesh.rows[0].cols[0].tile_inst: { location: [442,  3705], orientation: N }
-      i_chip_core.u_mesh.rows[0].cols[1].tile_inst: { location: [1192, 3705], orientation: N }
-      i_chip_core.u_mesh.rows[0].cols[2].tile_inst: { location: [1942, 3705], orientation: N }
-      i_chip_core.u_mesh.rows[0].cols[3].tile_inst: { location: [2692, 3705], orientation: N }
-      i_chip_core.u_mesh.rows[1].cols[0].tile_inst: { location: [442,  2634], orientation: N }
-      i_chip_core.u_mesh.rows[1].cols[1].tile_inst: { location: [1192, 2634], orientation: N }
-      i_chip_core.u_mesh.rows[1].cols[2].tile_inst: { location: [1942, 2634], orientation: N }
-      i_chip_core.u_mesh.rows[1].cols[3].tile_inst: { location: [2692, 2634], orientation: N }
-      i_chip_core.u_mesh.rows[2].cols[0].tile_inst: { location: [442,  1563], orientation: N }
-      i_chip_core.u_mesh.rows[2].cols[1].tile_inst: { location: [1192, 1563], orientation: N }
-      i_chip_core.u_mesh.rows[2].cols[2].tile_inst: { location: [1942, 1563], orientation: N }
-      i_chip_core.u_mesh.rows[2].cols[3].tile_inst: { location: [2692, 1563], orientation: N }
-      i_chip_core.u_mesh.rows[3].cols[0].tile_inst: { location: [442,  492], orientation: N }
-      i_chip_core.u_mesh.rows[3].cols[1].tile_inst: { location: [1192, 492], orientation: N }
-      i_chip_core.u_mesh.rows[3].cols[2].tile_inst: { location: [1942, 492], orientation: N }
-      i_chip_core.u_mesh.rows[3].cols[3].tile_inst: { location: [2692, 492], orientation: N }
+      # 3 columns leave generous VERTICAL channels (~329 µm) — the same roomy
+      # geometry that lets the proven 3×3 route. (4 columns left only ~42 µm,
+      # which is why 4×4 could not route in this fixed slot.)
+      #   3 × 730 + 2 × 329 = 2848  (+ ~100 µm L/R margins = 3048) ✓
+      #   4 × 920 + 3 × 159 = 4157  (+ ~40 µm T/B margins ≈ 4238) ✓
+      #
+      # CRITICAL: rows[0] is PHYSICALLY AT THE TOP (highest Y). The mesh RTL ties
+      # north_in of rows[r] = south_out of rows[r-1], so rows[r-1] must sit above
+      # rows[r]; otherwise inter-row NoC signals route across the whole chip.
+      #
+      # Cols (left→right = east):  x = 542, 1601, 2660   (channel = 329 µm)
+      # Rows (top→bottom):         y = 3719, 2640, 1561, 482   (channel = 159 µm)
+      i_chip_core.u_mesh.rows[0].cols[0].tile_inst: { location: [542,  3719], orientation: N }
+      i_chip_core.u_mesh.rows[0].cols[1].tile_inst: { location: [1601, 3719], orientation: N }
+      i_chip_core.u_mesh.rows[0].cols[2].tile_inst: { location: [2660, 3719], orientation: N }
+      i_chip_core.u_mesh.rows[1].cols[0].tile_inst: { location: [542,  2640], orientation: N }
+      i_chip_core.u_mesh.rows[1].cols[1].tile_inst: { location: [1601, 2640], orientation: N }
+      i_chip_core.u_mesh.rows[1].cols[2].tile_inst: { location: [2660, 2640], orientation: N }
+      i_chip_core.u_mesh.rows[2].cols[0].tile_inst: { location: [542,  1561], orientation: N }
+      i_chip_core.u_mesh.rows[2].cols[1].tile_inst: { location: [1601, 1561], orientation: N }
+      i_chip_core.u_mesh.rows[2].cols[2].tile_inst: { location: [2660, 1561], orientation: N }
+      i_chip_core.u_mesh.rows[3].cols[0].tile_inst: { location: [542,  482],  orientation: N }
+      i_chip_core.u_mesh.rows[3].cols[1].tile_inst: { location: [1601, 482],  orientation: N }
+      i_chip_core.u_mesh.rows[3].cols[2].tile_inst: { location: [2660, 482],  orientation: N }
 
 # Hierarchical: connect every mesh_tile macro's VDD/VSS pins to chip nets.
 # A single wildcard regex matches all 16 tile_inst instances at once —

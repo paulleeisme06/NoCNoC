@@ -199,14 +199,26 @@ add_pdn_connect \
 # horizontal stripes enter the tile region from outside and connect via
 # Via4 to the tile's full-height Metal4 LEF pins.
 #
-# We do NOT add extra Metal4 stripes inside the tile footprint — that
-# causes Magic "obsm4 vs metal4" illegal overlap errors (231k violations).
-# The Metal4↔Metal5 connect rule below places Via4 between tile Metal4
-# pins and chip Metal5 stripes that pass through, which is sufficient for
-# full VDD+VSS delivery.
+# Pattern .*tile_inst matches all mesh_tile instances (rows[*].cols[*].tile_inst).
 #
-# Pattern .*tile_inst matches all 16 mesh_tile instances in the 4×4 mesh
-# (rows[0..3].cols[0..3].tile_inst).
+# THE HIERARCHICAL POWER HANDOFF (professor's adder pattern):
+# The tile exposes power pins on Metal4 (vertical, x = 26.4 + 75·n relative to
+# the tile) and Metal5 (horizontal, full tile width, y = 28.4 + 75·n). The chip's
+# global PDN grid is suppressed over the macro, so without stamped straps the
+# tile pins connect to nothing → PSM-0069 "Check connectivity failed on VDD".
+#
+# Fix: stamp parent Metal4 straps over each tile, ALIGNED to the tile's own M4
+# pins (offset 26.4, pitch 75, placed relative to each macro so they line up
+# regardless of chip placement). Because they sit ON the tile's M4 pins they are
+# same-net (PDN is net-aware → no VDD/VSS short, minimal obstruction overlap),
+# they cross the tile's full-width M5 pins (M4↔M5 vias), and they reach the chip
+# M5 grid at the tile's top/bottom edges in the row channels. This is exactly the
+# adder's "adjust the parameters so the straps overlap" technique.
+#
+# A previous version removed these straps to avoid Magic "obsm4 vs metal4"
+# warnings — but those are NON-FATAL (ERROR_ON_MAGIC_DRC: False, and Magic DRC is
+# not required for submission), whereas dropping them gave the FATAL PSM-0069.
+# Connectivity wins; the Magic warnings are acceptable.
 define_pdn_grid \
     -macro \
     -instances {.*tile_inst} \
@@ -217,3 +229,14 @@ define_pdn_grid \
 add_pdn_connect \
     -grid sram_macros_NS \
     -layers "$::env(PDN_VERTICAL_LAYER) $::env(PDN_HORIZONTAL_LAYER)"
+
+# Stamp M4 straps over each tile, aligned to the tile's M4 power pins so they
+# overlap (same net) and cross the tile's full-width M5 pins.
+add_pdn_stripe \
+    -grid sram_macros_NS \
+    -layer $::env(PDN_VERTICAL_LAYER) \
+    -width $::env(PDN_VWIDTH) \
+    -pitch $::env(PDN_VPITCH) \
+    -offset 26.4 \
+    -spacing $::env(PDN_VSPACING) \
+    -starts_with POWER

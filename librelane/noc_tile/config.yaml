@@ -20,7 +20,7 @@ VERILOG_FILES:
   - dir::../../src/mesh_psi_aan/mesh_router.v
   - dir::../../src/serv/rtl/*.v 
   - dir::../../src/serv/servile/*.v
-  - dir::../../src/subservient/rtl/sram2048x8_gf180.v
+  - dir::../../src/sram2048x8_gf180.v
   - dir::../../src/subservient/rtl/subservient_core.v
   - dir::../../src/subservient/rtl/subservient_rf_ram_if.v
 
@@ -35,28 +35,22 @@ GND_NETS:
   - VSS
 
 FP_SIZING: absolute
-# Width is FIXED at 730: the 4×4 chip core (~3072 µm wide) only fits four
-# columns of ~730 µm tiles plus thin channels. Height is the free dimension,
-# and routing over the tiles (M4/M5 now free) means tight row channels are OK.
+# Sized for 4×4 chip-level integration in core 3048×4234 µm.
+# 4 × 730 + 3 × 42  = 3046  (col channels = 42 µm)
+# 4 × 920 + 3 × 158 = 4234 (row channels very comfortable)
 #
-# Height history: 820 → 880 → 920 → 1000.
-#  - 920 passed cleanly under the OLD M4/M5 PDN scheme (66.5% util, 535 repair
-#    buffers, 0 unplaced).
-#  - Moving to M2/M3 PDN + RT_MAX_LAYER=Metal3 (so M4/M5 stay free for the chip)
-#    raised repair buffers 535 → 665 and made placement routing-tighter, which
-#    overflowed legalization at 920 (DPL-0036: 161 unplaced cells).
-#  - 1000 drops natural util 66.5% → ~61%, giving the extra buffers room.
-#    4 rows × 1000 + 3 × ~66 µm channels ≈ 4198, still fits the chip core.
-DIE_AREA: [0, 0, 730, 1000]
-CORE_AREA: [10, 10, 720, 990]
+# Height history: 820 → 880 → 920. Bumped because making TILE_ID a runtime
+# port (needed for hierarchical correctness) disabled constant-propagation
+# through the router comparisons, growing buffer count 359 → ~585. At
+# 880 µm we were 4 cells shy of legalization (67.6% utilization). 920 µm
+# gives a comfortable cushion.
+DIE_AREA: [0, 0, 730, 920]
+CORE_AREA: [10, 10, 720, 910]
 
-# 65 packed well under the old M4/M5 scheme. M2/M3 PDN + M3 routing cap add
-# ~130 repair buffers and tighten routing-driven placement, which overflowed
-# legalization (DPL-0036: 161 unplaced @920/65 → 91 @1000/60). Width and height
-# are both near their ceilings (4 cols / 4 rows must fit the chip core), so
-# density is the remaining lever: 50 maximizes legalization whitespace for the
-# repair buffers. Natural util at 1000 is ~61%, so this mainly spreads cells.
-PL_TARGET_DENSITY_PCT: 50
+# Bumped 35 → 50 → 60 → 65 across iterations. With TILE_ID as a runtime port
+# the natural placement density measured ~0.643, so 0.65 lets GPL pack
+# decisively instead of trying to spread cells it can't actually spread.
+PL_TARGET_DENSITY_PCT: 65
 
 # Macro halo: 0. The gf180mcu_ocd_ip_sram__sram1024x8m8wm1 LEF already includes
 # its own keep-out boundary; adding extra LibreLane halo was blocking the
@@ -87,27 +81,14 @@ PDN_MULTILAYER: true
 PDN_EXTEND_TO: boundary
 
 PDN_ENABLE_PINS: True
-# Tile PDN layer scheme: Metal2 (vertical) / Metal3 (horizontal).
-#
-# WHY (evidence-based, 2026-06-02): The previous M4/M5 scheme produced a tile
-# LEF that blocks Metal4 AND Metal5 across the ENTIRE 730×920 footprint
-# (M5 OBS = 13 full-width 713 µm bands; M4 OBS = two 328×526 µm blocks). At
-# chip level the router uses M4 (vertical) and M5 (horizontal) as its primary
-# layers, so 16 tiles blocking M4/M5 forced all inter-tile NoC routing into
-# the 20–42 µm channels → GRT "finished with congestion" → DRT spun 9 h with
-# zero progress.
-#
-# Fix mirrors the professor's adder example and the foundry SRAM: keep the
-# macro entirely on M1–M3 and leave M4/M5 FREE. The chip then routes signals
-# AND stamps power stripes over the tile tops (chip M4 → tile M3 vias), exactly
-# how flat designs pack 50 SRAMs. RT_MAX_LAYER (below) caps tile signal routing
-# at M3 so nothing lands on M4/M5.
-PDN_VERTICAL_LAYER: Metal2
-PDN_HORIZONTAL_LAYER: Metal3
-
-# Cap internal signal routing at Metal3 so M4/M5 are completely free for the
-# chip to route over the tile (the crux of the hierarchical fix).
-RT_MAX_LAYER: Metal3
+# Tile PDN layer scheme: kept at PDK defaults (Metal4 vertical / Metal5
+# horizontal). Power pins are exposed on the tile boundary by PDN_ENABLE_PINS
+# + PDN_EXTEND_TO: boundary, above. This produced clean tile-level signoff
+# in RUN_2026-06-01_10-41-09. Chip-level integration on top of this tile
+# is the open question being investigated; do not change this section
+# without revisiting that investigation.
+#PDN_VERTICAL_LAYER: Metal2
+#PDN_HORIZONTAL_LAYER: Metal3
 
 # width of vertical and horizontal straps
 PDN_VWIDTH: 5

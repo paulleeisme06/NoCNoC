@@ -242,26 +242,12 @@ if { $::env(PDN_CORE_RING) == 1 } {
 
 
 
-# SRAM power delivery — MUST use Metal4.
-#
-# The gf180mcu_ocd_ip_sram__sram1024x8m8wm1 blocks Metal1/Metal2/Metal3 across
-# ~94% of its body (verified from its LEF OBS). Its VDD/VSS pins sit on M1/M2/M3
-# only at the left/right EDGES, but you cannot route an M2 or M3 stripe ACROSS
-# the macro to reach the far pins — those layers are walled off. Metal4 (and M5)
-# are the only layers free over the SRAM body, so power must be delivered from
-# above on M4 and via'd down to the SRAM's M3 edge pins. This is the same scheme
-# that gave 0 PSM errors in RUN_2026-06-01_11-43-40.
-#
-# This is LOCALIZED to the two SRAM footprints only — the std-cell logic PDN
-# stays on M2/M3 (PDN_VERTICAL/HORIZONTAL_LAYER above), so M4/M5 remain free over
-# the rest of the tile for the chip to route over. M4 is hardcoded here (not
-# $PDN_VERTICAL_LAYER, which is now Metal2) precisely because only the SRAMs need
-# M4.
-#
-# The "Metal4 Metal3" connect both drops vias onto the SRAM's M3 edge pins AND
-# stitches these M4 straps into the std-cell M3 horizontal grid wherever they
-# cross, so SRAM power ties back into the main M2/M3 grid and the tile's M2/M3
-# boundary pins.
+# gf180mcu_ocd_ip_sram__sram1024x8m8wm1 has VDD/VSS on Metal2 and Metal3
+# only — no Metal4 pins. A PDN ring at pad_offsets=0 places the Metal3
+# segment flush against the top macro boundary, contacting the Metal3 stubs
+# there. One connect rule per grid avoids PDN-0186 duplicate errors.
+# This configuration produced clean LVS + DRC on RUN_2026-05-27_17-17-57.
+
 define_pdn_grid \
     -macro \
     -instances "sram2048.u_bank0 sram2048.u_bank1" \
@@ -271,9 +257,13 @@ define_pdn_grid \
 
 add_pdn_connect \
     -grid sram_macros_NS \
-    -layers "Metal4 Metal3"
+    -layers "$::env(PDN_VERTICAL_LAYER) $::env(PDN_HORIZONTAL_LAYER)"
 
-# W/E edge straps over each SRAM (align to the M2/M3 edge power rails).
+add_pdn_connect \
+    -grid sram_macros_NS \
+    -layers "$::env(PDN_VERTICAL_LAYER) Metal3"
+
+# Add stripes on W/E edges of SRAM
 add_pdn_stripe \
     -grid sram_macros_NS \
     -layer Metal4 \
@@ -284,8 +274,8 @@ add_pdn_stripe \
     -starts_with GROUND \
     -number_of_straps 2
 
-# Body straps across each SRAM so power reaches the interior M3 pins and PSM
-# sees a fully connected macro.
+# Since the above stripes block the top level PDN at Metal4, add some more stripes
+# to improve the PDN's integrity and ensure a better connection for the macro.
 add_pdn_stripe \
     -grid sram_macros_NS \
     -layer Metal4 \
