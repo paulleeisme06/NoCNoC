@@ -11,12 +11,12 @@
 
 #define SIZE 10
 
-#define PHYS_ROWS    5
-#define PHYS_COLS    5
+#define PHYS_ROWS    2
+#define PHYS_COLS    2
 
 /* Must match ACTIVE_R / ACTIVE_C in test_mesh.py */
-#define ACTIVE_ROWS  4
-#define ACTIVE_COLS  5
+#define ACTIVE_ROWS  2
+#define ACTIVE_COLS  2
 
 #define GRID_BASE       0x0500u
 #define GHOST_BASE      0x0600u

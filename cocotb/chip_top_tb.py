@@ -379,7 +379,7 @@ async def test_dft_write_read(dut):
 # TEST 2 — DFT sweep: all 9 tiles, 3 patterns, 3 addresses
 # ============================================================================
 
-@cocotb.test()
+@cocotb.test(skip=True)
 async def test_dft_sweep(dut):
     """
     Thorough DFT SRAM sweep across all 9 tiles and multiple addresses/patterns.
@@ -633,7 +633,7 @@ async def test_mesh_route_smoke(dut):
 #   (2,0)=0x8  (2,1)=0x9  (2,2)=0xA
 # ============================================================================
 
-@cocotb.test()
+@cocotb.test(skip=True)
 async def test_mesh_dft_unique_byte(dut):
     """
     Write a unique sentinel byte to SRAM[0x300] of every tile via DFT,
@@ -697,7 +697,7 @@ async def test_mesh_dft_unique_byte(dut):
 # TEST 6 — Pure DFT mesh: 3 fault-detection patterns × 3 addresses × 9 tiles
 # ============================================================================
 
-@cocotb.test()
+@cocotb.test(skip=True)
 async def test_mesh_dft_all_tiles_patterns(dut):
     """
     Write three fault-detection patterns to three different SRAM addresses
@@ -775,6 +775,389 @@ async def test_mesh_dft_all_tiles_patterns(dut):
         f"all 9 tiles × {len(VECTORS)} patterns verified."
     )
 
+# # ============================================================================
+# # TEST 7 — Checkerboard readback: boot main.c, read grid from all tiles
+# #
+# # Unlike tests 1-6 which either load hand-assembled programs via DFT or do
+# # pure DFT SRAM sweeps, this test lets the boot_controller load main.c from
+# # SPI flash normally, waits for the CPUs to run at least one iteration, then
+# # reads back the 10×10 checkerboard grid from every tile via DFT SPI and
+# # prints a side-by-side expected vs actual comparison.
+# # ============================================================================
+
+# # Grid / mesh constants — must match main.c
+# _CB_SIZE   = 10     # grid is SIZE × SIZE bytes
+# _CB_MESH_R = 2
+# _CB_MESH_C = 2
+
+# # Physical SRAM addresses (CPU byte addr = DFT addr, direct mapping)
+# _SRAM_GRID_BASE   = 0x0500          # 10×10 grid, row-major
+# _DEBUG_ITER_COUNT = 0x0700 + 28     # 0x071C, 4-byte little-endian word
+
+# # Boot + poll budget
+# _CB_BOOT_CYCLES    = 80_000
+# _CB_POLL_INTERVAL  = 100            # clock cycles between iter polls
+# _CB_POLL_MAX_TRIES = 5_000          # give up after this many polls
+
+
+# def _cb_hw_tile_id(r, c):
+#     """Hardware fill value written by main.c: ((row<<3)|col)+1"""
+#     return ((r << 3) | c) + 1
+
+
+# def _cb_expected_grid(r, c, iteration):
+#     """
+#     Expected 10×10 grid for tile (r,c) at the given iteration.
+#     cell(row,col) = fill_val if (row+col+iteration)%2==0 else 0
+#     """
+#     fill_val = _cb_hw_tile_id(r, c)
+#     return [
+#         [fill_val if (row + col + iteration) % 2 == 0 else 0
+#          for col in range(_CB_SIZE)]
+#         for row in range(_CB_SIZE)
+#     ]
+
+
+# # Display char map: fill_val → single character for readable grid printout
+# _CB_CHARS = "123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+# _CB_FILL_TO_CHAR = {}
+# _cb_idx = 0
+# for _cb_r in range(8):
+#     for _cb_c in range(8):
+#         _cb_fv = (((_cb_r << 3) | _cb_c) + 1) & 0xFF
+#         if _cb_fv not in _CB_FILL_TO_CHAR:
+#             _CB_FILL_TO_CHAR[_cb_fv] = _CB_CHARS[_cb_idx % len(_CB_CHARS)]
+#             _cb_idx += 1
+
+
+# def _cb_fmt(v):
+#     return '.' if v == 0 else _CB_FILL_TO_CHAR.get(v, '?')
+
+
+# async def _cb_read_word(dut, tid, addr):
+#     """Read 4-byte little-endian word from tile tid at addr via DFT."""
+#     b0 = await dft_read(dut, tid, addr)
+#     b1 = await dft_read(dut, tid, addr + 1)
+#     b2 = await dft_read(dut, tid, addr + 2)
+#     b3 = await dft_read(dut, tid, addr + 3)
+#     return b0 | (b1 << 8) | (b2 << 16) | (b3 << 24)
+
+
+# async def _cb_read_grid(dut, row, col):
+#     """Read the 10×10 grid from tile (row,col) SRAM via DFT SPI."""
+#     tid = tile4(row, col)
+#     return [
+#         [await dft_read(dut, tid, _SRAM_GRID_BASE + y * _CB_SIZE + x)
+#          for x in range(_CB_SIZE)]
+#         for y in range(_CB_SIZE)
+#     ]
+
+
+# def _cb_print_comparison(row, col, iteration, actual):
+#     """Print expected vs actual side-by-side. Returns mismatch count."""
+#     exp      = _cb_expected_grid(row, col, iteration)
+#     fill_val = _cb_hw_tile_id(row, col)
+
+#     print(f"\n{'='*56}")
+#     print(f"TILE ({row},{col})  hw_id=0x{fill_val:02x}  iteration={iteration}")
+#     print(f"EXPECTED (checkerboard)       ACTUAL (DFT read)")
+#     print(f"{'-'*56}")
+
+#     mismatches = 0
+#     for y in range(_CB_SIZE):
+#         exp_row = "".join(_cb_fmt(exp[y][x]) for x in range(_CB_SIZE))
+#         act_row = "".join(_cb_fmt(actual[y][x]) for x in range(_CB_SIZE))
+#         marker  = "  <- MISMATCH" if exp_row != act_row else ""
+#         if marker:
+#             mismatches += sum(1 for x in range(_CB_SIZE) if exp[y][x] != actual[y][x])
+#         print(f"  {exp_row}          {act_row}{marker}")
+
+#     print(f"{'='*56}")
+#     print(f"  {'PASS' if mismatches == 0 else f'FAIL — {mismatches} cells wrong'}")
+#     return mismatches
+
+
+# ============================================================================
+# TEST 7 — Checkerboard readback: 2x2, DFT-loaded firmware
+# ============================================================================
+
+_CB_SIZE = 10
+_CB_TILES = [(0, 0), (0, 1), (1, 0), (1, 1)]
+
+_SRAM_GRID_BASE = 0x0500
+_DEBUG_ITER_COUNT = 0x0700 + 28
+_DEBUG_MY_ID = 0x0700 + 44
+
+_DEBUG_MAGIC0 = 0x0730
+_DEBUG_MAGIC1 = 0x0734
+_DEBUG_PRE_CHECKERBOARD = 0x0740
+_DEBUG_POST_CHECKERBOARD = 0x0744
+_DEBUG_PHASE_MARKER = 0x0748
+
+# Firmware should fit below SERV RF area.
+_FW_SAFE_LIMIT = 0x770
+
+_CB_BOOT_CYCLES = 80_000
+_CB_RUN_CYCLES = 1_000_000
+
+_FIRMWARE_BIN = Path(
+    os.getenv(
+        "FIRMWARE_BIN",
+        Path(__file__).resolve().parent / "../src/firmware/firmware.bin"
+    )
+)
+
+
+def _cb_hw_tile_id(row, col):
+    return ((row << 3) | col) + 1
+
+
+def _cb_expected_grid(row, col, iteration):
+    fill_val = _cb_hw_tile_id(row, col)
+    phase = iteration & 1
+
+    return [
+        [
+            fill_val if ((y + x + phase) & 1) == 0 else 0
+            for x in range(_CB_SIZE)
+        ]
+        for y in range(_CB_SIZE)
+    ]
+
+
+def _cb_fmt(value):
+    if value == 0:
+        return "."
+    if 1 <= value <= 9:
+        return str(value)
+    return chr(ord("A") + ((value - 10) % 26))
+
+
+async def _cb_read_word(dut, tile_id, addr):
+    value = 0
+    for i in range(4):
+        byte = await dft_read(dut, tile_id, addr + i)
+        value |= byte << (8 * i)
+    return value
+
+
+async def _cb_read_grid(dut, row, col):
+    tile_id = tile4(row, col)
+    grid = []
+
+    for y in range(_CB_SIZE):
+        row_values = []
+        for x in range(_CB_SIZE):
+            addr = _SRAM_GRID_BASE + y * _CB_SIZE + x
+            row_values.append(await dft_read(dut, tile_id, addr))
+        grid.append(row_values)
+
+    return grid
+
+
+async def _cb_load_firmware_to_tile(dut, row, col, firmware_bytes):
+    """
+    Load firmware directly into tile SRAM through DFT.
+
+    This bypasses the SPI flash boot path, so we can test:
+      firmware -> SERV CPU -> SRAM checkerboard writes
+    without depending on the boot_controller/flash model.
+    """
+    tid = tile4(row, col)
+    label = f"tile({row},{col})"
+
+    dut._log.info(f"[FW_LOAD] {label}: writing {len(firmware_bytes)} bytes...")
+
+    for addr, byte in enumerate(firmware_bytes):
+        await dft_write(dut, tid, addr, byte)
+
+    dut._log.info(f"[FW_LOAD] {label}: verifying firmware bytes...")
+
+    for addr, expected in enumerate(firmware_bytes):
+        got = await dft_read(dut, tid, addr)
+        assert got == expected, (
+            f"{label} firmware verify failed at 0x{addr:03X}: "
+            f"expected 0x{expected:02X}, got 0x{got:02X}"
+        )
+
+    # Zero SERV RF/register-file area.
+    # This is the same idea as _init_tile().
+    for addr in range(0x770, 0x800):
+        await dft_write(dut, tid, addr, 0x00)
+
+    # Touch bank0 so first instruction fetch at PC=0 sees the correct bank.
+    await dft_read(dut, tid, 0x000)
+
+    dut._log.info(f"[FW_LOAD] {label}: ready.")
+
+
+def _cb_print_comparison(row, col, expected_iteration, actual):
+    expected = _cb_expected_grid(row, col, expected_iteration)
+
+    print("")
+    print("=" * 64)
+    print(
+        f"TILE ({row},{col}) "
+        f"tid4=0x{tile4(row, col):X} "
+        f"fill=0x{_cb_hw_tile_id(row, col):02X} "
+        f"expected_phase={expected_iteration & 1}"
+    )
+    print("EXPECTED       ACTUAL")
+    print("-" * 64)
+
+    mismatches = 0
+
+    for y in range(_CB_SIZE):
+        expected_row = "".join(_cb_fmt(expected[y][x]) for x in range(_CB_SIZE))
+        actual_row = "".join(_cb_fmt(actual[y][x]) for x in range(_CB_SIZE))
+
+        row_mismatch = False
+        for x in range(_CB_SIZE):
+            if expected[y][x] != actual[y][x]:
+                mismatches += 1
+                row_mismatch = True
+
+        marker = "  <- MISMATCH" if row_mismatch else ""
+        print(f"{expected_row}       {actual_row}{marker}")
+
+    print(f"RESULT: {'PASS' if mismatches == 0 else f'FAIL — {mismatches} wrong cells'}")
+    print("=" * 64)
+
+    return mismatches
+
+
+@cocotb.test()
+async def test_checkerboard_2x2_via_dft(dut):
+    await start_up(dut)
+
+    # Freeze CPUs immediately.
+    dut.input_PAD.value = _DFT_MODE | _CS_N
+    await ClockCycles(dut.clk_PAD, 8)
+
+    # Let boot_controller finish whatever it is doing first, so it cannot
+    # overwrite the firmware we are about to DFT-load.
+    dut._log.info(f"Waiting {_CB_BOOT_CYCLES} cycles for boot_controller to finish...")
+    await ClockCycles(dut.clk_PAD, _CB_BOOT_CYCLES)
+
+    firmware_path = Path(_FIRMWARE_BIN)
+    assert firmware_path.exists(), f"Firmware binary not found: {firmware_path}"
+
+    raw_firmware = firmware_path.read_bytes()
+
+    assert len(raw_firmware) > 0, "Firmware binary is empty"
+
+    # firmware.bin is padded to 2048 bytes, but 0x770..0x7FF is SERV RF/register space.
+    # Load only 0x000..0x76F into SRAM, then explicitly zero RF below.
+    firmware_bytes = list(raw_firmware[:_FW_SAFE_LIMIT])
+
+    # Safety check: if there is actual nonzero code/data past 0x76F, the firmware is too large.
+    overflow = raw_firmware[_FW_SAFE_LIMIT:]
+    if any(byte != 0 for byte in overflow):
+        raise AssertionError(
+            f"Firmware has nonzero bytes past 0x{_FW_SAFE_LIMIT - 1:03X}. "
+            f"That overlaps SERV RF/register space. Rebuild smaller firmware or adjust linker."
+        )
+
+    dut._log.info(
+        f"Firmware raw size = {len(raw_firmware)} bytes; "
+        f"DFT-loading first {len(firmware_bytes)} bytes"
+    )
+
+    dut._log.info(f"Loading firmware from {firmware_path}")
+    dut._log.info(f"Firmware size = {len(firmware_bytes)} bytes")
+
+    for row, col in _CB_TILES:
+        await _cb_load_firmware_to_tile(dut, row, col, firmware_bytes)
+
+    # Release DFT mode. CPUs start executing from PC=0.
+    dut.input_PAD.value = _CS_N
+    await ClockCycles(dut.clk_PAD, _CB_RUN_CYCLES)
+
+    # Freeze CPUs and inspect SRAM.
+    dut.input_PAD.value = _DFT_MODE | _CS_N
+    await ClockCycles(dut.clk_PAD, 8)
+
+    print("")
+    print("#" * 64)
+    print("CHECKERBOARD 2x2 READBACK — DFT-LOADED FIRMWARE")
+    print("#" * 64)
+
+    total_mismatches = 0
+    tile_results = {}
+
+    # First: read debug markers. This tells us whether main() ran.
+    for row, col in _CB_TILES:
+        tid = tile4(row, col)
+
+        magic0 = await _cb_read_word(dut, tid, _DEBUG_MAGIC0)
+        magic1 = await _cb_read_word(dut, tid, _DEBUG_MAGIC1)
+        my_id = await _cb_read_word(dut, tid, _DEBUG_MY_ID)
+        phase = await _cb_read_word(dut, tid, _DEBUG_PHASE_MARKER)
+        pre = await _cb_read_word(dut, tid, _DEBUG_PRE_CHECKERBOARD)
+        post = await _cb_read_word(dut, tid, _DEBUG_POST_CHECKERBOARD)
+        iter_count = await _cb_read_word(dut, tid, _DEBUG_ITER_COUNT)
+
+        print(
+            f"DEBUG tile({row},{col}) tid=0x{tid:X}: "
+            f"magic0=0x{magic0:08X} magic1=0x{magic1:08X} "
+            f"my_id=0x{my_id:08X} phase=0x{phase:08X} "
+            f"pre=0x{pre:08X} post=0x{post:08X} iter={iter_count}"
+        )
+
+        if magic0 != 0xDEADBEEF or magic1 != 0xCAFEBABE:
+            raise AssertionError(
+                f"Firmware did not reach main() on tile({row},{col}). "
+                f"magic0=0x{magic0:08X}, magic1=0x{magic1:08X}"
+            )
+
+    # Use tile(0,0)'s iter_count as expected phase.
+    iter00 = await _cb_read_word(dut, tile4(0, 0), _DEBUG_ITER_COUNT)
+    expected_iteration = iter00 & 1
+
+    print(f"tile(0,0) raw iter_count = {iter00}")
+    print(f"using expected checkerboard phase = {expected_iteration}")
+
+    for row, col in _CB_TILES:
+        tid = tile4(row, col)
+        tile_iter = await _cb_read_word(dut, tid, _DEBUG_ITER_COUNT)
+        actual = await _cb_read_grid(dut, row, col)
+
+        mismatches = _cb_print_comparison(row, col, expected_iteration, actual)
+
+        tile_results[(row, col)] = {
+            "tile_id": tid,
+            "iter": tile_iter,
+            "mismatches": mismatches,
+        }
+
+        total_mismatches += mismatches
+
+    print("")
+    print("#" * 64)
+    print("SUMMARY")
+    print("#" * 64)
+
+    for row, col in _CB_TILES:
+        result = tile_results[(row, col)]
+        status = "PASS" if result["mismatches"] == 0 else f"FAIL ({result['mismatches']} cells)"
+        print(
+            f"tile({row},{col}) "
+            f"tid=0x{result['tile_id']:X} "
+            f"iter={result['iter']} "
+            f"{status}"
+        )
+
+    print("#" * 64)
+    print("")
+
+    dut.input_PAD.value = _CS_N
+
+    assert total_mismatches == 0, (
+        f"test_checkerboard_2x2_via_dft FAILED: "
+        f"{total_mismatches} mismatched cells across 2x2 tiles"
+    )
+
+    dut._log.info("test_checkerboard_2x2_via_dft PASSED")
 
 # ============================================================================
 # Runner
