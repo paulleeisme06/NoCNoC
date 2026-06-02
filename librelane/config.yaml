@@ -260,20 +260,28 @@ MACROS:
       # north_in of rows[r] = south_out of rows[r-1], so rows[r-1] must sit above
       # rows[r]; otherwise inter-row NoC signals route across the whole chip.
       #
-      # Cols (left→right = east):  x = 542, 1601, 2660   (channel = 329 µm)
-      # Rows (top→bottom):         y = 3719, 2640, 1561, 482   (channel = 159 µm)
-      i_chip_core.u_mesh.rows[0].cols[0].tile_inst: { location: [542,  3719], orientation: N }
-      i_chip_core.u_mesh.rows[0].cols[1].tile_inst: { location: [1601, 3719], orientation: N }
-      i_chip_core.u_mesh.rows[0].cols[2].tile_inst: { location: [2660, 3719], orientation: N }
-      i_chip_core.u_mesh.rows[1].cols[0].tile_inst: { location: [542,  2640], orientation: N }
-      i_chip_core.u_mesh.rows[1].cols[1].tile_inst: { location: [1601, 2640], orientation: N }
-      i_chip_core.u_mesh.rows[1].cols[2].tile_inst: { location: [2660, 2640], orientation: N }
-      i_chip_core.u_mesh.rows[2].cols[0].tile_inst: { location: [542,  1561], orientation: N }
-      i_chip_core.u_mesh.rows[2].cols[1].tile_inst: { location: [1601, 1561], orientation: N }
-      i_chip_core.u_mesh.rows[2].cols[2].tile_inst: { location: [2660, 1561], orientation: N }
-      i_chip_core.u_mesh.rows[3].cols[0].tile_inst: { location: [542,  482],  orientation: N }
-      i_chip_core.u_mesh.rows[3].cols[1].tile_inst: { location: [1601, 482],  orientation: N }
-      i_chip_core.u_mesh.rows[3].cols[2].tile_inst: { location: [2660, 482],  orientation: N }
+      # Cols (left→right = east):  x = 542, 1601, 2660   (channel = 329 µm, routable)
+      #
+      # Row Y is ALIGNED to the chip M5 PDN grid for the power handoff:
+      # chip M5 VDD stripes sit at y ≡ 6.22 mod 75 (measured from the generated
+      # PDN). The tile exposes M5 power pins at origin_y + 28.41 (+75·k), so to
+      # land them on the chip grid we need row origin_y ≡ 6.22 − 28.41 ≡ 52.81
+      # mod 75. Row stride = 1050 (= 14·75) keeps every row aligned.
+      # Combined with PDN_*_HALO = 0 (below), the chip's M5 channel stripes reach
+      # the tile edge and ABUT these pins → connectivity (fixes PSM-0069).
+      # Rows (top→bottom): y = 3727.81, 2677.81, 1627.81, 577.81 (channel 130 µm)
+      i_chip_core.u_mesh.rows[0].cols[0].tile_inst: { location: [542,  3727.81], orientation: N }
+      i_chip_core.u_mesh.rows[0].cols[1].tile_inst: { location: [1601, 3727.81], orientation: N }
+      i_chip_core.u_mesh.rows[0].cols[2].tile_inst: { location: [2660, 3727.81], orientation: N }
+      i_chip_core.u_mesh.rows[1].cols[0].tile_inst: { location: [542,  2677.81], orientation: N }
+      i_chip_core.u_mesh.rows[1].cols[1].tile_inst: { location: [1601, 2677.81], orientation: N }
+      i_chip_core.u_mesh.rows[1].cols[2].tile_inst: { location: [2660, 2677.81], orientation: N }
+      i_chip_core.u_mesh.rows[2].cols[0].tile_inst: { location: [542,  1627.81], orientation: N }
+      i_chip_core.u_mesh.rows[2].cols[1].tile_inst: { location: [1601, 1627.81], orientation: N }
+      i_chip_core.u_mesh.rows[2].cols[2].tile_inst: { location: [2660, 1627.81], orientation: N }
+      i_chip_core.u_mesh.rows[3].cols[0].tile_inst: { location: [542,  577.81],  orientation: N }
+      i_chip_core.u_mesh.rows[3].cols[1].tile_inst: { location: [1601, 577.81],  orientation: N }
+      i_chip_core.u_mesh.rows[3].cols[2].tile_inst: { location: [2660, 577.81],  orientation: N }
 
 # Hierarchical: connect every mesh_tile macro's VDD/VSS pins to chip nets.
 # A single wildcard regex matches all 16 tile_inst instances at once —
@@ -287,10 +295,13 @@ PDN_MACRO_CONNECTIONS:
 FP_MACRO_HORIZONTAL_HALO: 10
 FP_MACRO_VERTICAL_HALO: 10
 # PDN halos restored to 5: with tile exposing power on Metal2/Metal3 and
-# tile internal routing limited to Metal3, chip's Metal4/5 straps now pass
-# THROUGH the tile region freely (no OBS conflict). A small halo just keeps
-# vias from packing too close to the macro boundary.
-PDN_HORIZONTAL_HALO: 5
-PDN_VERTICAL_HALO: 5
+# Halo = 0 for the hierarchical power handoff: the tile's M5 power pins extend to
+# the tile boundary (PDN_EXTEND_TO: boundary in noc_tile), and the chip's M5
+# channel stripes must reach that same boundary to ABUT them. A non-zero halo
+# leaves a gap (the chip grid stops short of the tile edge) → pins float →
+# PSM-0069. With the rows aligned to the chip M5 grid (see placements above),
+# halo 0 lets the stripes meet the pins exactly.
+PDN_HORIZONTAL_HALO: 0
+PDN_VERTICAL_HALO: 0
 
 PDN_CFG: dir::pdn_cfg.tcl

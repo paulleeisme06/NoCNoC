@@ -230,13 +230,10 @@ add_pdn_connect \
     -grid sram_macros_NS \
     -layers "$::env(PDN_VERTICAL_LAYER) $::env(PDN_HORIZONTAL_LAYER)"
 
-# Stamp M4 straps over each tile, aligned to the tile's M4 power pins so they
-# overlap (same net) and cross the tile's full-width M5 pins.
-add_pdn_stripe \
-    -grid sram_macros_NS \
-    -layer $::env(PDN_VERTICAL_LAYER) \
-    -width $::env(PDN_VWIDTH) \
-    -pitch $::env(PDN_VPITCH) \
-    -offset 26.4 \
-    -spacing $::env(PDN_VSPACING) \
-    -starts_with POWER
+# NOTE: no stamped straps here. Stamping M4 over the large tile produced an
+# ISOLATED island (it overlapped the tile pins but never reached a chip M5
+# stripe → still PSM-0069). Instead the connection is made by ALIGNING the tile
+# placement so the tile's M5 power pins land exactly on the chip M5 grid
+# (y ≡ 6.22 mod 75) and dropping the PDN halo to 0 so the chip's M5 channel
+# stripes reach the tile edge and abut those pins. See the row Y placements and
+# PDN_*_HALO in config.yaml.
