@@ -1,8 +1,6 @@
 # Copyright 2025 LibreLane Contributors
 #
-# Adapted from OpenLane
-#
-# Copyright 2020-2022 Efabless Corporation
+# Adapted from OpenLane / from working 3×3 chip config.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -182,6 +180,7 @@ if { $::env(PDN_CORE_RING) == 1 } {
     }
 }
 
+# Default macro grid (catches anything that isn't otherwise specified).
 define_pdn_grid \
     -macro \
     -default \
@@ -193,10 +192,28 @@ add_pdn_connect \
     -grid macro \
     -layers "$::env(PDN_VERTICAL_LAYER) $::env(PDN_HORIZONTAL_LAYER)"
 
-# Per-SRAM PDN grids (sram_macros_NS / sram_macros_WE) removed.
-# These referenced i_chip_core.sram_0 and i_chip_core.sram_1, which were
-# chip-level SRAM instances in an older flat flow. In the hierarchical
-# 4×4 chip the SRAMs live INSIDE the hardened mesh_tile macros and have
-# their own PDN connections baked in at the tile level. The default
-# macro grid above (with PDN_MACRO_CONNECTIONS for each tile_inst) is
-# all the chip-level PDN setup that's needed.
+# mesh_tile macro grid — THIS is the key for hierarchical integration.
+#
+# Tile Metal4 VDD/VSS pins extend to the tile die boundary (set by
+# PDN_EXTEND_TO: boundary in noc_tile/config.yaml). The chip Metal5
+# horizontal stripes enter the tile region from outside and connect via
+# Via4 to the tile's full-height Metal4 LEF pins.
+#
+# We do NOT add extra Metal4 stripes inside the tile footprint — that
+# causes Magic "obsm4 vs metal4" illegal overlap errors (231k violations).
+# The Metal4↔Metal5 connect rule below places Via4 between tile Metal4
+# pins and chip Metal5 stripes that pass through, which is sufficient for
+# full VDD+VSS delivery.
+#
+# Pattern .*tile_inst matches all 16 mesh_tile instances in the 4×4 mesh
+# (rows[0..3].cols[0..3].tile_inst).
+define_pdn_grid \
+    -macro \
+    -instances {.*tile_inst} \
+    -name sram_macros_NS \
+    -starts_with POWER \
+    -halo "$::env(PDN_HORIZONTAL_HALO) $::env(PDN_VERTICAL_HALO)"
+
+add_pdn_connect \
+    -grid sram_macros_NS \
+    -layers "$::env(PDN_VERTICAL_LAYER) $::env(PDN_HORIZONTAL_LAYER)"
