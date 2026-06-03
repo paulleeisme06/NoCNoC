@@ -120,8 +120,22 @@ PDN_VWIDTH: 5
 PDN_HWIDTH: 5
 PDN_VSPACING: 1
 PDN_HSPACING: 1
-PDN_VPITCH: 75
-PDN_HPITCH: 75
+# 74.48 (= 19 rows = 133 sites) — MUST match the tile's PDN pitch so the chip
+# grid and the tile's M4/M5 power pins are co-aligned (the hierarchical power
+# handoff). 75 was incommensurate with the macro snap grid; 74.48 is exact.
+PDN_VPITCH: 74.48
+PDN_HPITCH: 74.48
+
+# Keep the M4/M5 straps running CONTINUOUSLY over the tiles instead of trimming
+# them off. The tile uses M4/M5 for its own power pins (the SRAM forces M5, so it
+# can't give up the top layers for the standard hierarchical method). With the
+# tiles grid-aligned (placements below), an un-trimmed chip strap lands directly
+# on top of the tile's same-net M4/M5 pin → solid overlap. Trimming (the default)
+# removed the over-tile straps and left only fragile channel abutment: VDD barely
+# connected (0.56µm gap), VSS opened (5.67µm gap) → PSM-0069 on VSS. Diagnosed
+# from RUN_2026-06-03_01-35-51. (chip_id/logo macros are outside the core, so
+# skip_trim only affects straps over the tiles.)
+PDN_SKIPTRIM: True
 
 # PDN - Core ring
 PDN_CORE_RING: True
@@ -260,28 +274,25 @@ MACROS:
       # north_in of rows[r] = south_out of rows[r-1], so rows[r-1] must sit above
       # rows[r]; otherwise inter-row NoC signals route across the whole chip.
       #
-      # Cols (left→right = east):  x = 542, 1601, 2660   (channel = 329 µm, routable)
-      #
-      # Row Y is ALIGNED to the chip M5 PDN grid for the power handoff:
-      # chip M5 VDD stripes sit at y ≡ 6.22 mod 75 (measured from the generated
-      # PDN). The tile exposes M5 power pins at origin_y + 28.41 (+75·k), so to
-      # land them on the chip grid we need row origin_y ≡ 6.22 − 28.41 ≡ 52.81
-      # mod 75. Row stride = 1050 (= 14·75) keeps every row aligned.
-      # Combined with PDN_*_HALO = 0 (below), the chip's M5 channel stripes reach
-      # the tile edge and ABUT these pins → connectivity (fixes PSM-0069).
-      # Rows (top→bottom): y = 3727.81, 2677.81, 1627.81, 577.81 (channel 130 µm)
-      i_chip_core.u_mesh.rows[0].cols[0].tile_inst: { location: [542,  3727.81], orientation: N }
-      i_chip_core.u_mesh.rows[0].cols[1].tile_inst: { location: [1601, 3727.81], orientation: N }
-      i_chip_core.u_mesh.rows[0].cols[2].tile_inst: { location: [2660, 3727.81], orientation: N }
-      i_chip_core.u_mesh.rows[1].cols[0].tile_inst: { location: [542,  2677.81], orientation: N }
-      i_chip_core.u_mesh.rows[1].cols[1].tile_inst: { location: [1601, 2677.81], orientation: N }
-      i_chip_core.u_mesh.rows[1].cols[2].tile_inst: { location: [2660, 2677.81], orientation: N }
-      i_chip_core.u_mesh.rows[2].cols[0].tile_inst: { location: [542,  1627.81], orientation: N }
-      i_chip_core.u_mesh.rows[2].cols[1].tile_inst: { location: [1601, 1627.81], orientation: N }
-      i_chip_core.u_mesh.rows[2].cols[2].tile_inst: { location: [2660, 1627.81], orientation: N }
-      i_chip_core.u_mesh.rows[3].cols[0].tile_inst: { location: [542,  577.81],  orientation: N }
-      i_chip_core.u_mesh.rows[3].cols[1].tile_inst: { location: [1601, 577.81],  orientation: N }
-      i_chip_core.u_mesh.rows[3].cols[2].tile_inst: { location: [2660, 577.81],  orientation: N }
+      # CO-DESIGN ALIGNED placements (pitch 74.48 = 19 rows = 133 sites).
+      # Aligned to the MEASURED chip grid (M4 VDD≡11.84, M5 VDD≡12.73 mod 74.48),
+      # NOT the config offset value (16.32/16.65) which isn't where the grid lands.
+      # cols: col_x ≡ 59.92 → tile M4 VDD(26.4)+col ≡ 11.84 = chip M4 VDD.
+      # rows: row_y ≡ 58.80 → tile M5 VDD(28.41)+row ≡ 12.73 = chip M5 VDD.
+      # Chip & tile both use VDD→VSS(+6) pairs, so VSS aligns automatically.
+      # stride 1042.72 (= 14·74.48), exact site/row multiple → no snap drift.
+      i_chip_core.u_mesh.rows[0].cols[0].tile_inst: { location: [506.80,  3633.84], orientation: N }
+      i_chip_core.u_mesh.rows[0].cols[1].tile_inst: { location: [1549.52, 3633.84], orientation: N }
+      i_chip_core.u_mesh.rows[0].cols[2].tile_inst: { location: [2592.24, 3633.84], orientation: N }
+      i_chip_core.u_mesh.rows[1].cols[0].tile_inst: { location: [506.80,  2591.12], orientation: N }
+      i_chip_core.u_mesh.rows[1].cols[1].tile_inst: { location: [1549.52, 2591.12], orientation: N }
+      i_chip_core.u_mesh.rows[1].cols[2].tile_inst: { location: [2592.24, 2591.12], orientation: N }
+      i_chip_core.u_mesh.rows[2].cols[0].tile_inst: { location: [506.80,  1548.40], orientation: N }
+      i_chip_core.u_mesh.rows[2].cols[1].tile_inst: { location: [1549.52, 1548.40], orientation: N }
+      i_chip_core.u_mesh.rows[2].cols[2].tile_inst: { location: [2592.24, 1548.40], orientation: N }
+      i_chip_core.u_mesh.rows[3].cols[0].tile_inst: { location: [506.80,  505.68],  orientation: N }
+      i_chip_core.u_mesh.rows[3].cols[1].tile_inst: { location: [1549.52, 505.68],  orientation: N }
+      i_chip_core.u_mesh.rows[3].cols[2].tile_inst: { location: [2592.24, 505.68],  orientation: N }
 
 # Hierarchical: connect every mesh_tile macro's VDD/VSS pins to chip nets.
 # A single wildcard regex matches all 16 tile_inst instances at once —
