@@ -192,48 +192,26 @@ add_pdn_connect \
     -grid macro \
     -layers "$::env(PDN_VERTICAL_LAYER) $::env(PDN_HORIZONTAL_LAYER)"
 
-# mesh_tile macro grid — THIS is the key for hierarchical integration.
-#
-# Tile Metal4 VDD/VSS pins extend to the tile die boundary (set by
-# PDN_EXTEND_TO: boundary in noc_tile/config.yaml). The chip Metal5
-# horizontal stripes enter the tile region from outside and connect via
-# Via4 to the tile's full-height Metal4 LEF pins.
-#
+# mesh_tile macro grid — RING METHOD.
 # Pattern .*tile_inst matches all mesh_tile instances (rows[*].cols[*].tile_inst).
 #
-# THE HIERARCHICAL POWER HANDOFF (professor's adder pattern):
-# The tile exposes power pins on Metal4 (vertical, x = 26.4 + 75·n relative to
-# the tile) and Metal5 (horizontal, full tile width, y = 28.4 + 75·n). The chip's
-# global PDN grid is suppressed over the macro, so without stamped straps the
-# tile pins connect to nothing → PSM-0069 "Check connectivity failed on VDD".
+# The tile is now hardened with a power CORE RING (PDN_CORE_RING) on M4/M5 around
+# its boundary — LibreLane's documented method for a macro that uses Metal5 (which
+# ours does; its std-cell PDN needs M5 to bridge the SRAMs, so it can't use the
+# default hierarchical method that requires giving up M5).
 #
-# Fix: stamp parent Metal4 straps over each tile, ALIGNED to the tile's own M4
-# pins (offset 26.4, pitch 75, placed relative to each macro so they line up
-# regardless of chip placement). Because they sit ON the tile's M4 pins they are
-# same-net (PDN is net-aware → no VDD/VSS short, minimal obstruction overlap),
-# they cross the tile's full-width M5 pins (M4↔M5 vias), and they reach the chip
-# M5 grid at the tile's top/bottom edges in the row channels. This is exactly the
-# adder's "adjust the parameters so the straps overlap" technique.
-#
-# A previous version removed these straps to avoid Magic "obsm4 vs metal4"
-# warnings — but those are NON-FATAL (ERROR_ON_MAGIC_DRC: False, and Magic DRC is
-# not required for submission), whereas dropping them gave the FATAL PSM-0069.
-# Connectivity wins; the Magic warnings are acceptable.
+# At the top level the connection is simple: the chip's M4/M5 PDN straps connect
+# to the tile's boundary ring via the M4↔M5 connect below. The ring is a
+# continuous boundary interface, so there is NO alignment/incommensurate-grid
+# problem and NO stamping needed. (This replaces all the earlier edge-straddle,
+# alignment, and stamp experiments — they were fighting the wrong PDN method.)
 define_pdn_grid \
     -macro \
     -instances {.*tile_inst} \
     -name sram_macros_NS \
     -starts_with POWER \
-    -halo "$::env(PDN_HORIZONTAL_HALO) $::env(PDN_VERTICAL_HALO)"
+    -halo "0 0"
 
 add_pdn_connect \
     -grid sram_macros_NS \
     -layers "$::env(PDN_VERTICAL_LAYER) $::env(PDN_HORIZONTAL_LAYER)"
-
-# NOTE: no stamped straps here. Stamping M4 over the large tile produced an
-# ISOLATED island (it overlapped the tile pins but never reached a chip M5
-# stripe → still PSM-0069). Instead the connection is made by ALIGNING the tile
-# placement so the tile's M5 power pins land exactly on the chip M5 grid
-# (y ≡ 6.22 mod 75) and dropping the PDN halo to 0 so the chip's M5 channel
-# stripes reach the tile edge and abut those pins. See the row Y placements and
-# PDN_*_HALO in config.yaml.

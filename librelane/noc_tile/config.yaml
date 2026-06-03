@@ -20,7 +20,7 @@ VERILOG_FILES:
   - dir::../../src/mesh_psi_aan/mesh_router.v
   - dir::../../src/serv/rtl/*.v 
   - dir::../../src/serv/servile/*.v
-  - dir::../../src/sram2048x8_gf180.v
+  - dir::../../src/subservient/rtl/sram2048x8_gf180.v
   - dir::../../src/subservient/rtl/subservient_core.v
   - dir::../../src/subservient/rtl/subservient_rf_ram_if.v
 
@@ -95,8 +95,8 @@ PDN_VWIDTH: 5
 PDN_HWIDTH: 5
 
 # distance between straps - was 90
-PDN_VPITCH: 75
-PDN_HPITCH: 75
+PDN_VPITCH: 74.48
+PDN_HPITCH: 74.48
 
 VERILOG_POWER_DEFINE: "USE_POWER_PINS"
 
