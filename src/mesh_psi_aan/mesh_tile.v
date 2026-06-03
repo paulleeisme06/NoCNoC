@@ -4,18 +4,19 @@
 // mesh_tile — one RISC-V tile in the MESH_R × MESH_C mesh
 //
 // Parameters:
-//   TILE_ID  : 6-bit tile identifier, encoded as {row[2:0], col[2:0]}
-//   MESH_R   : mesh row count    (passed through to router)
-//   MESH_C   : mesh column count (passed through to router)
+//   MESH_R   : mesh row count    (passed through to router, diagnostics only)
+//   MESH_C   : mesh column count (passed through to router, diagnostics only)
 //
-// Do NOT hardcode MESH_R / MESH_C here — they are driven from mesh_nxn.v
-// which reads them from mesh_config.vh.
+// Ports:
+//   TILE_ID  : 6-bit tile identifier {row[2:0], col[2:0]}, hardwired at chip level.
+//              Must be an input port (not a parameter) so each instance in the
+//              chip top gets its own correct ID without re-hardening.
 // ============================================================================
 module mesh_tile #(
-    parameter [5:0]   TILE_ID = 6'b000000,
     parameter integer MESH_R  = 5,
     parameter integer MESH_C  = 5
 )(
+    input wire [5:0] TILE_ID,   // {row[2:0], col[2:0]}, tied to constant at chip level
 `ifdef USE_POWER_PINS
     inout wire VDD,
     inout wire VSS,
@@ -232,10 +233,10 @@ module mesh_tile #(
     // Mesh router
     // -------------------------------------------------------------------------
     mesh_router #(
-        .MY_ID (TILE_ID),
         .MESH_R(MESH_R),
         .MESH_C(MESH_C)
     ) router_inst (
+        .MY_ID (TILE_ID),
         .clk            (clk),
         .rst            (rst),
         .local_wb_adr   (wb_adr),

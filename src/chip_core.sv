@@ -108,7 +108,11 @@ module chip_core #(
     end
     assign dbg_ack = dbg_ack_r;
 
-    mesh_rxc #(.MESH_R(3), .MESH_C(3)) u_mesh (
+    mesh_rxc #(.MESH_R(4), .MESH_C(3)) u_mesh (
+        `ifdef USE_POWER_PINS
+        .VDD          (VDD),
+        .VSS          (VSS),
+        `endif
         .clk          (clk),
         .rst          (~rst_n),
         .inject_00_nw (36'b0),

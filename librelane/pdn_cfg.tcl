@@ -193,61 +193,48 @@ add_pdn_connect \
     -grid macro \
     -layers "$::env(PDN_VERTICAL_LAYER) $::env(PDN_HORIZONTAL_LAYER)"
 
-# SRAM macros
 
-# mesh_tile macro grid.
-# Tile Metal4 VDD/VSS pins extend to the tile die boundary (PDN_EXTEND_TO: boundary in
-# noc_tile/config.yaml). The chip Metal5 horizontal stripes enter the tile ~47um from
-# the tile bottom and connect via Via4 to the tile's full-height Metal4 LEF pins.
-# No extra Metal4 stripes are added here: chip-level Metal4 inside the tile footprint
-# causes Magic "obsm4 vs metal4" illegal overlap errors (231k violations).
-# The Metal4-Metal5 connect rule below places Via4 between tile Metal4 pins and the
-# chip Metal5 stripes that pass through, which is sufficient for full VDD+VSS delivery.
+# -----------------------------------------------------------------------
+# gf180mcu_ocd_ip_sram__sram1024x8m8wm1 — 24 instances (2 per tile × 12 tiles)
+#
+# SRAM exposes VDD/VSS on Metal2 and Metal3 (stubs at top edge of macro).
+# Strategy: Metal4 V stripes on W/E edges + coverage stripes via M4-M3 vias
+# to the SRAM's Metal3 stubs. Chip Metal5 H stripes connect via M4-M5 above.
+# -----------------------------------------------------------------------
 define_pdn_grid \
     -macro \
-    -instances {.*tile_inst} \
-    -name sram_macros_NS \
+    -instances {.*sram2048\.u_bank0 .*sram2048\.u_bank1} \
+    -name chip_sram_macros \
     -starts_with POWER \
     -halo "$::env(PDN_HORIZONTAL_HALO) $::env(PDN_VERTICAL_HALO)"
 
 add_pdn_connect \
-    -grid sram_macros_NS \
+    -grid chip_sram_macros \
     -layers "$::env(PDN_VERTICAL_LAYER) $::env(PDN_HORIZONTAL_LAYER)"
 
-# define_pdn_grid \
-#     -macro \
-#     -instances i_chip_core.sram_1 \
-#     -name sram_macros_WE \
-#     -starts_with POWER \
-#     -halo "$::env(PDN_HORIZONTAL_HALO) $::env(PDN_VERTICAL_HALO)"
+add_pdn_connect \
+    -grid chip_sram_macros \
+    -layers "$::env(PDN_VERTICAL_LAYER) Metal3"
 
-# add_pdn_connect \
-#     -grid sram_macros_WE \
-#     -layers "$::env(PDN_VERTICAL_LAYER) $::env(PDN_HORIZONTAL_LAYER)"
+# W/E edge stripes (pitch ≈ SRAM width 301.3um)
+add_pdn_stripe \
+    -grid chip_sram_macros \
+    -layer Metal4 \
+    -width 2.36 \
+    -offset 1.18 \
+    -spacing 0.28 \
+    -pitch 298.94 \
+    -starts_with GROUND \
+    -number_of_straps 2
 
-# add_pdn_connect \
-#     -grid sram_macros_WE \
-#     -layers "$::env(PDN_VERTICAL_LAYER) Metal3"
+# Interior coverage stripes
+add_pdn_stripe \
+    -grid chip_sram_macros \
+    -layer Metal4 \
+    -width 4.00 \
+    -offset 50.00 \
+    -spacing 0.28 \
+    -pitch 50 \
+    -starts_with GROUND \
+    -number_of_straps 5
 
-# # Add stripes on W/E edges of SRAM
-# add_pdn_stripe \
-#     -grid sram_macros_WE \
-#     -layer Metal4 \
-#     -width 2.36 \
-#     -offset 1.18 \
-#     -spacing 0.28 \
-#     -pitch 479.88 \
-#     -starts_with GROUND \
-#     -number_of_straps 2
-
-# # Since the above stripes block the top level PDN at Metal4, add some more stripes
-# # to improve the PDN's integrity and ensure a better connection for the macro.
-# add_pdn_stripe \
-#     -grid sram_macros_WE \
-#     -layer Metal4 \
-#     -width 4.00 \
-#     -offset 46.48 \
-#     -spacing 0.28 \
-#     -pitch 48.48 \
-#     -starts_with GROUND \
-#     -number_of_straps 9

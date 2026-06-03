@@ -20,10 +20,10 @@
 // and is naturally correct for any rectangular mesh.
 // ============================================================================
 module mesh_router #(
-    parameter [5:0]   MY_ID  = 6'b000000,
     parameter integer MESH_R = 5,   // mesh rows    — for display / diagnostics
     parameter integer MESH_C = 5    // mesh columns — for display / diagnostics
 )(
+    input  wire [5:0]  MY_ID,       // tile position {row[2:0], col[2:0]}, driven by chip top
     input  wire        clk,
     input  wire        rst,
 

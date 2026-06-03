@@ -17,6 +17,10 @@ module mesh_rxc #(
     parameter integer MESH_R = 5,
     parameter integer MESH_C = 5
 )(
+`ifdef USE_POWER_PINS
+    inout  wire        VDD,
+    inout  wire        VSS,
+`endif
     input  wire        clk,
     input  wire        rst,
     input  wire [35:0] inject_00_nw,
@@ -97,6 +101,9 @@ module mesh_rxc #(
             4'b1000: dft_rdata_r = tile_dft_rdata[2][0];
             4'b1001: dft_rdata_r = tile_dft_rdata[2][1];
             4'b1010: dft_rdata_r = tile_dft_rdata[2][2];
+            4'b1100: dft_rdata_r = tile_dft_rdata[3][0];
+            4'b1101: dft_rdata_r = tile_dft_rdata[3][1];
+            4'b1110: dft_rdata_r = tile_dft_rdata[3][2];
             default: dft_rdata_r = 8'h0;
         endcase
     end
@@ -134,10 +141,14 @@ module mesh_rxc #(
                                  :                       36'b0;
 
                 mesh_tile #(
-                    .TILE_ID(THIS_TILE_ID),
                     .MESH_R (MESH_R),
                     .MESH_C (MESH_C)
                 ) tile_inst (
+`ifdef USE_POWER_PINS
+                    .VDD      (VDD),
+                    .VSS      (VSS),
+`endif
+                    .TILE_ID  (THIS_TILE_ID),
                     .clk      (clk),
                     .rst      (!cpu_rst_n),
                     .boot_mode(boot_mode),
