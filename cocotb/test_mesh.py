@@ -228,6 +228,12 @@ async def boot_mesh(dut):
     dut.flash_miso.value = 0
     if hasattr(dut, "inject_00_nw"):
         dut.inject_00_nw.value = 0
+    if hasattr(dut, "dft_mode"):
+        dut.dft_mode.value    = 0
+        dut.dft_tile_id.value = 0
+        dut.dft_we.value      = 0
+        dut.dft_addr.value    = 0
+        dut.dft_wdata.value   = 0
     await Timer(RESET_HOLD_MS, unit="ms")
     dut.rst.value = 0
     cocotb.start_soon(spi_flash_responder(dut))
