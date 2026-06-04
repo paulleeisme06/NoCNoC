@@ -1,7 +1,9 @@
 `default_nettype none
 
 module mesh_tile #(
-    parameter [3:0] TILE_ID = 4'b0000
+    parameter [5:0] TILE_ID = 6'b000000,
+    parameter integer MESH_R = 3,
+    parameter integer MESH_C = 3
 )(
     input wire clk,
     input wire rst,

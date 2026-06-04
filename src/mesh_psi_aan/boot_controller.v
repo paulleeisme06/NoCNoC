@@ -101,18 +101,26 @@ module boot_controller (
                 end
 
                 WRITE: begin
-                    if (spi_phase == 0) begin
-                        sram_wen <= 0; // Active low pulse start
-                        spi_phase <= 1;
-                    end else begin
-                        sram_wen <= 1; // Pulse end
-                        spi_phase <= 0;
-                        if (sram_waddr == 11'h7FF) state <= DONE;
-                        else begin
-                            sram_waddr <= sram_waddr + 1;
-                            state <= READ;
+                    case (spi_phase)
+                        2'b00: begin
+                            sram_wen <= 0; // Assert WEN low (setup cycle)
+                            spi_phase <= 2'b01;
                         end
-                    end
+                        2'b01: begin
+                            // Hold WEN low — SRAM captures GWEN=0 this cycle
+                            spi_phase <= 2'b10;
+                        end
+                        2'b10: begin
+                            sram_wen <= 1; // Deassert
+                            spi_phase <= 2'b00;
+                            if (sram_waddr == 11'h7FF) state <= DONE;
+                            else begin
+                                sram_waddr <= sram_waddr + 1;
+                                state <= READ;
+                            end
+                        end
+                        default: spi_phase <= 2'b00;
+                    endcase
                 end
 
                 DONE: begin

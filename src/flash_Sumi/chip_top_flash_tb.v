@@ -6,14 +6,12 @@ module chip_top_flash_tb;
     reg clk;
     reg rst_n;
 
-    // Pad wires
     wire        clk_PAD;
     wire        rst_n_PAD;
     wire [11:0] input_PAD;
     wire [39:0] bidir_PAD;
     wire [1:0]  analog_PAD;
 
-    // Flash signals
     wire flash_cs_n  = bidir_PAD[1];
     wire flash_clk   = bidir_PAD[2];
     wire flash_mosi  = bidir_PAD[3];
@@ -21,25 +19,22 @@ module chip_top_flash_tb;
     wire wp_neg      = 1'b1;
     wire io3_reset_n = 1'b1;
 
-    assign clk_PAD   = clk;
-    assign rst_n_PAD = rst_n;
-    assign input_PAD[4]    = flash_miso;
-    assign input_PAD[3:0]  = 4'b0;
-    assign input_PAD[11:5] = 7'b0;
-    assign analog_PAD = 2'bz;
+    assign clk_PAD        = clk;
+    assign rst_n_PAD      = rst_n;
+    assign input_PAD[4]   = flash_miso;
+    assign input_PAD[3:0] = 4'b0;
+    assign input_PAD[11:5]= 7'b0;
+    assign analog_PAD     = 2'bz;
 
-    // Clock
     initial clk = 0;
     always #5 clk = ~clk;
 
-    // Reset
     initial begin
         rst_n = 0;
         repeat(8) @(posedge clk);
         rst_n = 1;
     end
 
-    // DUT
     chip_top dut (
         .clk_PAD   (clk_PAD),
         .rst_n_PAD (rst_n_PAD),
@@ -48,8 +43,12 @@ module chip_top_flash_tb;
         .analog_PAD(analog_PAD)
     );
 
-    // Flash model
-    s25fl128l flash_model (
+    s25fl128l #(
+        .tdevice_PU    (1),
+        .UserPreload   (1),
+        .mem_file_name ("s25fl128l.mem"),
+        .secr_file_name("s25fl128lSECR.mem")
+    ) flash_model (
         .SI          (flash_mosi),
         .SO          (flash_miso),
         .SCK         (flash_clk),
@@ -59,97 +58,44 @@ module chip_top_flash_tb;
         .IO3_RESETNeg(io3_reset_n)
     );
 
-    // Force miso into boot_controller bypassing pad
-    initial forever begin
-        #1;
+    always @(flash_miso)
         force dut.i_chip_core.u_mesh.boot_inst.flash_miso = flash_miso;
+
+    initial begin
+        #100;
+        $display("[MEM] mem[0]=%02h mem[1]=%02h",
+                 flash_model.Mem[0], flash_model.Mem[1]);
     end
 
-initial begin
-    @(negedge dut.i_chip_core.u_mesh.boot_inst.flash_cs_n);
-    repeat(40) begin
-        @(posedge dut.i_chip_core.u_mesh.boot_inst.flash_clk);
-        $display("[CMD t=%0t] mosi=%b state=%0d shift=%08b",
+    initial begin
+        wait(dut.i_chip_core.u_mesh.boot_inst.sram_wen === 1'b0 && $time > 1000);
+        @(posedge clk);
+        $display("[WRITE t=%0t] CEN=%b GWEN=%b D=%02h A=%03h bm=%b bw=%b tw=%b sa=%b no_st=%b no_hd=%b cen_fell=%b",
                  $time,
-                 dut.i_chip_core.u_mesh.boot_inst.flash_mosi,
-                 dut.i_chip_core.u_mesh.boot_inst.state,
-                 dut.i_chip_core.u_mesh.boot_inst.shift_reg);
-    end
-end
-
-    // Debug
-    initial begin
-        #200000;
-        repeat(40) begin
-            @(posedge dut.i_chip_core.u_mesh.boot_inst.flash_clk);
-            $display("[MISO t=%0t] SO=%b cs_n=%b miso_internal=%b",
-                     $time, flash_model.SO, flash_cs_n,
-                     dut.i_chip_core.u_mesh.boot_inst.flash_miso);
-        end
-    end
-
-    // CS monitor
-    initial begin
-        @(negedge flash_cs_n);
-        $display("[TB t=%0t] flash_cs_n went LOW", $time);
-        @(posedge flash_cs_n);
-        $display("[TB t=%0t] flash_cs_n went HIGH", $time);
+                 dut.i_chip_core.u_mesh.rows[0].cols[0].tile_inst.sram_inst.CEN,
+                 dut.i_chip_core.u_mesh.rows[0].cols[0].tile_inst.sram_inst.GWEN,
+                 dut.i_chip_core.u_mesh.rows[0].cols[0].tile_inst.sram_inst.D,
+                 dut.i_chip_core.u_mesh.rows[0].cols[0].tile_inst.sram_inst.A,
+                 dut.i_chip_core.u_mesh.rows[0].cols[0].tile_inst.boot_mode,
+                 dut.i_chip_core.u_mesh.boot_inst.sram_wen,
+                 dut.i_chip_core.u_mesh.rows[0].cols[0].tile_inst.boot_wen,
+                 dut.i_chip_core.u_mesh.rows[0].cols[0].tile_inst.sram_active,
+                 dut.i_chip_core.u_mesh.rows[0].cols[0].tile_inst.sram_inst.no_st_viol,
+                 dut.i_chip_core.u_mesh.rows[0].cols[0].tile_inst.sram_inst.no_hd_viol,
+                 dut.i_chip_core.u_mesh.rows[0].cols[0].tile_inst.sram_inst.cen_fell);
+        #1;
+        $display("[AFTER1ps] mem[0]=%02h",dut.i_chip_core.u_mesh.rows[0].cols[0].tile_inst.sram_inst.mem[0]);
+        #1000;
+        $display("[AFTER1ns] mem[0]=%02h mem[1]=%02h",
+                 dut.i_chip_core.u_mesh.rows[0].cols[0].tile_inst.sram_inst.mem[0],
+                 dut.i_chip_core.u_mesh.rows[0].cols[0].tile_inst.sram_inst.mem[1]);
     end
 
     initial begin
-    #80100;
-    repeat(10) begin
-        #200;
-        $display("[CLK t=%0t] flash_clk=%b mosi=%b", $time, flash_clk, flash_mosi);
-    end
-end
-
-initial begin
-    #80100;
-    repeat(20) begin
-        #200;
-        $display("[SPI t=%0t] cs=%b clk=%b mosi=%b SO=%b",
-                 $time, flash_model.CSNeg, flash_model.SCK,
-                 flash_model.SI, flash_model.SO);
-    end
-end
-
-initial begin
-    #80100;
-    repeat(20) begin
-        #200;
-$display("[BC t=%0t] bc_rst_n=%b mesh_rst=%b chip_rst_n=%b",
-         $time,
-         dut.i_chip_core.u_mesh.boot_inst.rst_n,
-         dut.i_chip_core.u_mesh.rst,
-         dut.i_chip_core.rst_n);
-        $display("[BC t=%0t] bc_mosi=%b bc_clk=%b bc_cs=%b",
-                 $time,
-                 dut.i_chip_core.u_mesh.boot_inst.flash_mosi,
-                 dut.i_chip_core.u_mesh.boot_inst.flash_clk,
-                 dut.i_chip_core.u_mesh.boot_inst.flash_cs_n);
-    end
-end
-
-initial begin
-    #82000;
-    $display("[RST t=%0t] bc_rst_n=%b mesh_rst=%b chip_rst_n=%b state=%0d",
-             $time,
-             dut.i_chip_core.u_mesh.boot_inst.rst_n,
-             dut.i_chip_core.u_mesh.rst,
-             dut.i_chip_core.rst_n,
-             dut.i_chip_core.u_mesh.boot_inst.state);
-end
-
-
-
-    // Timeout
-    initial begin
-        #5_000_000;
+        #50_000_000;
         $display("TIMEOUT");
         $finish;
     end
-
 
 endmodule
 `default_nettype wire
