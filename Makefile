@@ -43,7 +43,8 @@ VERILOG_EXTRA_DIRS = \
 VERILOG_EXTRA = $(wildcard $(addsuffix /*.v,$(VERILOG_EXTRA_DIRS)))
 
 VERILOG_SOURCES := \
-    $(SRC)/top.v \
+    $(SRC)/chip_top.sv \
+    $(SRC)/chip_core.sv \
 	$(SRC)/flash_Sumi/top_tb.v \
     model/s25fl128l.sv \
 	$(MESH)/boot_controller.v \
@@ -60,9 +61,36 @@ VERILOG_SOURCES := \
     $(DFT)/gf180mcu_fd_ip_sram__sram2048x8m8wm1.v \
     $(VERILOG_EXTRA)
 
+# Replace gf180mcu_fd_io.v with blackbox version in CHIP_SOURCES
+GF180_IO_V  := $(MAKEFILE_DIR)/gf180mcu/gf180mcuD/libs.ref/gf180mcu_fd_io/verilog/gf180mcu_fd_io__blackbox.v
+GF180_WS_IO := $(MAKEFILE_DIR)/gf180mcu/gf180mcuD/libs.ref/gf180mcu_fd_io/verilog/gf180mcu_ws_io__blackbox.v
+GF180_WS_ID := $(MAKEFILE_DIR)/ip/gf180mcu_ws_ip__id/vh/gf180mcu_ws_ip__id.v
+GF180_WS_LG := $(MAKEFILE_DIR)/ip/gf180mcu_ws_ip__logo/vh/gf180mcu_ws_ip__logo.v
+
+CHIP_SOURCES := \
+	$(SRC)/flash_Sumi/gf180_io_sim.v \
+    $(SRC)/chip_top.sv \
+    $(SRC)/chip_core.sv \
+    $(SRC)/flash_Sumi/chip_top_flash_tb.v \
+    model/s25fl128l.sv \
+    $(MESH)/boot_controller.v \
+    $(MESH)/mesh_rxc.v \
+    $(SRC)/flash_Sumi/mesh_tile_dft_shim.v \
+    $(MESH)/mesh_router.v \
+    $(SRC)/dft_ethan/spi_debug.v \
+    $(DFT)/gf180mcu_fd_ip_sram__sram2048x8m8wm1.v \
+    $(VERILOG_EXTRA)
+
 export VERILOG_SOURCES
 
 SIM = icarus
+ICARUS_COMPILE_ARGS = \
+    -I$(SRC) \
+    -I$(SRC)/mesh_psi_aan \
+    -I$(SRC)/dft_ethan \
+    $(addprefix -I,$(VERILOG_EXTRA_DIRS)) \
+    -DSLOT_1X1 \
+    -Wno-timescale
 
 COMPILE_ARGS += \
     -I$(SRC) \
@@ -112,6 +140,20 @@ sim-clean: ## Clean simulation build artifacts
 .PHONY: sim-clean
 
 COCOTB_MK := $(shell cocotb-config --makefiles)/Makefile.sim
+
+sim-flash-chip: ## Flash boot via chip_top pad ring with real S25FL128L
+	mkdir -p sim_build/flash_chip
+	cp model/s25fl128l.mem sim_build/flash_chip/
+	cp model/s25fl128lSECR.mem sim_build/flash_chip/
+	$(MAKE) results.xml \
+		TOPLEVEL=chip_top_flash_tb \
+		MODULE=test_chip_top_flash \
+		SIM=icarus \
+		SIM_BUILD=sim_build/flash_chip \
+		COMPILE_ARGS="$(ICARUS_COMPILE_ARGS)" \
+		VERILOG_SOURCES="$(CHIP_SOURCES)" \
+		PYTHONPATH=$(MAKEFILE_DIR)/cocotb:$(PYTHONPATH)
+.PHONY: sim-flash-chip
 
 sim-flash-tb: ## Run flash test with real S25FL128L model via top_tb
 	$(MAKE) results.xml \
