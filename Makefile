@@ -164,14 +164,22 @@ sim: ## Run RTL simulation with cocotb
 	cd cocotb; SIM=${SIM} PDK_ROOT=${PDK_ROOT} PDK=${PDK} SLOT=${SLOT} python3 chip_top_tb.py
 .PHONY: sim
 
-sim-gl: ## Run gate-level simulation with cocotb (after copy-final)
-	cd cocotb; GL=1 PDK_ROOT=${PDK_ROOT} PDK=${PDK} SLOT=${SLOT} python3 chip_top_tb.py
+GL_HARD_TILE ?= $(MAKEFILE_DIR)/librelane/hard_tile/nl/mesh_tile.nl.v
+GL_TESTS ?= test_dft_write_read|test_dft_sweep|test_dft_boot_hello
+
+sim-gl: ## Run GL sim with hardened tile netlist (all 3 DFT tests)
+	cd cocotb; PDK_ROOT=${PDK_ROOT} PDK=${PDK} SLOT=${SLOT} \
+		GL_TILE=$(GL_HARD_TILE) \
+		COCOTB_TEST_FILTER='$(GL_TESTS)' \
+		python3 chip_top_tb.py
 .PHONY: sim-gl
 
 NOC_TILE_RUN ?= $(shell ls -td librelane/noc_tile/runs/RUN_* 2>/dev/null | head -1)
+GL_TILE_PATH = $(or $(wildcard $(MAKEFILE_DIR)/$(NOC_TILE_RUN)/nl/mesh_tile.nl.v),\
+                    $(wildcard $(MAKEFILE_DIR)/$(NOC_TILE_RUN)/final/nl/mesh_tile.nl.v))
 sim-gl-tile: ## Run mixed RTL/GL sim using the latest mesh_tile synthesis run
 	cd cocotb; PDK_ROOT=${PDK_ROOT} PDK=${PDK} SLOT=${SLOT} \
-		GL_TILE=$(MAKEFILE_DIR)/$(NOC_TILE_RUN)/final/nl/mesh_tile.nl.v \
+		GL_TILE=$(GL_TILE_PATH) \
 		python3 chip_top_tb.py
 .PHONY: sim-gl-tile
 

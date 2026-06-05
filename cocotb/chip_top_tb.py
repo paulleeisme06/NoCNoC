@@ -115,19 +115,104 @@ def prepare_gl_tile_sources(nl_path: Path, build_dir: Path):
     # directly from A[10], matching the RTL simulation behaviour.
     nl_text = nl_path.read_text()
     nl_renamed = re.sub(r'\bmodule\s+mesh_tile\b', 'module mesh_tile_gl', nl_text)
-    # bank_sel_q timing patch — only needed for netlists where synthesis created
-    # an explicit bank_sel_cap FF, giving a 2-cycle delay instead of 1.
-    # Netlists without bank_sel_cap already have the correct 1-cycle behaviour.
-    if r'\sram2048.bank_sel_cap ' in nl_renamed:
+    # bank_sel_cap GL patch
+    #
+    # The RTL sram2048x8_gf180.v uses a BLOCKING assignment for bank_sel_cap:
+    #   always @(posedge CLK) bank_sel_cap = bank_sel;  // active-region capture
+    #   assign cen_bank0 = CEN | bank_sel_cap;
+    # Because it is blocking, bank_sel_cap is set in the active region (before
+    # NBA) and stays frozen through the 100 ps clk_dly window.  The SRAM model's
+    # "marked_a = A" is also blocking (active region), so both capture the same
+    # pre-NBA A value — cen_bank and marked_a are always in sync.
+    #
+    # Synthesis drops bank_sel_cap and replaces it with combinational _0709_
+    # (effective A[10]).  In GL simulation _0709_ updates in the NBA region when
+    # SERV's synthesised FFs latch new addresses.  By the time clk_dly (+100 ps)
+    # fires, _0709_ already reflects the POST-NBA address while marked_a still
+    # holds the pre-NBA address → bank mismatch → SERV RF reads return garbage.
+    #
+    # Fix (two parts):
+    #
+    # Part 1 — re-create bank_sel_cap as a blocking-assignment cell.
+    #   bank_sel_cap_cell captures _0709_ in the Verilog active region, just
+    #   like the RTL blocking assignment, freezing the value through NBA/clk_dly.
+    #   Initialised to 0 → CEN_bank0 starts inactive (=1) so the first DFT
+    #   access produces a clean 1→0 transition and cen_fell fires correctly.
+    #   The cell is clocked by clknet_1_0__leaf_clk (u_bank0's CTS leaf).
+    #   hold1193 is redirected from _0709_ → bank_sel_cap_gl output.
+    #
+    # Part 2 — initialise bank_sel_q (Q-mux select) FF to 0.
+    #   The dfxtp_2 driving bank_sel_q has no reset; starts as X in GL sim.
+    #   X propagates through the output mux, making DFT reads return X/0.
+    #   Replace the cell with dfxtp_2_bsq_init0 (identical, but state=0 init).
+    BSQ_PATCH_PREFIX = """\
+// GL patch cell 1: re-creates sram2048 bank_sel_cap using a blocking FF so
+// CEN is frozen at the pre-NBA A[10] value during the 100 ps clk_dly window,
+// matching the RTL sram2048x8_gf180.v blocking-assignment behaviour.
+module bank_sel_cap_cell (CLK, D, Q);
+  input CLK, D; output Q;
+  reg state = 1'b0;
+  always @(posedge CLK) state = D;  // BLOCKING: captures D in active region
+  assign Q = state;
+endmodule
+// GL patch cell 2: dfxtp_2 for bank_sel_q initialised to 0.
+module dfxtp_2_bsq_init0 (CLK, D, Q);
+  input CLK, D; output Q;
+  reg state = 1'b0;
+  always @(posedge CLK) state <= D;
+  assign Q = state;
+endmodule
+"""
+    if 'hold1193 (.A(_0709_)' in nl_renamed:
+        # Part 1a: redirect hold1193 from _0709_ to bsc_gl_q (plain wire name,
+        # no escaped hierarchy — avoids forward-reference issues in Icarus).
+        nl_renamed = nl_renamed.replace(
+            'hold1193 (.A(_0709_),',
+            'hold1193 (.A(bsc_gl_q ),'
+        )
+        if 'hold1193 (.A(_0709_),' in nl_renamed:
+            raise RuntimeError(
+                "bank_sel_cap GL patch (part 1a) did not apply — "
+                "hold1193 pattern changed, update prepare_gl_tile_sources()"
+            )
+        # Part 1b: insert wire declaration + bank_sel_cap_cell instance BEFORE
+        # hold1193's first use so the wire is always declared before its use.
+        _hold1193_idx = nl_renamed.find('hold1193 (.A(bsc_gl_q ')
+        if _hold1193_idx == -1:
+            raise RuntimeError("bank_sel_cap GL patch: hold1193 not found after rename")
+        # Find start of that line
+        _line_start = nl_renamed.rfind('\n', 0, _hold1193_idx) + 1
+        _bsc_decl = (
+            ' wire bsc_gl_q;\n'
+            ' bank_sel_cap_cell bsc_gl_inst (.CLK(clknet_1_0__leaf_clk),'
+            '.D(_0709_),.Q(bsc_gl_q));\n'
+        )
+        nl_renamed = nl_renamed[:_line_start] + _bsc_decl + nl_renamed[_line_start:]
+
+        # Part 2: swap dfxtp_2 driving bank_sel_q for the initialised variant
+        _bsq_q_marker = r'\sram2048.bank_sel_q ));'
+        _cell_type     = 'gf180mcu_as_sc_mcu7t3v3__dfxtp_2'
+        _bsq_q_idx  = nl_renamed.find(_bsq_q_marker)
+        _bsq_ct_idx = nl_renamed.rfind(_cell_type, 0, _bsq_q_idx) if _bsq_q_idx != -1 else -1
+        if _bsq_ct_idx == -1:
+            raise RuntimeError(
+                "bank_sel_cap GL patch (part 2) did not apply — "
+                "bank_sel_q dfxtp_2 not found, update prepare_gl_tile_sources()"
+            )
+        nl_renamed = (
+            nl_renamed[:_bsq_ct_idx]
+            + 'dfxtp_2_bsq_init0'
+            + nl_renamed[_bsq_ct_idx + len(_cell_type):]
+        )
+        nl_renamed = BSQ_PATCH_PREFIX + nl_renamed
+
+    # Legacy patch for older netlists that synthesised an explicit bank_sel_cap FF
+    # giving a 2-cycle delay on bank_sel_q.
+    elif r'\sram2048.bank_sel_cap ' in nl_renamed:
         nl_renamed = nl_renamed.replace(
             '.B(\\sram2048.bank_sel_cap ),\n    .A(\\sram2048.bank_sel_q ),\n    .Y(_0211_))',
             '.B(\\sram2048.A[10] ),\n    .A(\\sram2048.bank_sel_q ),\n    .Y(_0211_))'
         )
-        if r'\sram2048.bank_sel_cap ),\n    .A(\sram2048.bank_sel_q ),\n    .Y(_0211_))' in nl_renamed:
-            raise RuntimeError(
-                "bank_sel_q netlist patch did not apply — "
-                "netlist layout changed, update the patch in prepare_gl_tile_sources()"
-            )
 
     renamed_path = build_dir / "mesh_tile_gl.nl.v"
     renamed_path.write_text(nl_renamed)
@@ -153,22 +238,22 @@ module mesh_tile #(
     input  wire [10:0] dft_addr,
     output wire  [7:0] dft_rdata,
     input  wire  [7:0] dft_wdata,
-    input  wire [33:0] east_in,
-    output wire [33:0] east_out,
-    input  wire [33:0] ne_in,
-    output wire [33:0] ne_out,
-    input  wire [33:0] north_in,
-    output wire [33:0] north_out,
-    input  wire [33:0] nw_in,
-    output wire [33:0] nw_out,
-    input  wire [33:0] se_in,
-    output wire [33:0] se_out,
-    input  wire [33:0] south_in,
-    output wire [33:0] south_out,
-    input  wire [33:0] sw_in,
-    output wire [33:0] sw_out,
-    input  wire [33:0] west_in,
-    output wire [33:0] west_out
+    input  wire [35:0] east_in,
+    output wire [35:0] east_out,
+    input  wire [35:0] ne_in,
+    output wire [35:0] ne_out,
+    input  wire [35:0] north_in,
+    output wire [35:0] north_out,
+    input  wire [35:0] nw_in,
+    output wire [35:0] nw_out,
+    input  wire [35:0] se_in,
+    output wire [35:0] se_out,
+    input  wire [35:0] south_in,
+    output wire [35:0] south_out,
+    input  wire [35:0] sw_in,
+    output wire [35:0] sw_out,
+    input  wire [35:0] west_in,
+    output wire [35:0] west_out
 );
     mesh_tile_gl u_gl (
         .boot_mode(boot_mode), .boot_wen(boot_wen),
@@ -432,11 +517,27 @@ async def test_dft_sweep(dut):
     dut.input_PAD.value = _DFT_MODE | _CS_N
     await ClockCycles(dut.clk_PAD, 4)
 
-    # Write phase — fill every tile
+    BANK0_VECTORS = [(a, d) for a, d in TEST_VECTORS if a < 0x400]
+    BANK1_VECTORS = [(a, d) for a, d in TEST_VECTORS if a >= 0x400]
+
+    # Write bank0 for all tiles first.
     for row, col, tile_id in ALL_TILES:
-        for addr, data in TEST_VECTORS:
+        for addr, data in BANK0_VECTORS:
             await dft_write(dut, tile_id, addr, data)
-        dut._log.info(f"  tile ({row},{col}): wrote {len(TEST_VECTORS)} locations")
+        dut._log.info(f"  tile ({row},{col}): wrote {len(BANK0_VECTORS)} bank0 locations")
+
+    # The boot_controller starts writing bank1 (addr >= 0x400) roughly 70k cycles after
+    # reset and takes another ~70k cycles to finish.  Wait here to ensure it has written
+    # every bank1 address before we do our DFT bank1 writes; otherwise the boot_controller
+    # will overwrite our test patterns and reads will return boot data (0x00).
+    dut._log.info("  waiting for boot_controller to finish bank1 writes...")
+    await ClockCycles(dut.clk_PAD, 60000)
+
+    # Write bank1 for all tiles.
+    for row, col, tile_id in ALL_TILES:
+        for addr, data in BANK1_VECTORS:
+            await dft_write(dut, tile_id, addr, data)
+        dut._log.info(f"  tile ({row},{col}): wrote {len(BANK1_VECTORS)} bank1 locations")
 
     # Read-back phase — verify every tile
     failures = []
