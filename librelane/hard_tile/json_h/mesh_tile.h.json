@@ -32884,7 +32884,7 @@
             "Y": [ 26469, 26470, 26471, 26472, 26473, 26474, 26475, 26476, 26477, 26478, 26479, 26480, 26481, 26482, 26483, 26484, 26485, 26486, 26487, 26488, 26489, 26490, 26491, 26492, 26493, 26494, 26495, 26496, 26497, 26498, 26499, 26500 ]
           }
         },
-        "$flatten\\sram2048.$not$/home/flee14/NoCNoC/src/sram2048x8_gf180.v:75$269": {
+        "$flatten\\sram2048.$not$/home/flee14/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:75$269": {
           "hide_name": 1,
           "type": "$not",
           "parameters": {
@@ -32893,7 +32893,7 @@
             "Y_WIDTH": "00000000000000000000000000000001"
           },
           "attributes": {
-            "src": "/home/flee14/NoCNoC/src/sram2048x8_gf180.v:75.27-75.36"
+            "src": "/home/flee14/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:75.27-75.36"
           },
           "port_directions": {
             "A": "input",
@@ -32904,7 +32904,7 @@
             "Y": [ 26502 ]
           }
         },
-        "$flatten\\sram2048.$or$/home/flee14/NoCNoC/src/sram2048x8_gf180.v:74$268": {
+        "$flatten\\sram2048.$or$/home/flee14/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:74$268": {
           "hide_name": 1,
           "type": "$or",
           "parameters": {
@@ -32915,7 +32915,7 @@
             "Y_WIDTH": "00000000000000000000000000000001"
           },
           "attributes": {
-            "src": "/home/flee14/NoCNoC/src/sram2048x8_gf180.v:74.20-74.37"
+            "src": "/home/flee14/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:74.20-74.37"
           },
           "port_directions": {
             "A": "input",
@@ -32928,7 +32928,7 @@
             "Y": [ 26504 ]
           }
         },
-        "$flatten\\sram2048.$or$/home/flee14/NoCNoC/src/sram2048x8_gf180.v:75$270": {
+        "$flatten\\sram2048.$or$/home/flee14/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:75$270": {
           "hide_name": 1,
           "type": "$or",
           "parameters": {
@@ -32939,7 +32939,7 @@
             "Y_WIDTH": "00000000000000000000000000000001"
           },
           "attributes": {
-            "src": "/home/flee14/NoCNoC/src/sram2048x8_gf180.v:75.20-75.37"
+            "src": "/home/flee14/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:75.20-75.37"
           },
           "port_directions": {
             "A": "input",
@@ -32960,7 +32960,7 @@
             "WIDTH": "00000000000000000000000000000001"
           },
           "attributes": {
-            "src": "/home/flee14/NoCNoC/src/sram2048x8_gf180.v:92.1-95.4"
+            "src": "/home/flee14/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:92.1-95.4"
           },
           "port_directions": {
             "CLK": "input",
@@ -32980,7 +32980,7 @@
             "WIDTH": "00000000000000000000000000000001"
           },
           "attributes": {
-            "src": "/home/flee14/NoCNoC/src/sram2048x8_gf180.v:93.9-93.13|/home/flee14/NoCNoC/src/sram2048x8_gf180.v:93.5-94.32"
+            "src": "/home/flee14/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:93.9-93.13|/home/flee14/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:93.5-94.32"
           },
           "port_directions": {
             "A": "input",
@@ -32995,14 +32995,14 @@
             "Y": [ 26506 ]
           }
         },
-        "$flatten\\sram2048.$ternary$/home/flee14/NoCNoC/src/sram2048x8_gf180.v:98$273": {
+        "$flatten\\sram2048.$ternary$/home/flee14/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:98$273": {
           "hide_name": 1,
           "type": "$mux",
           "parameters": {
             "WIDTH": "00000000000000000000000000001000"
           },
           "attributes": {
-            "src": "/home/flee14/NoCNoC/src/sram2048x8_gf180.v:98.12-98.42"
+            "src": "/home/flee14/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:98.12-98.42"
           },
           "port_directions": {
             "A": "input",
@@ -33436,7 +33436,7 @@
           "attributes": {
             "hdlname": "sram2048 u_bank0",
             "module_not_derived": "00000000000000000000000000000001",
-            "src": "/home/flee14/NoCNoC/src/sram2048x8_gf180.v:105.39-117.2"
+            "src": "/home/flee14/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:105.39-117.2"
           },
           "port_directions": {
             "A": "input",
@@ -33469,7 +33469,7 @@
           "attributes": {
             "hdlname": "sram2048 u_bank1",
             "module_not_derived": "00000000000000000000000000000001",
-            "src": "/home/flee14/NoCNoC/src/sram2048x8_gf180.v:120.39-132.2"
+            "src": "/home/flee14/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:120.39-132.2"
           },
           "port_directions": {
             "A": "input",
@@ -41451,14 +41451,14 @@
           "hide_name": 1,
           "bits": [ 26506 ],
           "attributes": {
-            "src": "/home/flee14/NoCNoC/src/sram2048x8_gf180.v:92.1-95.4"
+            "src": "/home/flee14/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:92.1-95.4"
           }
         },
-        "$flatten\\sram2048.$not$/home/flee14/NoCNoC/src/sram2048x8_gf180.v:75$269_Y": {
+        "$flatten\\sram2048.$not$/home/flee14/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:75$269_Y": {
           "hide_name": 1,
           "bits": [ 26502 ],
           "attributes": {
-            "src": "/home/flee14/NoCNoC/src/sram2048x8_gf180.v:75.27-75.36"
+            "src": "/home/flee14/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:75.27-75.36"
           }
         },
         "$not$/home/flee14/NoCNoC/src/mesh_psi_aan/mesh_tile.v:115$7_Y": {
@@ -43473,7 +43473,7 @@
           "bits": [ 26545, 26546, 26547, 26548, 26549, 26550, 26551, 26552, 26553, 26554, 26501 ],
           "attributes": {
             "hdlname": "sram2048 A",
-            "src": "/home/flee14/NoCNoC/src/sram2048x8_gf180.v:54.17-54.18"
+            "src": "/home/flee14/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:54.17-54.18"
           }
         },
         "sram2048.CEN": {
@@ -43481,7 +43481,7 @@
           "bits": [ 26503 ],
           "attributes": {
             "hdlname": "sram2048 CEN",
-            "src": "/home/flee14/NoCNoC/src/sram2048x8_gf180.v:51.17-51.20"
+            "src": "/home/flee14/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:51.17-51.20"
           }
         },
         "sram2048.D": {
@@ -43489,7 +43489,7 @@
           "bits": [ 26563, 26564, 26565, 26566, 26567, 26568, 26569, 26570 ],
           "attributes": {
             "hdlname": "sram2048 D",
-            "src": "/home/flee14/NoCNoC/src/sram2048x8_gf180.v:55.17-55.18"
+            "src": "/home/flee14/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:55.17-55.18"
           }
         },
         "sram2048.GWEN": {
@@ -43497,7 +43497,7 @@
           "bits": [ 26533 ],
           "attributes": {
             "hdlname": "sram2048 GWEN",
-            "src": "/home/flee14/NoCNoC/src/sram2048x8_gf180.v:52.17-52.21"
+            "src": "/home/flee14/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:52.17-52.21"
           }
         },
         "sram2048.bank_sel_q": {
@@ -43505,7 +43505,7 @@
           "bits": [ 26507 ],
           "attributes": {
             "hdlname": "sram2048 bank_sel_q",
-            "src": "/home/flee14/NoCNoC/src/sram2048x8_gf180.v:91.5-91.15"
+            "src": "/home/flee14/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:91.5-91.15"
           }
         },
         "sram2048.cen_bank0": {
@@ -43513,7 +43513,7 @@
           "bits": [ 26504 ],
           "attributes": {
             "hdlname": "sram2048 cen_bank0",
-            "src": "/home/flee14/NoCNoC/src/sram2048x8_gf180.v:72.13-72.22"
+            "src": "/home/flee14/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:72.13-72.22"
           }
         },
         "sram2048.cen_bank1": {
@@ -43521,7 +43521,7 @@
           "bits": [ 26505 ],
           "attributes": {
             "hdlname": "sram2048 cen_bank1",
-            "src": "/home/flee14/NoCNoC/src/sram2048x8_gf180.v:73.13-73.22"
+            "src": "/home/flee14/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:73.13-73.22"
           }
         },
         "sram2048.q_bank0": {
@@ -43529,7 +43529,7 @@
           "bits": [ 26508, 26509, 26510, 26511, 26512, 26513, 26514, 26515 ],
           "attributes": {
             "hdlname": "sram2048 q_bank0",
-            "src": "/home/flee14/NoCNoC/src/sram2048x8_gf180.v:78.12-78.19"
+            "src": "/home/flee14/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:78.12-78.19"
           }
         },
         "sram2048.q_bank1": {
@@ -43537,7 +43537,7 @@
           "bits": [ 26516, 26517, 26518, 26519, 26520, 26521, 26522, 26523 ],
           "attributes": {
             "hdlname": "sram2048 q_bank1",
-            "src": "/home/flee14/NoCNoC/src/sram2048x8_gf180.v:79.12-79.19"
+            "src": "/home/flee14/NoCNoC/src/subservient/rtl/sram2048x8_gf180.v:79.12-79.19"
           }
         },
         "sram_active": {

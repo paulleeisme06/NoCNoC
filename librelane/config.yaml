@@ -291,18 +291,24 @@ MACROS:
       # RUN_2026-06-03_01-56-59): PSM-0040 "All shapes connected" on BOTH nets.
       # stride 1042.72 (= 14·74.48), exact site/row multiple → every tile shares
       # the same X/Y phase. Channels unchanged from the routable placement.
-      i_chip_core.u_mesh.rows[0].cols[0].tile_inst: { location: [547.68,  3641.68], orientation: N }
-      i_chip_core.u_mesh.rows[0].cols[1].tile_inst: { location: [1590.40, 3641.68], orientation: N }
-      i_chip_core.u_mesh.rows[0].cols[2].tile_inst: { location: [2633.12, 3641.68], orientation: N }
-      i_chip_core.u_mesh.rows[1].cols[0].tile_inst: { location: [547.68,  2598.96], orientation: N }
-      i_chip_core.u_mesh.rows[1].cols[1].tile_inst: { location: [1590.40, 2598.96], orientation: N }
-      i_chip_core.u_mesh.rows[1].cols[2].tile_inst: { location: [2633.12, 2598.96], orientation: N }
-      i_chip_core.u_mesh.rows[2].cols[0].tile_inst: { location: [547.68,  1556.24], orientation: N }
-      i_chip_core.u_mesh.rows[2].cols[1].tile_inst: { location: [1590.40, 1556.24], orientation: N }
-      i_chip_core.u_mesh.rows[2].cols[2].tile_inst: { location: [2633.12, 1556.24], orientation: N }
-      i_chip_core.u_mesh.rows[3].cols[0].tile_inst: { location: [547.68,  513.52],  orientation: N }
-      i_chip_core.u_mesh.rows[3].cols[1].tile_inst: { location: [1590.40, 513.52],  orientation: N }
-      i_chip_core.u_mesh.rows[3].cols[2].tile_inst: { location: [2633.12, 513.52],  orientation: N }
+      # RING TILE re-tune: rows shifted +19.6 µm (+5 rows) from the non-ring
+      # placement. The ring's perimeter M5 rail perturbed the original VSS
+      # top-edge bridge; this offset re-aligns BOTH nets' edge-bridges to the
+      # ring tile. Verified in-session (move tiles + pdngen + check_power_grid
+      # on RUN_2026-06-04_22-16-02): VDD=0 and VSS=0 unconnected, and the VSS
+      # bridge connects across rows +3…+13, so +5 is well inside the window.
+      i_chip_core.u_mesh.rows[0].cols[0].tile_inst: { location: [547.68,  3661.28], orientation: N }
+      i_chip_core.u_mesh.rows[0].cols[1].tile_inst: { location: [1590.40, 3661.28], orientation: N }
+      i_chip_core.u_mesh.rows[0].cols[2].tile_inst: { location: [2633.12, 3661.28], orientation: N }
+      i_chip_core.u_mesh.rows[1].cols[0].tile_inst: { location: [547.68,  2618.56], orientation: N }
+      i_chip_core.u_mesh.rows[1].cols[1].tile_inst: { location: [1590.40, 2618.56], orientation: N }
+      i_chip_core.u_mesh.rows[1].cols[2].tile_inst: { location: [2633.12, 2618.56], orientation: N }
+      i_chip_core.u_mesh.rows[2].cols[0].tile_inst: { location: [547.68,  1575.84], orientation: N }
+      i_chip_core.u_mesh.rows[2].cols[1].tile_inst: { location: [1590.40, 1575.84], orientation: N }
+      i_chip_core.u_mesh.rows[2].cols[2].tile_inst: { location: [2633.12, 1575.84], orientation: N }
+      i_chip_core.u_mesh.rows[3].cols[0].tile_inst: { location: [547.68,  533.12],  orientation: N }
+      i_chip_core.u_mesh.rows[3].cols[1].tile_inst: { location: [1590.40, 533.12],  orientation: N }
+      i_chip_core.u_mesh.rows[3].cols[2].tile_inst: { location: [2633.12, 533.12],  orientation: N }
 
 # Hierarchical: connect every mesh_tile macro's VDD/VSS pins to chip nets.
 # A single wildcard regex matches all 16 tile_inst instances at once —

@@ -27,11 +27,10 @@ module mesh_rxc #(
     output wire        flash_mosi,
 
     input  wire        dft_mode,
-    // TODO(team): dft_tile_id is 4-bit ({2'(row), 2'(col)}). For 5×4 mesh,
-    // row 4 aliases to row 0 in DFT mode (rows 0–3 work normally). Chip operates
-    // fine in normal mode; only DFT debug of row 4 is affected. Fixing requires
-    // widening to 5-bit AND updating the SPI debug frame in spi_debug.v, which
-    // means coordinating with the host-side firmware. Defer until ready.
+    // dft_tile_id is 4-bit ({2'(row), 2'(col)}). For this 4×3 mesh (rows 0–3,
+    // cols 0–2) all 12 tiles are fully addressable for both DFT write and read.
+    // NOTE: scaling to 5+ rows would need a 5-bit id (2 row bits saturate at 3)
+    // plus a matching SPI debug frame in spi_debug.v / host firmware.
     input  wire [3:0]  dft_tile_id,
     input  wire        dft_we,
     input  wire [10:0] dft_addr,
@@ -102,6 +101,9 @@ module mesh_rxc #(
             4'b1000: dft_rdata_r = tile_dft_rdata[2][0];
             4'b1001: dft_rdata_r = tile_dft_rdata[2][1];
             4'b1010: dft_rdata_r = tile_dft_rdata[2][2];
+            4'b1100: dft_rdata_r = tile_dft_rdata[3][0];
+            4'b1101: dft_rdata_r = tile_dft_rdata[3][1];
+            4'b1110: dft_rdata_r = tile_dft_rdata[3][2];
             default: dft_rdata_r = 8'h0;
         endcase
     end

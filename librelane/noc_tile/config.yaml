@@ -59,15 +59,20 @@ PL_TARGET_DENSITY_PCT: 65
 FP_MACRO_HORIZONTAL_HALO: 0
 FP_MACRO_VERTICAL_HALO: 0
 
-PDN_CORE_RING: False
+# RING EXPERIMENT (branch ring-tile-experiment): harden the tile WITH an M4/M5
+# core ring, while KEEPING the boundary pins (PDN_EXTEND_TO: boundary below) so
+# the chip's edge-bridge still has something to connect to. The ring is internal
+# robustness; the chip connection is unchanged.
+PDN_CORE_RING: True
 
-
-# Fix 1: Core ring overflow → PDN-0239 → PSM-0069
 # Die-to-core gap is 10µm. Ring needs offset + width + spacing + width.
-# PDK default offset=6 → 6+1.6+1.7+1.6=10.9µm which overflows by 0.9µm.
-# Reducing offset to 3 → 3+1.6+1.7+1.6=7.9µm fits within the 10µm gap.
-#PDN_CORE_RING_VOFFSET: 3
-#PDN_CORE_RING_HOFFSET: 3
+# offset 3 + 1.6 + 1.7 + 1.6 = 7.9µm → fits within the 10µm gap (avoids PDN-0239).
+PDN_CORE_RING_VWIDTH: 1.6
+PDN_CORE_RING_HWIDTH: 1.6
+PDN_CORE_RING_VSPACING: 1.7
+PDN_CORE_RING_HSPACING: 1.7
+PDN_CORE_RING_VOFFSET: 3
+PDN_CORE_RING_HOFFSET: 3
 
 # specify both vertical m2 and horizonstal m3 stripes to the stdcell grid
 PDN_MULTILAYER: true
