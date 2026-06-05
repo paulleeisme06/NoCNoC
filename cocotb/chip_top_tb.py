@@ -115,27 +115,117 @@ def prepare_gl_tile_sources(nl_path: Path, build_dir: Path):
     # directly from A[10], matching the RTL simulation behaviour.
     nl_text = nl_path.read_text()
     nl_renamed = re.sub(r'\bmodule\s+mesh_tile\b', 'module mesh_tile_gl', nl_text)
-    # Patch the mux: replace the one instance where B drives bank_sel_q's D
-    # (B=bank_sel_cap) with B=A[10].  The replacement is exact-string safe
-    # because the mux also has A=bank_sel_q on the next line.
-    nl_renamed = nl_renamed.replace(
-        '.B(\\sram2048.bank_sel_cap ),\n    .A(\\sram2048.bank_sel_q ),\n    .Y(_0211_))',
-        '.B(\\sram2048.A[10] ),\n    .A(\\sram2048.bank_sel_q ),\n    .Y(_0211_))'
-    )
+    # bank_sel_cap GL patch
+    #
+    # The RTL sram2048x8_gf180.v uses a BLOCKING assignment for bank_sel_cap:
+    #   always @(posedge CLK) bank_sel_cap = bank_sel;  // active-region capture
+    #   assign cen_bank0 = CEN | bank_sel_cap;
+    # Because it is blocking, bank_sel_cap is set in the active region (before
+    # NBA) and stays frozen through the 100 ps clk_dly window.  The SRAM model's
+    # "marked_a = A" is also blocking (active region), so both capture the same
+    # pre-NBA A value — cen_bank and marked_a are always in sync.
+    #
+    # Synthesis drops bank_sel_cap and replaces it with combinational _0709_
+    # (effective A[10]).  In GL simulation _0709_ updates in the NBA region when
+    # SERV's synthesised FFs latch new addresses.  By the time clk_dly (+100 ps)
+    # fires, _0709_ already reflects the POST-NBA address while marked_a still
+    # holds the pre-NBA address → bank mismatch → SERV RF reads return garbage.
+    #
+    # Fix (two parts):
+    #
+    # Part 1 — re-create bank_sel_cap as a blocking-assignment cell.
+    #   bank_sel_cap_cell captures _0709_ in the Verilog active region, just
+    #   like the RTL blocking assignment, freezing the value through NBA/clk_dly.
+    #   Initialised to 0 → CEN_bank0 starts inactive (=1) so the first DFT
+    #   access produces a clean 1→0 transition and cen_fell fires correctly.
+    #   The cell is clocked by clknet_1_0__leaf_clk (u_bank0's CTS leaf).
+    #   hold1193 is redirected from _0709_ → bank_sel_cap_gl output.
+    #
+    # Part 2 — initialise bank_sel_q (Q-mux select) FF to 0.
+    #   The dfxtp_2 driving bank_sel_q has no reset; starts as X in GL sim.
+    #   X propagates through the output mux, making DFT reads return X/0.
+    #   Replace the cell with dfxtp_2_bsq_init0 (identical, but state=0 init).
+    BSQ_PATCH_PREFIX = """\
+// GL patch cell 1: re-creates sram2048 bank_sel_cap using a blocking FF so
+// CEN is frozen at the pre-NBA A[10] value during the 100 ps clk_dly window,
+// matching the RTL sram2048x8_gf180.v blocking-assignment behaviour.
+module bank_sel_cap_cell (CLK, D, Q);
+  input CLK, D; output Q;
+  reg state = 1'b0;
+  always @(posedge CLK) state = D;  // BLOCKING: captures D in active region
+  assign Q = state;
+endmodule
+// GL patch cell 2: dfxtp_2 for bank_sel_q initialised to 0.
+module dfxtp_2_bsq_init0 (CLK, D, Q);
+  input CLK, D; output Q;
+  reg state = 1'b0;
+  always @(posedge CLK) state <= D;
+  assign Q = state;
+endmodule
+"""
+    if 'hold1193 (.A(_0709_)' in nl_renamed:
+        # Part 1a: redirect hold1193 from _0709_ to bsc_gl_q (plain wire name,
+        # no escaped hierarchy — avoids forward-reference issues in Icarus).
+        nl_renamed = nl_renamed.replace(
+            'hold1193 (.A(_0709_),',
+            'hold1193 (.A(bsc_gl_q ),'
+        )
+        if 'hold1193 (.A(_0709_),' in nl_renamed:
+            raise RuntimeError(
+                "bank_sel_cap GL patch (part 1a) did not apply — "
+                "hold1193 pattern changed, update prepare_gl_tile_sources()"
+            )
+        # Part 1b: insert wire declaration + bank_sel_cap_cell instance BEFORE
+        # hold1193's first use so the wire is always declared before its use.
+        _hold1193_idx = nl_renamed.find('hold1193 (.A(bsc_gl_q ')
+        if _hold1193_idx == -1:
+            raise RuntimeError("bank_sel_cap GL patch: hold1193 not found after rename")
+        # Find start of that line
+        _line_start = nl_renamed.rfind('\n', 0, _hold1193_idx) + 1
+        _bsc_decl = (
+            ' wire bsc_gl_q;\n'
+            ' bank_sel_cap_cell bsc_gl_inst (.CLK(clknet_1_0__leaf_clk),'
+            '.D(_0709_),.Q(bsc_gl_q));\n'
+        )
+        nl_renamed = nl_renamed[:_line_start] + _bsc_decl + nl_renamed[_line_start:]
+
+        # Part 2: swap dfxtp_2 driving bank_sel_q for the initialised variant
+        _bsq_q_marker = r'\sram2048.bank_sel_q ));'
+        _cell_type     = 'gf180mcu_as_sc_mcu7t3v3__dfxtp_2'
+        _bsq_q_idx  = nl_renamed.find(_bsq_q_marker)
+        _bsq_ct_idx = nl_renamed.rfind(_cell_type, 0, _bsq_q_idx) if _bsq_q_idx != -1 else -1
+        if _bsq_ct_idx == -1:
+            raise RuntimeError(
+                "bank_sel_cap GL patch (part 2) did not apply — "
+                "bank_sel_q dfxtp_2 not found, update prepare_gl_tile_sources()"
+            )
+        nl_renamed = (
+            nl_renamed[:_bsq_ct_idx]
+            + 'dfxtp_2_bsq_init0'
+            + nl_renamed[_bsq_ct_idx + len(_cell_type):]
+        )
+        nl_renamed = BSQ_PATCH_PREFIX + nl_renamed
+
+    # Legacy patch for older netlists that synthesised an explicit bank_sel_cap FF
+    # giving a 2-cycle delay on bank_sel_q.
+    elif r'\sram2048.bank_sel_cap ' in nl_renamed:
+        nl_renamed = nl_renamed.replace(
+            '.B(\\sram2048.bank_sel_cap ),\n    .A(\\sram2048.bank_sel_q ),\n    .Y(_0211_))',
+            '.B(\\sram2048.A[10] ),\n    .A(\\sram2048.bank_sel_q ),\n    .Y(_0211_))'
+        )
+
     renamed_path = build_dir / "mesh_tile_gl.nl.v"
     renamed_path.write_text(nl_renamed)
-    # Verify the patch applied (detect netlist layout changes between runs)
-    if r'\sram2048.bank_sel_cap ),\n    .A(\sram2048.bank_sel_q ),\n    .Y(_0211_))' in nl_renamed:
-        raise RuntimeError(
-            "bank_sel_q netlist patch did not apply — "
-            "netlist layout changed, update the patch in prepare_gl_tile_sources()"
-        )
 
     # 2. Build wrapper with TILE_ID param + full port passthrough
     wrapper = """\
-// Auto-generated wrapper: adds TILE_ID parameter dropped by synthesis.
-// TILE_ID is accepted but unused — post-synthesis the value is baked in.
-module mesh_tile #(parameter [3:0] TILE_ID = 0) (
+// Auto-generated wrapper: adds parameters dropped by synthesis.
+// All parameters are accepted but unused — post-synthesis values are baked in.
+module mesh_tile #(
+    parameter [5:0]   TILE_ID = 0,
+    parameter integer MESH_R  = 3,
+    parameter integer MESH_C  = 3
+) (
     input  wire        boot_mode,
     input  wire        boot_wen,
     input  wire        clk,
@@ -148,22 +238,22 @@ module mesh_tile #(parameter [3:0] TILE_ID = 0) (
     input  wire [10:0] dft_addr,
     output wire  [7:0] dft_rdata,
     input  wire  [7:0] dft_wdata,
-    input  wire [33:0] east_in,
-    output wire [33:0] east_out,
-    input  wire [33:0] ne_in,
-    output wire [33:0] ne_out,
-    input  wire [33:0] north_in,
-    output wire [33:0] north_out,
-    input  wire [33:0] nw_in,
-    output wire [33:0] nw_out,
-    input  wire [33:0] se_in,
-    output wire [33:0] se_out,
-    input  wire [33:0] south_in,
-    output wire [33:0] south_out,
-    input  wire [33:0] sw_in,
-    output wire [33:0] sw_out,
-    input  wire [33:0] west_in,
-    output wire [33:0] west_out
+    input  wire [35:0] east_in,
+    output wire [35:0] east_out,
+    input  wire [35:0] ne_in,
+    output wire [35:0] ne_out,
+    input  wire [35:0] north_in,
+    output wire [35:0] north_out,
+    input  wire [35:0] nw_in,
+    output wire [35:0] nw_out,
+    input  wire [35:0] se_in,
+    output wire [35:0] se_out,
+    input  wire [35:0] south_in,
+    output wire [35:0] south_out,
+    input  wire [35:0] sw_in,
+    output wire [35:0] sw_out,
+    input  wire [35:0] west_in,
+    output wire [35:0] west_out
 );
     mesh_tile_gl u_gl (
         .boot_mode(boot_mode), .boot_wen(boot_wen),
@@ -236,9 +326,7 @@ def chip_top_runner():
         proj_path / "../ip/gf180mcu_ws_ip__id/vh/gf180mcu_ws_ip__id.v",
         proj_path / "../ip/gf180mcu_ws_ip__logo/vh/gf180mcu_ws_ip__logo.v",
 
-        # Ethan: Added these files:
         proj_path / "../src/dft_ethan/spi_debug.v",
-        proj_path / "../src/dft_ethan/gf180mcu_fd_ip_sram__sram2048x8m8wm1.v",
         proj_path / "../src/mesh_psi_aan/mesh_rxc.v",
         # mesh_tile: use synthesized netlist in GL_TILE mode, RTL otherwise
         *(
@@ -253,7 +341,7 @@ def chip_top_runner():
         # In GL_TILE mode the synthesized netlist replaces all subservient/serv RTL
         *([] if gl_tile else [
             *sorted(f for f in (proj_path / "../src/subservient/rtl").glob("*.v")
-                    if "sram1024x8" not in f.name and "sram2048" not in f.name),
+                    if "sram1024x8" not in f.name and "gf180mcu_fd_ip_sram__sram2048x8m8wm1" not in f.name),
             *sorted((proj_path / "../src/serv/rtl").glob("*.v")),
             *sorted((proj_path / "../src/serv/servile").glob("*.v")),
         ]),
@@ -418,19 +506,38 @@ async def test_dft_sweep(dut):
         (2, 0, 0b1000), (2, 1, 0b1001), (2, 2, 0b1010),
     ]
     TEST_VECTORS = [
-        (0x000, 0xA5),  # low address,  alternating bits
-        (0x1FF, 0x5A),  # mid address,  inverse alternating
-        (0x3FE, 0xFF),  # high address, all ones
+        (0x000, 0xA5),  # bank0 low address,  alternating bits
+        (0x1FF, 0x5A),  # bank0 mid address,  inverse alternating
+        (0x3FE, 0xFF),  # bank0 high address, all ones
+        (0x400, 0xA5),  # bank1 low address,  alternating bits
+        (0x5FF, 0x5A),  # bank1 mid address,  inverse alternating
+        (0x7FE, 0xFF),  # bank1 high address, all ones
     ]
 
     dut.input_PAD.value = _DFT_MODE | _CS_N
     await ClockCycles(dut.clk_PAD, 4)
 
-    # Write phase — fill every tile
+    BANK0_VECTORS = [(a, d) for a, d in TEST_VECTORS if a < 0x400]
+    BANK1_VECTORS = [(a, d) for a, d in TEST_VECTORS if a >= 0x400]
+
+    # Write bank0 for all tiles first.
     for row, col, tile_id in ALL_TILES:
-        for addr, data in TEST_VECTORS:
+        for addr, data in BANK0_VECTORS:
             await dft_write(dut, tile_id, addr, data)
-        dut._log.info(f"  tile ({row},{col}): wrote {len(TEST_VECTORS)} locations")
+        dut._log.info(f"  tile ({row},{col}): wrote {len(BANK0_VECTORS)} bank0 locations")
+
+    # The boot_controller starts writing bank1 (addr >= 0x400) roughly 70k cycles after
+    # reset and takes another ~70k cycles to finish.  Wait here to ensure it has written
+    # every bank1 address before we do our DFT bank1 writes; otherwise the boot_controller
+    # will overwrite our test patterns and reads will return boot data (0x00).
+    dut._log.info("  waiting for boot_controller to finish bank1 writes...")
+    await ClockCycles(dut.clk_PAD, 60000)
+
+    # Write bank1 for all tiles.
+    for row, col, tile_id in ALL_TILES:
+        for addr, data in BANK1_VECTORS:
+            await dft_write(dut, tile_id, addr, data)
+        dut._log.info(f"  tile ({row},{col}): wrote {len(BANK1_VECTORS)} bank1 locations")
 
     # Read-back phase — verify every tile
     failures = []
@@ -505,38 +612,57 @@ async def test_dft_boot_hello(dut):
     dut.input_PAD.value = _DFT_MODE | _CS_N
     await ClockCycles(dut.clk_PAD, 4)
 
-    # Step 2: write the hand-assembled RISC-V program byte-by-byte via DFT.
-    # Each instruction is 4 bytes, little-endian (LSB at lower address).
+    # Step 2: write a "Hello World" RISC-V program byte-by-byte via DFT.
+    # 25 instructions × 4 bytes = 100 bytes at SRAM[0x000..0x063].
+    # Uses only LUI (no source regs) and ADDI to avoid the x0/regzero issue.
+    # Each character is built by incrementing/decrementing a1 from the previous.
     #
-    # Deliberately avoid reading x0 (zero register). In SERV, regzero
-    # (the hardware x0=0 override) requires i_raddr >= 0xFC, but the max
-    # RF address with rf_regs=36 is 0x8F — so regzero never fires and x0
-    # reads from SRAM. The RF area may hold garbage before it is zeroed,
-    # so any instruction that reads x0 can compute a wrong result.
-    # Using LUI (U-type, no source register) sidesteps this entirely.
-    #
-    #   PC 0x000: 0x00000537 = lui  a0, 0          # a0 = 0 (no rs1)
-    #   PC 0x004: 0x20050513 = addi a0, a0, 0x200  # a0 = 0x200
-    #   PC 0x008: 0x000005B7 = lui  a1, 0          # a1 = 0 (no rs1)
-    #   PC 0x00C: 0x04858593 = addi a1, a1, 0x48   # a1 = 0x48 ('H')
-    #   PC 0x010: 0x00B50023 = sb   a1, 0(a0)      # SRAM[0x200] = 'H'
-    #   PC 0x014: 0x0000006F = jal  zero, 0        # spin
-    #
-    # SRAM layout (servile_rf_mem_if, aw=11):
-    #   Physical 0x000-0x76F = program + data (CPU byte addr = physical addr)
-    #   Physical 0x770-0x7FF = SERV register file (bitwise-NOT mapping, top of SRAM)
-    # CPU PC=0 → physical SRAM[0x000]. CPU data addr 0x200 → physical SRAM[0x200].
-    PROG_BASE   = 0x000  # physical SRAM address where CPU PC=0 fetches
+    #   PC 0x000: lui  a0, 0           # a0 = 0
+    #   PC 0x004: addi a0, a0, 0x200   # a0 = 0x200  (destination base)
+    #   PC 0x008: lui  a1, 0           # a1 = 0
+    #   PC 0x00C: addi a1, a1, 0x48   # a1 = 'H' (0x48)
+    #   PC 0x010: sb   a1,  0(a0)     # SRAM[0x200] = 'H'
+    #   PC 0x014: addi a1, a1, 0x1D   # a1 = 'e' (0x65)
+    #   PC 0x018: sb   a1,  1(a0)     # SRAM[0x201] = 'e'
+    #   PC 0x01C: addi a1, a1, 0x07   # a1 = 'l' (0x6C)
+    #   PC 0x020: sb   a1,  2(a0)     # SRAM[0x202] = 'l'
+    #   PC 0x024: sb   a1,  3(a0)     # SRAM[0x203] = 'l'
+    #   PC 0x028: addi a1, a1, 0x03   # a1 = 'o' (0x6F)
+    #   PC 0x02C: sb   a1,  4(a0)     # SRAM[0x204] = 'o'
+    #   PC 0x030: addi a1, a1, -79    # a1 = ' ' (0x20)
+    #   PC 0x034: sb   a1,  5(a0)     # SRAM[0x205] = ' '
+    #   PC 0x038: addi a1, a1, 0x37   # a1 = 'W' (0x57)
+    #   PC 0x03C: sb   a1,  6(a0)     # SRAM[0x206] = 'W'
+    #   PC 0x040: addi a1, a1, 0x18   # a1 = 'o' (0x6F)
+    #   PC 0x044: sb   a1,  7(a0)     # SRAM[0x207] = 'o'
+    #   PC 0x048: addi a1, a1, 0x03   # a1 = 'r' (0x72)
+    #   PC 0x04C: sb   a1,  8(a0)     # SRAM[0x208] = 'r'
+    #   PC 0x050: addi a1, a1, -6     # a1 = 'l' (0x6C)
+    #   PC 0x054: sb   a1,  9(a0)     # SRAM[0x209] = 'l'
+    #   PC 0x058: addi a1, a1, -8     # a1 = 'd' (0x64)
+    #   PC 0x05C: sb   a1, 10(a0)     # SRAM[0x20A] = 'd'
+    #   PC 0x060: jal  zero, 0        # spin
+    PROG_BASE    = 0x000
+    RESULT_ADDR  = 0x200
+    EXPECTED     = 0x48   # 'H'
+    # 6-instruction program using LUI (U-type, no source registers) so neither
+    # a0 nor a1 ever reads from the RF.  SERV's regzero override does NOT fire
+    # at runtime — x0 reads come from SRAM and may be garbage — so addi with
+    # x0 as source is unreliable.
+    #   lui  a0, 0            a0 = 0
+    #   addi a0, a0, 0x200   a0 = 0x200
+    #   lui  a1, 0            a1 = 0
+    #   addi a1, a1, 0x48    a1 = 'H'
+    #   sb   a1, 0(a0)        SRAM[0x200] = 'H'
+    #   jal  zero, 0          spin
     HELLO_PROG = [
-        0x37, 0x05, 0x00, 0x00,  # lui  a0, 0
-        0x13, 0x05, 0x05, 0x20,  # addi a0, a0, 0x200
-        0xB7, 0x05, 0x00, 0x00,  # lui  a1, 0
-        0x93, 0x85, 0x85, 0x04,  # addi a1, a1, 0x48  ('H')
-        0x23, 0x00, 0xB5, 0x00,  # sb   a1, 0(a0)
-        0x6F, 0x00, 0x00, 0x00,  # jal  zero, 0
+        0x37, 0x05, 0x00, 0x00,  # lui  a0, 0           a0 = 0
+        0x13, 0x05, 0x05, 0x20,  # addi a0, a0, 0x200   a0 = 0x200
+        0xB7, 0x05, 0x00, 0x00,  # lui  a1, 0           a1 = 0
+        0x93, 0x05, 0x85, 0x04,  # addi a1, a1, 0x48    a1 = 'H'
+        0x23, 0x00, 0xB5, 0x00,  # sb   a1, 0(a0)       SRAM[0x200] = 'H'
+        0x6F, 0x00, 0x00, 0x00,  # jal  zero, 0         spin
     ]
-    RESULT_ADDR = 0x200  # physical SRAM addr = CPU data addr (direct mapping)
-    EXPECTED    = 0x48   # 'H'
 
     dut._log.info("Writing RISC-V hello-world program to tile(0,0) via DFT...")
     for i, byte in enumerate(HELLO_PROG):
@@ -554,7 +680,7 @@ async def test_dft_boot_hello(dut):
             f"Program verify failed at SRAM[0x{phys:03X}]: "
             f"wrote 0x{expected_byte:02X}, read back 0x{got:02X}"
         )
-    dut._log.info("Program verified — all 24 bytes match.")
+    dut._log.info(f"Program verified — all {len(HELLO_PROG)} bytes match.")
 
     # Step 3: wait for boot_controller to finish its flash-read sequence.
     # Timing: IDLE(1) + CMD(24) + ADDR(72) + 2048×(READ32+WRITE2) = 69729 cycles.
@@ -628,15 +754,27 @@ async def test_dft_boot_hello(dut):
     await dft_read(dut, tile_id=0b0000, addr=0x000)
     dut._log.info("bank_sel_q reset to 0 (bank0 touch done).")
 
+    # Pre-release diagnostics
+    a0_pre = await dft_read(dut, tile_id=0b0000, addr=0x7D7)
+    dut._log.info(f"PRE-RELEASE: SRAM[0x7D7] (a0 LSB RF) = 0x{a0_pre:02X}  (expect 0x00)")
+    a0_pre_b1 = await dft_read(dut, tile_id=0b0000, addr=0x7D6)
+    dut._log.info(f"PRE-RELEASE: SRAM[0x7D6] (a0 byte1 RF) = 0x{a0_pre_b1:02X}  (expect 0x00)")
+    prog0_pre = await dft_read(dut, tile_id=0b0000, addr=0x000)
+    dut._log.info(f"PRE-RELEASE: SRAM[0x000] (first program byte) = 0x{prog0_pre:02X}  (expect 0x37)")
+
+    # Write a sentinel to SRAM[0x200] so we can tell if the store wrote there.
+    # 0x00 = nothing happened; 0x48 = store wrote 'H'; 0xAA = store never ran.
+    await dft_write(dut, tile_id=0b0000, addr=0x200, data=0xAA)
+    dut._log.info("Sentinel 0xAA written to SRAM[0x200] — will be 0x48 if store ran correctly")
+
     # Step 4: release dft_mode — SERV sees rst=0, boot_mode=0, dft_mode=0 → runs!
     dut.input_PAD.value = _CS_N
     dut._log.info("Released dft_mode — SERV core now executing (PC=0 → phys SRAM[0x000])...")
 
-    # Step 5: give SERV time to execute the 5-instruction program (+ spin).
-    # SERV is bit-serial; RF and instruction memory share one SRAM via
-    # servile_rf_mem_if, so each instruction takes ~100-300 cycles with
-    # arbitration. 10000 cycles gives >5× margin for 5 instructions.
-    await ClockCycles(dut.clk_PAD, 10000)
+    # Step 5: give SERV time to execute the 6-instruction program (+ spin).
+    # SERV is bit-serial; each instruction takes ~100-300 cycles.
+    # 50000 cycles gives ample margin.
+    await ClockCycles(dut.clk_PAD, 50000)
 
     # Step 6: re-assert dft_mode to stop the core and take back SRAM
     dut.input_PAD.value = _DFT_MODE | _CS_N
@@ -649,14 +787,35 @@ async def test_dft_boot_hello(dut):
     # a1 (x11=11): i_raddr 0x2C-0x2F → SRAM 0x7D3(byte0), 0x7D2, 0x7D1, 0x7D0(byte3)
     a0_b = [await dft_read(dut, 0b0000, a) for a in (0x7D7, 0x7D6, 0x7D5, 0x7D4)]
     a0_val = a0_b[0] | (a0_b[1] << 8) | (a0_b[2] << 16) | (a0_b[3] << 24)
-    dut._log.info(f"RF a0 = 0x{a0_val:08x}  bytes(lsb→msb)={[f'0x{b:02x}' for b in a0_b]}")
+    dut._log.info(f"RF a0@0x7D7 = 0x{a0_val:08x}  (if a0=0x200 expect 0x00,0x02,0x00,0x00)")
     a1_b = [await dft_read(dut, 0b0000, a) for a in (0x7D3, 0x7D2, 0x7D1, 0x7D0)]
     a1_val = a1_b[0] | (a1_b[1] << 8) | (a1_b[2] << 16) | (a1_b[3] << 24)
-    dut._log.info(f"RF a1 = 0x{a1_val:08x}  bytes(lsb→msb)={[f'0x{b:02x}' for b in a1_b]}")
+    dut._log.info(f"RF a1@0x7D3 = 0x{a1_val:08x}  (if a1=0x48 expect 0x48,0x00,0x00,0x00)")
+    # Also check shifted RF addresses (-0x10) in case SERV's write address is offset
+    a0s_b = [await dft_read(dut, 0b0000, a) for a in (0x7C7, 0x7C6, 0x7C5, 0x7C4)]
+    a0s_val = a0s_b[0] | (a0s_b[1] << 8) | (a0s_b[2] << 16) | (a0s_b[3] << 24)
+    dut._log.info(f"RF a0@0x7C7 = 0x{a0s_val:08x}  (non-zero → SERV RF write is shifted -0x10)")
+    a1s_b = [await dft_read(dut, 0b0000, a) for a in (0x7C3, 0x7C2, 0x7C1, 0x7C0)]
+    a1s_val = a1s_b[0] | (a1s_b[1] << 8) | (a1s_b[2] << 16) | (a1s_b[3] << 24)
+    dut._log.info(f"RF a1@0x7C3 = 0x{a1s_val:08x}  (non-zero → SERV RF write is shifted -0x10)")
     prog0 = await dft_read(dut, 0b0000, 0x000)
     dut._log.info(f"SRAM[0x000] = 0x{prog0:02x} (expect 0x37 = first byte of lui a0,0)")
 
-    # Step 7: read back the result
+    # Diagnostic: if a0 was wrong (e.g. 0x050), the sb instructions landed there
+    sram_050 = [await dft_read(dut, 0b0000, 0x050 + i) for i in range(11)]
+    sram_050_str = "".join(chr(b) if 32 <= b < 127 else f"\\x{b:02x}" for b in sram_050)
+    dut._log.info(f"SRAM[0x050..0x05A] = {repr(sram_050_str)}  (non-empty → sb wrote to wrong addr, a0 was 0x50)")
+
+    # Diagnostic: bank0 mirror of bank1 a0-LSB address (0x7D7 in bank1 = 0x3D7 in bank0)
+    # If SERV's RF writes went to bank0 instead of bank1, a0 byte0 would be here
+    sram_3d7 = await dft_read(dut, 0b0000, 0x3D7)
+    dut._log.info(f"SRAM[0x3D7] (bank0 mirror of a0-LSB RF slot) = 0x{sram_3d7:02x}  (0x50 → RF write hit bank0 instead of bank1)")
+
+    # Diagnostic: check where the store landed
+    sram_050 = await dft_read(dut, 0b0000, 0x050)
+    dut._log.info(f"SRAM[0x050] = 0x{sram_050:02X}  (non-zero → sb wrote here, a0 was 0x50)")
+
+    # Step 7: read back 'H' from SRAM[0x200] via DFT
     result = await dft_read(dut, tile_id=0b0000, addr=RESULT_ADDR)
     dut._log.info(
         f"SRAM[0x{RESULT_ADDR:03X}] = 0x{result:02X}  "
@@ -666,7 +825,7 @@ async def test_dft_boot_hello(dut):
     dut.input_PAD.value = _CS_N
     assert result == EXPECTED, \
         f"DFT boot failed: expected 0x{EXPECTED:02X} ('{chr(EXPECTED)}'), got 0x{result:02X}"
-    dut._log.info("test_dft_boot_hello PASSED — SERV booted via DFT and wrote 'H' to SRAM!")
+    dut._log.info("test_dft_boot_hello PASSED — SERV wrote 'H' to SRAM[0x200]!")
 
 
 
