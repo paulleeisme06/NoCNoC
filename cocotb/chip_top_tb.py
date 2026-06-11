@@ -1279,7 +1279,11 @@ def chip_top_runner():
         proj_path / "../ip/gf180mcu_ws_ip__id/vh/gf180mcu_ws_ip__id.v",
         proj_path / "../ip/gf180mcu_ws_ip__logo/vh/gf180mcu_ws_ip__logo.v",
         proj_path / "../src/dft_ethan/spi_debug.v",
-        # proj_path / "../src/dft_ethan/gf180mcu_fd_ip_sram__sram2048x8m8wm1.v",
+
+        # 2 KiB SRAM used by mesh_tile.v.
+        # This wrapper is built from two gf180mcu_ocd 1024x8 SRAM macros.
+        proj_path / "../src/subservient/rtl/sram2048x8_gf180.v",
+
         proj_path / "../src/mesh_psi_aan/mesh_rxc.v",
         *(
             prepare_gl_tile_sources(Path(gl_tile), proj_path / "sim_build")
@@ -1289,8 +1293,13 @@ def chip_top_runner():
         proj_path / "../src/mesh_psi_aan/mesh_router.v",
         proj_path / "../src/mesh_psi_aan/boot_controller.v",
         *([] if gl_tile else [
-            *sorted(f for f in (proj_path / "../src/subservient/rtl").glob("*.v")
-                if "sram1024x8" not in f.name),
+            *sorted(
+                f for f in (proj_path / "../src/subservient/rtl").glob("*.v")
+                # Exclude SRAM macro/wrapper files from the broad glob:
+                #   - the 1 KiB macro is included explicitly above
+                #   - sram2048x8_gf180.v is included explicitly above
+                if "sram1024x8" not in f.name and "sram2048" not in f.name
+            ),
             *sorted((proj_path / "../src/serv/rtl").glob("*.v")),
             *sorted((proj_path / "../src/serv/servile").glob("*.v")),
         ]),
