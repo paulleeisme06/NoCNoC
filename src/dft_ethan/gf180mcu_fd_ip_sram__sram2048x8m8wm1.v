@@ -131,7 +131,7 @@ assign read_flag  =  cen_fell & !CEN &  GWEN;
 
 reg cen_flag_dly;
 always @(cen_flag) cen_flag_dly = #100 cen_flag;
-
+ 
 `ifndef VERILATOR
 specify
   specparam Tcyc = 55600 : 55600 : 55600;
