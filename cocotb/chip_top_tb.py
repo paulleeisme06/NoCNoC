@@ -219,12 +219,13 @@ endmodule
 
     # 2. Build wrapper with TILE_ID param + full port passthrough
     wrapper = """\
-// Auto-generated wrapper: adds parameters dropped by synthesis.
-// All parameters are accepted but unused — post-synthesis values are baked in.
+// Auto-generated wrapper: accepts TILE_ID/MESH_R/MESH_C as parameters from
+// mesh_rxc and passes TILE_ID through to the synthesized netlist as a port.
+// MESH_R/MESH_C are accepted but unused — routing dimensions are in the RTL.
 module mesh_tile #(
     parameter [5:0]   TILE_ID = 0,
     parameter integer MESH_R  = 3,
-    parameter integer MESH_C  = 3
+    parameter integer MESH_C  = 4
 ) (
     input  wire        boot_mode,
     input  wire        boot_wen,
@@ -256,6 +257,7 @@ module mesh_tile #(
     output wire [35:0] west_out
 );
     mesh_tile_gl u_gl (
+        .TILE_ID(TILE_ID),
         .boot_mode(boot_mode), .boot_wen(boot_wen),
         .clk(clk), .dft_ce(dft_ce), .dft_mode(dft_mode), .dft_we(dft_we),
         .rst(rst), .boot_addr(boot_addr), .boot_data(boot_data),
@@ -478,10 +480,10 @@ async def test_dft_write_read(dut):
 @cocotb.test()
 async def test_dft_sweep(dut):
     """
-    Thorough DFT SRAM sweep across all 9 tiles and multiple addresses/patterns.
+    Thorough DFT SRAM sweep across all 12 tiles and multiple addresses/patterns.
 
     What this test does:
-      1. Enters DFT mode (holds all 9 SERV cores in reset so they can't touch SRAM).
+      1. Enters DFT mode (holds all 12 SERV cores in reset so they can't touch SRAM).
       2. For every tile in the 3x3 mesh it writes three different byte patterns
          to three different SRAM addresses:
            - 0xA5 (1010_0101) — alternating bits, catches stuck-at faults
@@ -493,17 +495,17 @@ async def test_dft_sweep(dut):
          value matches what was written.
       4. Exits DFT mode.
 
-    Tile IDs are {row[1:0], col[1:0]}, so the 3x3 grid is:
-      (0,0)=0x0  (0,1)=0x1  (0,2)=0x2
-      (1,0)=0x4  (1,1)=0x5  (1,2)=0x6
-      (2,0)=0x8  (2,1)=0x9  (2,2)=0xA
+    Tile IDs are {row[1:0], col[1:0]}, so the 3x4 grid is:
+      (0,0)=0x0  (0,1)=0x1  (0,2)=0x2  (0,3)=0x3
+      (1,0)=0x4  (1,1)=0x5  (1,2)=0x6  (1,3)=0x7
+      (2,0)=0x8  (2,1)=0x9  (2,2)=0xA  (2,3)=0xB
     """
     await start_up(dut)
 
     ALL_TILES = [
-        (0, 0, 0b0000), (0, 1, 0b0001), (0, 2, 0b0010),
-        (1, 0, 0b0100), (1, 1, 0b0101), (1, 2, 0b0110),
-        (2, 0, 0b1000), (2, 1, 0b1001), (2, 2, 0b1010),
+        (0, 0, 0b0000), (0, 1, 0b0001), (0, 2, 0b0010), (0, 3, 0b0011),
+        (1, 0, 0b0100), (1, 1, 0b0101), (1, 2, 0b0110), (1, 3, 0b0111),
+        (2, 0, 0b1000), (2, 1, 0b1001), (2, 2, 0b1010), (2, 3, 0b1011),
     ]
     TEST_VECTORS = [
         (0x000, 0xA5),  # bank0 low address,  alternating bits

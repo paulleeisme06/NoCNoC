@@ -55,7 +55,6 @@ VERILOG_SOURCES := \
     $(FLASH)/housekeeping.sv \
     $(FLASH)/flash_clk.sv \
     $(FLASH)/shiftregister.sv \
-    $(DFT)/gf180mcu_fd_ip_sram__sram2048x8m8wm1.v \
     $(VERILOG_EXTRA)
 
 export VERILOG_SOURCES

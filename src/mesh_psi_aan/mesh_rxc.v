@@ -91,12 +91,15 @@ module mesh_rxc #(
             4'b0000: dft_rdata_r = tile_dft_rdata[0][0];
             4'b0001: dft_rdata_r = tile_dft_rdata[0][1];
             4'b0010: dft_rdata_r = tile_dft_rdata[0][2];
+            4'b0011: dft_rdata_r = tile_dft_rdata[0][3];
             4'b0100: dft_rdata_r = tile_dft_rdata[1][0];
             4'b0101: dft_rdata_r = tile_dft_rdata[1][1];
             4'b0110: dft_rdata_r = tile_dft_rdata[1][2];
+            4'b0111: dft_rdata_r = tile_dft_rdata[1][3];
             4'b1000: dft_rdata_r = tile_dft_rdata[2][0];
             4'b1001: dft_rdata_r = tile_dft_rdata[2][1];
             4'b1010: dft_rdata_r = tile_dft_rdata[2][2];
+            4'b1011: dft_rdata_r = tile_dft_rdata[2][3];
             default: dft_rdata_r = 8'h0;
         endcase
     end
@@ -172,8 +175,9 @@ module mesh_rxc #(
     assign monitor_se = grid_se[MESH_R-1][MESH_C-1];
 
     // =========================================================================
-    // INTER-TILE WIRE MONITOR (compile-time guarded — only when MESH_COLS >= 2)
+    // INTER-TILE WIRE MONITOR (RTL only — disabled in gate-level sim)
     // =========================================================================
+`ifndef FUNCTIONAL
     generate
         if (MESH_C >= 2) begin : wire_monitor
             always @(posedge clk) begin
@@ -222,5 +226,6 @@ module mesh_rxc #(
             end
         end
     endgenerate
+`endif
 
 endmodule
