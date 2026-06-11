@@ -155,31 +155,6 @@ sim-flash-chip: ## Flash boot via chip_top pad ring with real S25FL128L
 		PYTHONPATH=$(MAKEFILE_DIR)/cocotb:$(PYTHONPATH)
 .PHONY: sim-flash-chip
 
-sim-flash-tb: ## Run flash test with real S25FL128L model via top_tb
-	$(MAKE) results.xml \
-		TOPLEVEL=top_tb \
-		MODULE=test_flash_mesh \
-		SIM_BUILD=sim_build/flash_tb \
-		PYTHONPATH=$(MAKEFILE_DIR)/cocotb:$(PYTHONPATH)
-.PHONY: sim-flash-tb
-
-sim-flash-tb-iv: ## Run flash test with real S25FL128L model via iverilog
-	$(MAKE) results.xml \
-		TOPLEVEL=top_tb \
-		MODULE=test_flash_mesh \
-		SIM=icarus \
-		SIM_BUILD=sim_build/flash_tb_iv \
-		PYTHONPATH=$(MAKEFILE_DIR)/cocotb:$(PYTHONPATH)
-.PHONY: sim-flash-tb-iv
-
-sim-flash: ## Run flash->housekeeping->mesh SRAM test
-	$(MAKE) results.xml \
-		MODULE=test_flash_mesh \
-		SIM_BUILD=sim_build/flash \
-		PYTHONPATH=$(MAKEFILE_DIR)/cocotb:$(PYTHONPATH)
-		VERILOG_SOURCES="$(VERILOG_SOURCES)"
-.PHONY: sim-flash
-
 clone-pdk: ## Clone the GF180MCU PDK repository
 	rm -rf $(MAKEFILE_DIR)/gf180mcu
 	git clone https://github.com/wafer-space/gf180mcu.git $(MAKEFILE_DIR)/gf180mcu --depth 1 --branch ${PDK_TAG}
