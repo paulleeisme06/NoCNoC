@@ -1290,7 +1290,7 @@ def chip_top_runner():
         proj_path / "../src/mesh_psi_aan/boot_controller.v",
         *([] if gl_tile else [
             *sorted(f for f in (proj_path / "../src/subservient/rtl").glob("*.v")
-                    if "sram1024x8" not in f.name and "sram2048" not in f.name),
+                if "sram1024x8" not in f.name),
             *sorted((proj_path / "../src/serv/rtl").glob("*.v")),
             *sorted((proj_path / "../src/serv/servile").glob("*.v")),
         ]),
