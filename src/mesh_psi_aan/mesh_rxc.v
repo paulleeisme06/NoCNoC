@@ -14,8 +14,8 @@
 //   flash_*       : SPI flash shared by the boot controller
 // ============================================================================
 module mesh_rxc #(
-    parameter integer MESH_R = 5,
-    parameter integer MESH_C = 5
+    parameter integer MESH_R = 2,
+    parameter integer MESH_C = 2
 )(
     input  wire        clk,
     input  wire        rst,
