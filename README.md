@@ -1,124 +1,95 @@
-# gf180mcu Project Template
+# NoCNoC: A Hierarchical 3×4 Mesh Network-on-Chip
 
-Project template for wafer.space MPW runs using the gf180mcu PDK.
+NoCNoC is a hierarchical 3×4 mesh Network-on-Chip (NoC) in **GlobalFoundries 180 nm (3.3 V)**, built with **LibreLane**. The architecture is a tiled, scalable compute mesh where one tile is hardened once as a macro and instantiated 12 times.
 
-## Helpful Commands
+## Setup & Helpful Commands
 
+### 1. Initialize Submodules
+To get started, you must initialize the submodules. This fetches the SERV RISC-V core, the LibreLane flow components, and other critical IP blocks including the SRAM wrappers.
 ```bash
 git submodule update --init --recursive
 ```
 
-## Prerequisites
+### 2. PDK & Flow
+-   **PDK**: We use a custom fork of the [gf180mcu PDK](https://github.com/wafer-space/gf180mcu).
+    ```bash
+    make clone-pdk
+    ```
+-   **Environment**: Launch the development shell (Nix-based) to access the LibreLane tools:
+    ```bash
+    nix-shell
+    ```
 
-We use a custom fork of the [gf180mcuD PDK variant](https://github.com/wafer-space/gf180mcu) until all changes have been upstreamed.
+### 3. Firmware Toolchain
+For compiling firmware (`.bin` files), you **must** use `riscv64-unknown-elf-gcc` **version 15.2.0**.
+-   **Check Version**: `riscv64-unknown-elf-gcc --version`
 
-To clone the latest PDK version, simply run `make clone-pdk`.
+### 4. Implementation & Viewing
+-   **Run Implementation**: `make librelane`
+-   **OpenROAD (GDS View)**: `make librelane-openroad`
+-   **KLayout (LVS/DRC View)**: `make librelane-klayout`
 
-In the next step, install LibreLane by following the Nix-based installation instructions: https://librelane.readthedocs.io/en/latest/installation/nix_installation/index.html
+---
 
-## Implement the Design
+## Architecture
 
-This repository contains a Nix flake that provides a shell with the [`leo/gf180mcu`](https://github.com/librelane/librelane/tree/leo/gf180mcu) branch of LibreLane.
+The chip is organized as a 4×3 mesh of independent RISC-V compute nodes connected via inter-tile NoC links.
 
-Simply run `nix-shell` in the root of this repository.
+### Building Blocks
+-   **Tile (×12, 730×920 µm)**: Contains a **SERV RISC-V** core, **2 KB SRAM** (two 1024×8 banks merged), and a **NoC router**. It is hardened into a macro (GDS/LEF/LIB).
+-   **Mesh Fabric (mesh_rxc)**: Handles the inter-tile wiring and decodes DFT/debug access.
+-   **Host-to-Chip SPI Debug (spi_debug)**: Provides SPI access for an external host to read/write each tile's memory.
+-   **Boot Controller**: Feeds instructions to the mesh from an **external off-chip SPI flash**.
+-   **Periphery**: Includes 58 IO/power pads, a chip-ID block, and the wafer.space logo (14 macros total).
 
-> [!NOTE]
-> Since we are working on a branch of LibreLane, OpenROAD needs to be compiled locally. This will be done automatically by Nix, and the binary will be cached locally. 
+### Scale & Results
+-   **Integration**: 191,358 instances (41,803 std cells + 12 hardened tiles).
+-   **Physical**: 3932×5122 µm die, ~3048×4238 µm core area.
+-   **Power/Clock**: ~12.3 mW consumption at a 40 MHz clock frequency.
+-   **Signoff**: Full clean signoff (DRC, LVS, antenna, XOR, density, power all 0; 0 timing violations across 6 corners; IR drop ~0.14 mV).
 
-With this shell enabled, run the implementation:
+---
 
-```
-make librelane
-```
+## Technical Story: Power Integration & Design Choices
 
-## View the Design
+### The Power Integration Contribution
+Because each tile must use Metal4/Metal5 for its own grid (due to the SRAM macros forcing Metal5), the standard "macro gives up its top layers" method was not feasible. We solved this by **pitch-matching the chip PDN to the tile** (74.48 µm = 19 rows = 133 sites, grid-commensurate) and aligning the power straps to the tile's boundary pins via **sub-micron perpendicular edge vias**. The placement was re-tuned so VDD and VSS each bridge on a different edge.
 
-After completion, you can view the design using the OpenROAD GUI:
+### Why No Power Ring?
+We chose a pin-aligned version over a formal power ring for several engineering reasons:
+-   **7× fewer signal-integrity warnings**: No-ring had 23 max-slew warnings vs. 162 for the ring-based experiment.
+-   **Less Congestion**: The ring wraps tiles in extra M4/M5 metal, crowding signal routing at the edges. No-ring leaves more headroom.
+-   **Simpler PDN**: Fewer structures mean fewer failure modes and easier verification for first silicon.
+-   **Zero Functional Loss**: Both methods pass all gating checks, but the ring's IR drop gain (0.11 mV vs 0.14 mV) is negligible (both are ~100× below any concern).
 
-```
-make librelane-openroad
-```
+### Timing Signoff (Cores ARE Timed)
+Detailed hierarchical STA provides two layers of evidence:
+1.  **Tile Level**: Hardened tiles were independently STA'd with real register-to-register paths. They closed at setup +10.5 ns, hold +0.092 ns, with 0 violations.
+2.  **Chip Level**: 2,350 timing endpoints reference the tiles. They contribute their characterized 1,136-arc Liberty timing to the top-level graph. The chip closes at setup +16.1 ns, hold +0.092 ns, 0 violations.
 
-Or using KLayout:
+**Note on Max Cap/Slew**: These are **non-gating electrical warnings**, not timing failures. They do not affect timing (zero violations) or manufacturability (DRC/LVS pass). Most are sub-femtofarad noise inside the tiles and IO pads.
 
-```
-make librelane-klayout
-```
+## Verification & Simulation
 
-## Verification and Simulation
+We use a comprehensive **cocotb** simulation suite for multi-level verification:
 
-We use [cocotb](https://www.cocotb.org/), a Python-based testbench environment, for the verification of the chip.
-The underlying simulator is Icarus Verilog (https://github.com/steveicarus/iverilog).
+-   `make sim`: Runs a full RTL simulation of the 3×4 mesh using the top-level `chip_top_tb.py`.
+-   `make sim-flash`: Verifies the physical integration path from the external SPI flash, through the housekeeping boot-adapter, to the internal NoC SRAMs.
+-   `make sim-gl`: Gate-level simulation of the entire chip using the synthesized netlist.
+-   `make sim-gl-tile`: Targeted mixed RTL/GL simulation that uses the gate-level netlist for a single tile while keeping the rest of the mesh in RTL for faster iteration.
 
-The testbench is located in `cocotb/chip_top_tb.py`. To run the RTL simulation, run the following command:
+## Acknowledgments
 
-```
-make sim
-```
+This project builds upon several award-winning open-source components:
+-   **SERV**: The world's smallest compliant bitserial RISC-V CPU, designed by Olof Kindgren.
+-   **Subservient**: A minimal SoC infrastructure designed for SERV, providing the SRAM-banking logic and SoC-let wrapper used in our tiles.
 
-To run the GL (gate-level) simulation, run the following command:
+## Limitations & Caveats
 
-```
-make sim-gl
-```
+-   **3×4 Mesh Maximum**: This is the max in the fixed die slot; 4×4 would collapse the routing channels (~42 µm vs the ~236 µm needed).
+-   **Conservative Clock**: 40 MHz is used (only ~36% of the period) as this is not a performance-targeted part.
+-   **DFT Readback Issue**: Due to the row-3 readback limitation in this specific run (fixed on the ring branch), the host can write to all 12 tiles but only read back from 9. Normal operation is unaffected.
+-   **External Boot**: Programs are fed from an off-chip external flash component, not on-die memory.
 
-> [!NOTE]
-> You need to have the latest implementation of your design in the `final/` folder. After a run has completed without errors, the final views will be copied to `final/`.
-
-In both cases, a waveform file will be generated under `cocotb/sim_build/chip_top.fst`.
-You can view it using a waveform viewer, for example, [GTKWave](https://gtkwave.github.io/gtkwave/).
-
-```
-make sim-view
-```
-
-You can now update the testbench according to your design.
-
-## Implementing Your Own Design
-
-The source files for this template can be found in the `src/` directory. `chip_top.sv` defines the top-level ports and instantiates `chip_core`, chip ID (QR code) and the wafer.space logo. To allow for the default bonding setup, do not change the number of pads in order to keep the original bondpad positions. To be compatible with the default breakout PCB, do not change any of the power or ground pads. However, you can change the type of the signal pads, e.g. to bidirectional, input-only or e.g. analog pads. The template provides the `NUM_INPUT` and `NUM_BIDIR` parameters for this purpose.
-
-The actual pad positions are defined in the LibreLane configuration file under `librelane/config.yaml`. The variables `PAD_SOUTH`/`PAD_EAST`/`PAD_NORTH`/`PAD_WEST` determine the respective pad placement. The LibreLane configuration also allows you to customize the flow (enable or disable steps), specify the source files, set various variables for the steps, and instantiate macros. For more information about the configuration, please refer to the LibreLane documentation: https://librelane.readthedocs.io/en/latest/
-
-To implement your own design, simply edit `chip_core.sv`. The `chip_core` module receives the clock and reset, as well as the signals from the pads defined in `chip_top`. As an example, a 42-bit wide counter is implemented.
-
-> [!NOTE]
-> For more comprehensive SystemVerilog support, enable the `USE_SLANG` variable in the LibreLane configuration.
-
-## Choosing a Different Slot Size
-
-The template supports the following slot sizes: `1x1`, `0p5x1`, `1x0p5`, `0p5x0p5`.
-By default, the design is implemented using the `1x1` slot definition.
-
-To select a different slot size, simply set the `SLOT` environment variable.
-This can be done when invoking a make target:
-
-```
-SLOT=0p5x0p5 make librelane
-```
-
-Alternatively, you can export the slot size:
-
-```
-export SLOT=0p5x0p5
-```
-
-You can change the slot that is selected by default in the Makefile by editing the value of `DEFAULT_SLOT`.
-
-## Building a Standalone Padring for Analog Design
-
-To build just the padring without any standard cell rows, digital routing or filler cells, run the following command:
-
-```
-make librelane-padring
-```
-
-It is also possible to build the padring for other slot sizes:
-
-```
-SLOT=0p5x0p5 make librelane-padring
-```
-
-## Precheck
-
-To check whether your design is suitable for manufacturing, run the [gf180mcu-precheck](https://github.com/wafer-space/gf180mcu-precheck) with your layout.
+## Usage
+Each tile is an independent RISC-V node. The NoC routes messages between them. A host loads programs and data via the SPI debug interface, and the cores boot from external flash.
