@@ -25,53 +25,18 @@ meta:
     #Checker.LVS: null
 
 DESIGN_NAME: chip_top
+# Hierarchical flow: chip-level only elaborates what lives OUTSIDE the
+# hardened mesh_tile macro. The tile's internals (mesh_router, sram2048
+# wrapper, SERV core, subservient, etc.) are blackboxed via
+# hard_tile/vh/mesh_tile.vh (declared in the MACROS section below).
+# Including those files here would either conflict with the blackbox or
+# uselessly elaborate code that the chip will never re-synthesize.
 VERILOG_FILES:
 - dir::../src/chip_top.sv
 - dir::../src/chip_core.sv
+- dir::../src/mesh_psi_aan/mesh_rxc.v
+- dir::../src/mesh_psi_aan/boot_controller.v
 - dir::../src/dft_ethan/spi_debug.v
-- dir::../src/mesh_psi_aan/mesh_3x3.v
-- dir::../src/mesh_psi_aan/mesh_tile.v
-- dir::../src/mesh_psi_aan/mesh_router.v
-- dir::../src/mesh_psi_aan/boot_loader.v
-- dir::../src/host-to-chip - Paul&Andrea/host_to_chip.v
-- dir::../src/flash_Sumi/flash_clk.sv
-- dir::../src/flash_Sumi/hk_boot_adapter.v
-- dir::../src/flash_Sumi/housekeeping.sv
-- dir::../src/flash_Sumi/shiftregister.sv
-- dir::../src/serv/*.v 
-- dir::../src/subservient/*.v
-- dir::../src/serv/servile/*.v
-- dir::../src/serv/rtl/serv_alu.v
-- dir::../src/serv/rtl/serv_aligner.v
-- dir::../src/serv/rtl/serv_bufreg.v
-- dir::../src/serv/rtl/serv_bufreg2.v
-- dir::../src/serv/rtl/serv_compdec.v
-- dir::../src/serv/rtl/serv_csr.v
-- dir::../src/serv/rtl/serv_ctrl.v
-- dir::../src/serv/rtl/serv_debug.v
-- dir::../src/serv/rtl/serv_decode.v
-- dir::../src/serv/rtl/serv_immdec.v
-- dir::../src/serv/rtl/serv_mem_if.v
-- dir::../src/serv/rtl/serv_rf_if.v
-- dir::../src/serv/rtl/serv_rf_ram.v
-- dir::../src/serv/rtl/serv_rf_ram_if.v
-- dir::../src/serv/rtl/serv_rf_top.v
-- dir::../src/serv/rtl/serv_state.v
-- dir::../src/serv/rtl/serv_synth_wrapper.v
-- dir::../src/serv/rtl/serv_top.v
-- dir::../src/serv/servile/servile.v
-- dir::../src/serv/servile/servile_arbiter.v
-- dir::../src/serv/servile/servile_mux.v
-- dir::../src/serv/servile/servile_rf_mem_if.v
-- dir::../src/subservient/rtl/subservient.v
-- dir::../src/subservient/rtl/subservient_core.v
-- dir::../src/subservient/rtl/subservient_debug_switch.v
-- dir::../src/subservient/rtl/subservient_generic_ram.v
-- dir::../src/subservient/rtl/subservient_gpio.v
-- dir::../src/subservient/rtl/subservient_gf180_ram_1024x8.v
-- dir::../src/subservient/rtl/subservient_ram.v
-- dir::../src/subservient/rtl/subservient_rf_ram_if.v
-- dir::../src/subservient/rtl/sram2048x8_gf180.v
 
 
 # Enable plugin for better SystemVerilog support
@@ -125,17 +90,14 @@ CLOCK_PORT: clk_PAD
 CLOCK_NET: clk_pad/Y
 CLOCK_PERIOD: 25 # Was set to 40 for previous run
 
-# Fix hold violations
-# pre placement slack margin to guide hold buffer insertion; set to 0.0 for no margin, or a positive value to allow hold buffers even if they cause a minor hold violation.
-PL_RESIZER_HOLD_SLACK_MARGIN: 0.7 # Was set to 0.7
-# post placement slack margin to guide hold buffer insertion; set to 0.0 for no margin, or a positive value to allow hold buffers even if they cause a minor hold violation.
-GRT_RESIZER_HOLD_SLACK_MARGIN: 0.6 # Was set to 0.6
-# makes sure everything is passing with the positive 0.6 of hold slack
-
-# Allow hold buffers even if they cause a minor setup violation.
-# Hold violations are dead-on-arrival; setup violations only reduce max frequency.
-# Fix hold time violations no matter what, even if it causes a minor setup violation.
-# set up time violations can be fixed by manually adjusting the clock period constraint and re-running STA, but hold time violations are much more difficult to fix manually.
+# Resizer settings restored to the proven values from the working 3×3 chip.
+# Our earlier tuning (0.1 hold margin, disabled setup buffering, etc.) was
+# trying to fix DPL-0036, but the real cause of DPL failure was the BAD tile
+# placement (rows[0] at bottom instead of top → NoC signals routing across
+# the entire chip → global router unable to fit cells). With placement now
+# fixed, we can keep the proven resizer settings.
+PL_RESIZER_HOLD_SLACK_MARGIN: 0.7
+GRT_RESIZER_HOLD_SLACK_MARGIN: 0.6
 PL_RESIZER_ALLOW_SETUP_VIOS: True
 GRT_RESIZER_ALLOW_SETUP_VIOS: True
 
@@ -145,8 +107,7 @@ GRT_RESIZER_ALLOW_SETUP_VIOS: True
 CTS_SINK_CLUSTERING_SIZE: 20
 CTS_SINK_CLUSTERING_MAX_DIAMETER: 40
 
-# Increase for more logic
-# on your die
+# Target density restored to 35 (matches working 3×3 chip).
 PL_TARGET_DENSITY_PCT: 35
 GRT_ALLOW_CONGESTION: true
 
@@ -159,8 +120,22 @@ PDN_VWIDTH: 5
 PDN_HWIDTH: 5
 PDN_VSPACING: 1
 PDN_HSPACING: 1
-PDN_VPITCH: 75
-PDN_HPITCH: 75
+# 74.48 (= 19 rows = 133 sites) — MUST match the tile's PDN pitch so the chip
+# grid and the tile's M4/M5 power pins are co-aligned (the hierarchical power
+# handoff). 75 was incommensurate with the macro snap grid; 74.48 is exact.
+PDN_VPITCH: 74.48
+PDN_HPITCH: 74.48
+
+# Keep the M4/M5 straps running CONTINUOUSLY over the tiles instead of trimming
+# them off. The tile uses M4/M5 for its own power pins (the SRAM forces M5, so it
+# can't give up the top layers for the standard hierarchical method). With the
+# tiles grid-aligned (placements below), an un-trimmed chip strap lands directly
+# on top of the tile's same-net M4/M5 pin → solid overlap. Trimming (the default)
+# removed the over-tile straps and left only fragile channel abutment: VDD barely
+# connected (0.56µm gap), VSS opened (5.67µm gap) → PSM-0069 on VSS. Diagnosed
+# from RUN_2026-06-03_01-35-51. (chip_id/logo macros are outside the core, so
+# skip_trim only affects straps over the tiles.)
+PDN_SKIPTRIM: True
 
 # PDN - Core ring
 PDN_CORE_RING: True
@@ -259,76 +234,8 @@ MACROS:
         location: ["expr::$DIE_AREA[2] + -169.25", "expr::$DIE_AREA[3] + -169.25"]
         orientation: N
 
-  gf180mcu_ocd_ip_sram__sram1024x8m8wm1:
-    gds:
-      - dir::../libs/gf180mcu_ocd_ip_sram/cells/gf180mcu_ocd_ip_sram__sram1024x8m8wm1/gf180mcu_ocd_ip_sram__sram1024x8m8wm1.gds
-    lef:
-      - dir::../libs/gf180mcu_ocd_ip_sram/cells/gf180mcu_ocd_ip_sram__sram1024x8m8wm1/gf180mcu_ocd_ip_sram__sram1024x8m8wm1.lef
-    vh:
-      - dir::../libs/gf180mcu_ocd_ip_sram/cells/gf180mcu_ocd_ip_sram__sram1024x8m8wm1/gf180mcu_ocd_ip_sram__sram1024x8m8wm1.blackbox.v
-    lib:
-      "*_tt_025C_3v30":
-        - dir::../libs/gf180mcu_ocd_ip_sram/cells/gf180mcu_ocd_ip_sram__sram1024x8m8wm1/gf180mcu_ocd_ip_sram__sram1024x8m8wm1__tt_025C_3v30.lib
-      "*_ff_n40C_3v60":
-        - dir::../libs/gf180mcu_ocd_ip_sram/cells/gf180mcu_ocd_ip_sram__sram1024x8m8wm1/gf180mcu_ocd_ip_sram__sram1024x8m8wm1__ff_n40C_3v60.lib
-    instances:
-      # 3x3 mesh, each tile has 2 banks (bank0 and bank1)
-      # Core area [442,442] to [3490,4680]; tile grid ~1016x1413 um each
-      # SRAM size: 301.3 x 515.8 um; bank0 at tile_x+50, bank1 at tile_x+357
-      i_chip_core.u_mesh.rows[0].cols[0].tile_inst.sram2048.u_bank0:
-        location: [492, 492]
-        orientation: N
-      i_chip_core.u_mesh.rows[0].cols[0].tile_inst.sram2048.u_bank1:
-        location: [799, 492]
-        orientation: N
-      i_chip_core.u_mesh.rows[0].cols[1].tile_inst.sram2048.u_bank0:
-        location: [1508, 492]
-        orientation: N
-      i_chip_core.u_mesh.rows[0].cols[1].tile_inst.sram2048.u_bank1:
-        location: [1815, 492]
-        orientation: N
-      i_chip_core.u_mesh.rows[0].cols[2].tile_inst.sram2048.u_bank0:
-        location: [2524, 492]
-        orientation: N
-      i_chip_core.u_mesh.rows[0].cols[2].tile_inst.sram2048.u_bank1:
-        location: [2831, 492]
-        orientation: N
-      i_chip_core.u_mesh.rows[1].cols[0].tile_inst.sram2048.u_bank0:
-        location: [492, 1905]
-        orientation: N
-      i_chip_core.u_mesh.rows[1].cols[0].tile_inst.sram2048.u_bank1:
-        location: [799, 1905]
-        orientation: N
-      i_chip_core.u_mesh.rows[1].cols[1].tile_inst.sram2048.u_bank0:
-        location: [1508, 1905]
-        orientation: N
-      i_chip_core.u_mesh.rows[1].cols[1].tile_inst.sram2048.u_bank1:
-        location: [1815, 1905]
-        orientation: N
-      i_chip_core.u_mesh.rows[1].cols[2].tile_inst.sram2048.u_bank0:
-        location: [2524, 1905]
-        orientation: N
-      i_chip_core.u_mesh.rows[1].cols[2].tile_inst.sram2048.u_bank1:
-        location: [2831, 1905]
-        orientation: N
-      i_chip_core.u_mesh.rows[2].cols[0].tile_inst.sram2048.u_bank0:
-        location: [492, 3318]
-        orientation: N
-      i_chip_core.u_mesh.rows[2].cols[0].tile_inst.sram2048.u_bank1:
-        location: [799, 3318]
-        orientation: N
-      i_chip_core.u_mesh.rows[2].cols[1].tile_inst.sram2048.u_bank0:
-        location: [1508, 3318]
-        orientation: N
-      i_chip_core.u_mesh.rows[2].cols[1].tile_inst.sram2048.u_bank1:
-        location: [1815, 3318]
-        orientation: N
-      i_chip_core.u_mesh.rows[2].cols[2].tile_inst.sram2048.u_bank0:
-        location: [2524, 3318]
-        orientation: N
-      i_chip_core.u_mesh.rows[2].cols[2].tile_inst.sram2048.u_bank1:
-        location: [2831, 3318]
-        orientation: N
+  # NOTE: the gf180mcu_ocd_ip_sram__sram1024x8m8wm1 macros are no longer placed
+  # at chip level — they live inside the hardened mesh_tile macro below.
 
   mesh_tile:
     gds:
@@ -352,37 +259,70 @@ MACROS:
       "*_tt_025C_3v30":
         - dir::hard_tile/lib/nom_tt_025C_3v30/mesh_tile__nom_tt_025C_3v30.lib
       "*_ff_n40C_3v60":
-        - dir::librelane/hard_tile/lib/nom_ff_n40C_3v60/mesh_tile__nom_ff_n40C_3v60.lib
+        - dir::hard_tile/lib/nom_ff_n40C_3v60/mesh_tile__nom_ff_n40C_3v60.lib
     instances:
-      # Fill this part in
+      # 3 cols × 4 rows = 12 tiles (3×4 mesh). Each tile is 730 × 920 µm.
+      # Core area = [442, 442, 3490, 4680] = 3048 × 4238 µm.
+      #
+      # 3 columns leave generous VERTICAL channels (~329 µm) — the same roomy
+      # geometry that lets the proven 3×3 route. (4 columns left only ~42 µm,
+      # which is why 4×4 could not route in this fixed slot.)
+      #   3 × 730 + 2 × 329 = 2848  (+ ~100 µm L/R margins = 3048) ✓
+      #   4 × 920 + 3 × 159 = 4157  (+ ~40 µm T/B margins ≈ 4238) ✓
+      #
+      # CRITICAL: rows[0] is PHYSICALLY AT THE TOP (highest Y). The mesh RTL ties
+      # north_in of rows[r] = south_out of rows[r-1], so rows[r-1] must sit above
+      # rows[r]; otherwise inter-row NoC signals route across the whole chip.
+      #
+      # EDGE-BRIDGE placements (pitch 74.48 = 19 rows = 133 sites).
+      # The tile pins never physically overlap the chip straps (trimmed at the
+      # macro boundary), so the power handoff happens by a sub-micron EDGE BRIDGE:
+      # a chip strap whose width grazes the tile boundary vias down to the tile's
+      # perpendicular pin there. Because chip VDD/VSS straps are 6 µm apart, only
+      # ONE net can bridge at any single edge. The tiles are therefore placed so
+      # that each net bridges at a DIFFERENT edge:
+      #   X ≡ 26.32 mod 74.48 → core M4 VDD strap grazes the tile RIGHT edge,
+      #                          via to the tile's M5 VDD pin   (2.18 µm overlap)
+      #   Y ≡ 66.64 mod 74.48 → core M5 VSS strap grazes the tile TOP edge,
+      #                          via to the tile's M4 VSS pin   (2.17 µm overlap)
+      # Both overlaps are 6× the (working) 0.33 µm VDD bridge of the old aligned
+      # placement, which connected VDD but left VSS islanded (PSM-0069 on VSS).
+      # VERIFIED in-session (move tiles + pdngen + check_power_grid on
+      # RUN_2026-06-03_01-56-59): PSM-0040 "All shapes connected" on BOTH nets.
+      # stride 1042.72 (= 14·74.48), exact site/row multiple → every tile shares
+      # the same X/Y phase. Channels unchanged from the routable placement.
+      i_chip_core.u_mesh.rows[0].cols[0].tile_inst: { location: [547.68,  3641.68], orientation: N }
+      i_chip_core.u_mesh.rows[0].cols[1].tile_inst: { location: [1590.40, 3641.68], orientation: N }
+      i_chip_core.u_mesh.rows[0].cols[2].tile_inst: { location: [2633.12, 3641.68], orientation: N }
+      i_chip_core.u_mesh.rows[1].cols[0].tile_inst: { location: [547.68,  2598.96], orientation: N }
+      i_chip_core.u_mesh.rows[1].cols[1].tile_inst: { location: [1590.40, 2598.96], orientation: N }
+      i_chip_core.u_mesh.rows[1].cols[2].tile_inst: { location: [2633.12, 2598.96], orientation: N }
+      i_chip_core.u_mesh.rows[2].cols[0].tile_inst: { location: [547.68,  1556.24], orientation: N }
+      i_chip_core.u_mesh.rows[2].cols[1].tile_inst: { location: [1590.40, 1556.24], orientation: N }
+      i_chip_core.u_mesh.rows[2].cols[2].tile_inst: { location: [2633.12, 1556.24], orientation: N }
+      i_chip_core.u_mesh.rows[3].cols[0].tile_inst: { location: [547.68,  513.52],  orientation: N }
+      i_chip_core.u_mesh.rows[3].cols[1].tile_inst: { location: [1590.40, 513.52],  orientation: N }
+      i_chip_core.u_mesh.rows[3].cols[2].tile_inst: { location: [2633.12, 513.52],  orientation: N }
 
-# This is an alternative method compared to
-# specifying the power connections in the RTL
+# Hierarchical: connect every mesh_tile macro's VDD/VSS pins to chip nets.
+# A single wildcard regex matches all 16 tile_inst instances at once —
+# avoids the bracket-escaping issues we hit with per-tile patterns.
+# (This matches the working pattern in the proven 3×3 chip config.)
 PDN_MACRO_CONNECTIONS:
-- "i_chip_core.u_mesh.rows\\[0\\].cols\\[0\\].tile_inst.sram2048.u_bank0 VDD VSS VDD VSS"
-- "i_chip_core.u_mesh.rows\\[0\\].cols\\[0\\].tile_inst.sram2048.u_bank1 VDD VSS VDD VSS"
-- "i_chip_core.u_mesh.rows\\[0\\].cols\\[1\\].tile_inst.sram2048.u_bank0 VDD VSS VDD VSS"
-- "i_chip_core.u_mesh.rows\\[0\\].cols\\[1\\].tile_inst.sram2048.u_bank1 VDD VSS VDD VSS"
-- "i_chip_core.u_mesh.rows\\[0\\].cols\\[2\\].tile_inst.sram2048.u_bank0 VDD VSS VDD VSS"
-- "i_chip_core.u_mesh.rows\\[0\\].cols\\[2\\].tile_inst.sram2048.u_bank1 VDD VSS VDD VSS"
-- "i_chip_core.u_mesh.rows\\[1\\].cols\\[0\\].tile_inst.sram2048.u_bank0 VDD VSS VDD VSS"
-- "i_chip_core.u_mesh.rows\\[1\\].cols\\[0\\].tile_inst.sram2048.u_bank1 VDD VSS VDD VSS"
-- "i_chip_core.u_mesh.rows\\[1\\].cols\\[1\\].tile_inst.sram2048.u_bank0 VDD VSS VDD VSS"
-- "i_chip_core.u_mesh.rows\\[1\\].cols\\[1\\].tile_inst.sram2048.u_bank1 VDD VSS VDD VSS"
-- "i_chip_core.u_mesh.rows\\[1\\].cols\\[2\\].tile_inst.sram2048.u_bank0 VDD VSS VDD VSS"
-- "i_chip_core.u_mesh.rows\\[1\\].cols\\[2\\].tile_inst.sram2048.u_bank1 VDD VSS VDD VSS"
-- "i_chip_core.u_mesh.rows\\[2\\].cols\\[0\\].tile_inst.sram2048.u_bank0 VDD VSS VDD VSS"
-- "i_chip_core.u_mesh.rows\\[2\\].cols\\[0\\].tile_inst.sram2048.u_bank1 VDD VSS VDD VSS"
-- "i_chip_core.u_mesh.rows\\[2\\].cols\\[1\\].tile_inst.sram2048.u_bank0 VDD VSS VDD VSS"
-- "i_chip_core.u_mesh.rows\\[2\\].cols\\[1\\].tile_inst.sram2048.u_bank1 VDD VSS VDD VSS"
-- "i_chip_core.u_mesh.rows\\[2\\].cols\\[2\\].tile_inst.sram2048.u_bank0 VDD VSS VDD VSS"
-- "i_chip_core.u_mesh.rows\\[2\\].cols\\[2\\].tile_inst.sram2048.u_bank1 VDD VSS VDD VSS"
+- ".*tile_inst VDD VSS VDD VSS"
 
 # Halo size around macros while cutting rows.
 # Workaround for: https://github.com/The-OpenROAD-Project/OpenROAD/issues/8868
 FP_MACRO_HORIZONTAL_HALO: 10
 FP_MACRO_VERTICAL_HALO: 10
-PDN_HORIZONTAL_HALO: 5
-PDN_VERTICAL_HALO: 5
+# PDN halos restored to 5: with tile exposing power on Metal2/Metal3 and
+# Halo = 0 for the hierarchical power handoff: the tile's M5 power pins extend to
+# the tile boundary (PDN_EXTEND_TO: boundary in noc_tile), and the chip's M5
+# channel stripes must reach that same boundary to ABUT them. A non-zero halo
+# leaves a gap (the chip grid stops short of the tile edge) → pins float →
+# PSM-0069. With the rows aligned to the chip M5 grid (see placements above),
+# halo 0 lets the stripes meet the pins exactly.
+PDN_HORIZONTAL_HALO: 0
+PDN_VERTICAL_HALO: 0
 
 PDN_CFG: dir::pdn_cfg.tcl

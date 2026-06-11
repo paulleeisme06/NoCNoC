@@ -1,8 +1,6 @@
 # Copyright 2025 LibreLane Contributors
 #
-# Adapted from OpenLane
-#
-# Copyright 2020-2022 Efabless Corporation
+# Adapted from OpenLane / from working 3×3 chip config.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -182,6 +180,7 @@ if { $::env(PDN_CORE_RING) == 1 } {
     }
 }
 
+# Default macro grid (catches anything that isn't otherwise specified).
 define_pdn_grid \
     -macro \
     -default \
@@ -193,80 +192,26 @@ add_pdn_connect \
     -grid macro \
     -layers "$::env(PDN_VERTICAL_LAYER) $::env(PDN_HORIZONTAL_LAYER)"
 
-# SRAM macros
-
+# mesh_tile macro grid — RING METHOD.
+# Pattern .*tile_inst matches all mesh_tile instances (rows[*].cols[*].tile_inst).
+#
+# The tile is now hardened with a power CORE RING (PDN_CORE_RING) on M4/M5 around
+# its boundary — LibreLane's documented method for a macro that uses Metal5 (which
+# ours does; its std-cell PDN needs M5 to bridge the SRAMs, so it can't use the
+# default hierarchical method that requires giving up M5).
+#
+# At the top level the connection is simple: the chip's M4/M5 PDN straps connect
+# to the tile's boundary ring via the M4↔M5 connect below. The ring is a
+# continuous boundary interface, so there is NO alignment/incommensurate-grid
+# problem and NO stamping needed. (This replaces all the earlier edge-straddle,
+# alignment, and stamp experiments — they were fighting the wrong PDN method.)
 define_pdn_grid \
     -macro \
-    -instances i_chip_core.sram_0 \
+    -instances {.*tile_inst} \
     -name sram_macros_NS \
     -starts_with POWER \
-    -halo "$::env(PDN_HORIZONTAL_HALO) $::env(PDN_VERTICAL_HALO)"
+    -halo "0 0"
 
 add_pdn_connect \
     -grid sram_macros_NS \
     -layers "$::env(PDN_VERTICAL_LAYER) $::env(PDN_HORIZONTAL_LAYER)"
-
-add_pdn_connect \
-    -grid sram_macros_NS \
-    -layers "$::env(PDN_VERTICAL_LAYER) Metal3"
-
-# Add stripes on W/E edges of SRAM
-add_pdn_stripe \
-    -grid sram_macros_NS \
-    -layer Metal4 \
-    -width 2.36 \
-    -offset 1.18 \
-    -spacing 0.28 \
-    -pitch 426.86 \
-    -starts_with GROUND \
-    -number_of_straps 2
-
-# Since the above stripes block the top level PDN at Metal4, add some more stripes
-# to improve the PDN's integrity and ensure a better connection for the macro.
-add_pdn_stripe \
-    -grid sram_macros_NS \
-    -layer Metal4 \
-    -width 4.00 \
-    -offset 65.93 \
-    -spacing 0.28 \
-    -pitch 50 \
-    -starts_with GROUND \
-    -number_of_straps 7
-
-define_pdn_grid \
-    -macro \
-    -instances i_chip_core.sram_1 \
-    -name sram_macros_WE \
-    -starts_with POWER \
-    -halo "$::env(PDN_HORIZONTAL_HALO) $::env(PDN_VERTICAL_HALO)"
-
-add_pdn_connect \
-    -grid sram_macros_WE \
-    -layers "$::env(PDN_VERTICAL_LAYER) $::env(PDN_HORIZONTAL_LAYER)"
-
-add_pdn_connect \
-    -grid sram_macros_WE \
-    -layers "$::env(PDN_VERTICAL_LAYER) Metal3"
-
-# Add stripes on W/E edges of SRAM
-add_pdn_stripe \
-    -grid sram_macros_WE \
-    -layer Metal4 \
-    -width 2.36 \
-    -offset 1.18 \
-    -spacing 0.28 \
-    -pitch 479.88 \
-    -starts_with GROUND \
-    -number_of_straps 2
-
-# Since the above stripes block the top level PDN at Metal4, add some more stripes
-# to improve the PDN's integrity and ensure a better connection for the macro.
-add_pdn_stripe \
-    -grid sram_macros_WE \
-    -layer Metal4 \
-    -width 4.00 \
-    -offset 46.48 \
-    -spacing 0.28 \
-    -pitch 48.48 \
-    -starts_with GROUND \
-    -number_of_straps 9

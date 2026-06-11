@@ -11,8 +11,12 @@
 // Do NOT hardcode MESH_R / MESH_C here — they are driven from mesh_nxn.v
 // which reads them from mesh_config.vh.
 // ============================================================================
+// TILE_ID was previously a parameter, but parameters get baked into the GDS
+// when this module is hardened as a macro — that would force every hardened
+// instance to share the same MY_ID at chip level and break NoC routing.
+// Now TILE_ID is a true input port driven from outside; MESH_R/MESH_C stay
+// as parameters because they only affect $display diagnostics (mesh_router.v).
 module mesh_tile #(
-    parameter [5:0]   TILE_ID = 6'b000000,
     parameter integer MESH_R  = 5,
     parameter integer MESH_C  = 5
 )(
@@ -20,9 +24,10 @@ module mesh_tile #(
     inout wire VDD,
     inout wire VSS,
 `endif
-    input wire clk,
-    input wire rst,
-    input wire boot_mode,
+    input wire [5:0]  TILE_ID,
+    input wire        clk,
+    input wire        rst,
+    input wire        boot_mode,
     input wire [10:0] boot_addr,
     input wire [7:0]  boot_data,
     input wire        boot_wen,
@@ -232,10 +237,11 @@ module mesh_tile #(
     // Mesh router
     // -------------------------------------------------------------------------
     mesh_router #(
-        .MY_ID (TILE_ID),
+        // MY_ID was here as a parameter; now it's a port (TILE_ID forwarded below).
         .MESH_R(MESH_R),
         .MESH_C(MESH_C)
     ) router_inst (
+        .MY_ID          (TILE_ID),
         .clk            (clk),
         .rst            (rst),
         .local_wb_adr   (wb_adr),

@@ -27,6 +27,11 @@ module mesh_rxc #(
     output wire        flash_mosi,
 
     input  wire        dft_mode,
+    // TODO(team): dft_tile_id is 4-bit ({2'(row), 2'(col)}). For 5×4 mesh,
+    // row 4 aliases to row 0 in DFT mode (rows 0–3 work normally). Chip operates
+    // fine in normal mode; only DFT debug of row 4 is affected. Fixing requires
+    // widening to 5-bit AND updating the SPI debug frame in spi_debug.v, which
+    // means coordinating with the host-side firmware. Defer until ready.
     input  wire [3:0]  dft_tile_id,
     input  wire        dft_we,
     input  wire [10:0] dft_addr,
@@ -133,11 +138,14 @@ module mesh_rxc #(
                                  : (r > 0  && c > 0 ) ? grid_se[r-1][c-1]
                                  :                       36'b0;
 
-                mesh_tile #(
-                    .TILE_ID(THIS_TILE_ID),
-                    .MESH_R (MESH_R),
-                    .MESH_C (MESH_C)
-                ) tile_inst (
+                // mesh_tile in this build is the HARDENED macro — its blackbox
+                // .vh has no parameters at all (they were baked in at harden time).
+                // So we cannot pass MESH_R / MESH_C here; they live as defaults
+                // inside the hardened tile and only affect $display anyway.
+                // TILE_ID is driven through the port list (was a parameter
+                // before the hierarchical conversion).
+                mesh_tile tile_inst (
+                    .TILE_ID  (THIS_TILE_ID),
                     .clk      (clk),
                     .rst      (!cpu_rst_n),
                     .boot_mode(boot_mode),
@@ -174,6 +182,16 @@ module mesh_rxc #(
     // =========================================================================
     // INTER-TILE WIRE MONITOR (compile-time guarded — only when MESH_COLS >= 2)
     // =========================================================================
+    // These $display statements reach into each tile's internal router_inst.
+    // They work only when mesh_tile is included as flat RTL in the same compile
+    // unit. In the hierarchical flow (chip_top) the tile is a hardened blackbox
+    // macro, so router_inst is invisible and these refs become lint errors.
+    //
+    // Guarded behind ENABLE_TILE_WIRE_MONITOR — undefined by default. To turn
+    // these traces back on during a flat-RTL simulation, add
+    //     +define+ENABLE_TILE_WIRE_MONITOR
+    // to the simulator command line.
+`ifdef ENABLE_TILE_WIRE_MONITOR
     generate
         if (MESH_C >= 2) begin : wire_monitor
             always @(posedge clk) begin
@@ -222,5 +240,6 @@ module mesh_rxc #(
             end
         end
     endgenerate
+`endif
 
 endmodule

@@ -19,11 +19,16 @@
 // diagnostics; routing logic is purely based on comparing dest vs MY_ID
 // and is naturally correct for any rectangular mesh.
 // ============================================================================
+// MY_ID is now an input port (was a parameter). Reason: when mesh_tile is
+// hardened as a macro, its TILE_ID input port is forwarded here, and Verilog
+// parameters must be compile-time constants — a port value can't be passed
+// to a parameter. The router only uses MY_ID for comparisons / bit-slicing,
+// both of which work the same on a port.
 module mesh_router #(
-    parameter [5:0]   MY_ID  = 6'b000000,
     parameter integer MESH_R = 5,   // mesh rows    — for display / diagnostics
     parameter integer MESH_C = 5    // mesh columns — for display / diagnostics
 )(
+    input  wire [5:0]  MY_ID,
     input  wire        clk,
     input  wire        rst,
 
